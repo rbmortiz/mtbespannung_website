@@ -1,0 +1,36 @@
+.nav-link {
+    border-style: dotted;
+}
+
+.navbar-brand {
+    margin-right: 0;
+    margin-left: 0;
+    padding: 12px 20px 12px 20px;
+}
+
+.navbar-nav {
+    padding: 8px;
+    width: 100%;
+    text-align: center;
+    justify-content: center;
+}
+
+.navbar-toggler {
+    margin-right: 10px;
+}
+
+.nav-item {
+    margin-left: 10px;
+    margin-right: 10px;
+}
+
+#nb {
+    padding: 0;
+    margin: 0;
+}
+
+@media (max-width: 230px){
+    .navbar-toggler {
+        display: none;
+    }
+}
