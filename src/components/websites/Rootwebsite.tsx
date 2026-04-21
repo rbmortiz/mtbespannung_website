@@ -1,7 +1,13 @@
-import './css/rootwebsite.css'
-
 function Rootwebsite(){
-    return <h1>Rootwebsite</h1>;
+    return (
+        <>
+            <div className="boundary-element">
+                <div className="main-element">
+
+                </div>
+            </div>
+        </>
+    );
 }
 
 export default Rootwebsite;

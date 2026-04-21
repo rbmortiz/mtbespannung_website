@@ -1,7 +1,13 @@
-import './css/bespannungen.css'
-
 function Bespannungen(){
-    return <h1>Bespannungen</h1>
+    return (
+        <>
+            <div className="boundary-element">
+                <div className="main-element">
+
+                </div>
+            </div>
+        </>
+    );
 }
 
 export default Bespannungen;

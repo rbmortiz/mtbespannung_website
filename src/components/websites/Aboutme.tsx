@@ -1,7 +1,13 @@
-import './css/aboutme.css'
-
 function Aboutme(){
-    return <h1>Über-mich</h1>
+    return(
+        <>
+            <div className="boundary-element">
+                <div className="main-element">
+
+                </div>
+            </div>
+        </>
+    );
 }
 
 export default Aboutme;

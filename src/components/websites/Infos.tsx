@@ -1,7 +1,13 @@
-import './css/infos.css'
-
 function Infos(){
-    return <h1>Bespannungsinfos</h1>;
+    return (
+        <>
+            <div className="boundary-element">
+                <div className="main-element">
+
+                </div>
+            </div>
+        </>
+    );
 }
 
 export default Infos;

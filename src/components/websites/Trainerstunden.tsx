@@ -1,7 +1,13 @@
-import './css/trainerstunden.css'
-
 function Trainerstunden(){
-    return <h1>Trainerstunden</h1>;
+    return (
+        <>
+            <div className="boundary-element">
+                <div className="main-element">
+
+                </div>
+            </div>
+        </>
+    );
 }
 
 export default Trainerstunden;
