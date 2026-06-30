@@ -1,7 +1,38 @@
+/* HTML Elements */
+
+@font-face {
+    font-family: Spacemono;
+    src: url(../fonts/SpaceMono-Regular.woff2);
+}
+
+body {
+    font-family: Spacemono;
+}
+
+/* Conditional Elements */
+
+@media (max-width: 948px) {
+
+    .navbar-link {
+        display: none;
+    }
+
+    .rightbox {
+        max-width: 70px;
+    }
+
+    .leftbox {
+        flex: 1;
+    }
+
+}
+
 /* NavBar Elements */
 
 .allbox{
     display: flex;
+    justify-content: flex-end;
+    flex-wrap: wrap;
 }
 
 .leftbox {
@@ -10,6 +41,11 @@
     margin: 10px 10px 0 10px;
     background-color: grey;
     border-radius: 25px;
+    color: white;
+}
+
+.navbar-name {
+    color: white;
 }
 
 .rightbox {
@@ -45,7 +81,13 @@
 
 .navbar-link {
     text-decoration: none;
+    color: white;
     padding: 10px 20px;
+}
+
+.active {
+    color: grey;
+    text-decoration: none;
 }
 
 
