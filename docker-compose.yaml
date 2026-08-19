@@ -21,4 +21,4 @@ services:
       DB_PORT: 5432
       DB_NAME: postgres
       DB_USER: postgres
-      DB_PASSWORD: nqszdfyMJ6XcjXToyM4sy6o1VrMvm1TLToLiMkUkqWpPfsiLQ1A0ZVsw8sIAnleU
+      DB_PASSWORD: ${DB_PASSWORD}
