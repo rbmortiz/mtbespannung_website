@@ -17,8 +17,8 @@ services:
     expose:
       - "8080"
     environment:
-      DB_HOST: postgres
+      DB_HOST: wkgcga9iwohbo6g20erdtiym
       DB_PORT: 5432
-      DB_NAME: ${POSTGRES_DB}
-      DB_USER: ${POSTGRES_USER}
-      DB_PASSWORD: ${POSTGRES_PASSWORD}
+      DB_NAME: postgres
+      DB_USER: postgres
+      DB_PASSWORD: nqszdfyMJ6XcjXToyM4sy6o1VrMvm1TLToLiMkUkqWpPfsiLQ1A0ZVsw8sIAnleU
