@@ -82,7 +82,7 @@ public class MainVerticle extends VerticleBase {
       ctx.response() 
         .setStatusCode(200)
         .putHeader("Content-Type", "application/json")
-        .end(new JsonObject().put("status", "ok").encode());
+        .end(new JsonObject().put("status", "ok").put("host", System.getenv("DB_HOST")).encode());
     });
 
     // Create Server
