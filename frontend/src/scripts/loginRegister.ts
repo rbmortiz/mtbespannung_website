@@ -109,7 +109,7 @@ async function sendRegister(): Promise<void> {
             console.log("Register successful!");
 
             // Send user to login page
-            window.location.replace("/");
+            window.location.replace("/src/pages/loginRegister.html");
         } else {
             const error = await response.text();
 

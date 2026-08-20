@@ -53,3 +53,34 @@ export function redirectIfNoToken(): void {
     let token = localStorage.getItem("token");
     if(!token) window.location.replace("/src/pages/main.html");
 }
+
+export async function getFirstName(): Promise<void> {
+    const userText = getEl<HTMLAnchorElement>("userText");
+    let token = localStorage.getItem("token");
+
+    if(!token)return;
+
+    try {
+        const response = await fetch(
+            "https://api.mtbespannung.de/getUser",
+            {
+                method: "GET",
+
+                headers: {
+                    "Authorization": `Bearer ${token}`
+                }
+            }
+        );
+
+        if (response.ok) {
+            const data = await response.json();
+            userText.innerHTML = `/${data.firstName}`;
+            console.log("username updated");
+        } else {
+            console.log("Not Valid First Name found");
+        }
+
+    } catch (error) {
+        console.error("Backend could not be reached:", error);
+    }
+}

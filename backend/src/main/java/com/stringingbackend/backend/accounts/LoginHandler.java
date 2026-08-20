@@ -3,6 +3,7 @@ package com.stringingbackend.backend.accounts;
 import io.vertx.core.Future;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.auth.jwt.JWTAuth;
+import io.vertx.ext.web.handler.JWTAuthHandler;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.RoutingContext;
 
@@ -19,6 +20,9 @@ public class LoginHandler {
     public void registerRoutes(Router router) {
         router.post("/loginUser")
             .handler(ctx -> loginUser(ctx));
+        router.get("/getUser")
+            .handler(JWTAuthHandler.create(jwtAuth))
+            .handler(ctx -> getFirstName(ctx));
     }
 
     private Future<Void> loginUser(RoutingContext ctx) {
@@ -68,5 +72,24 @@ public class LoginHandler {
 
                 return Future.<Void>succeededFuture();
             });
+    }
+
+    private void getFirstName(RoutingContext ctx){
+        JsonObject obj = ctx.user().principal();
+
+        String firstName = obj.getString("firstName");
+
+        if(firstName == null || firstName.isBlank()){
+            ctx.response() 
+                .setStatusCode(304)
+                .end("First Name could not be decoded");
+            return;
+        }
+
+        JsonObject ans = new JsonObject().put("firstName", firstName);
+
+        ctx.response()
+            .setStatusCode(200)
+            .end(ans.encode());
     }
 }
