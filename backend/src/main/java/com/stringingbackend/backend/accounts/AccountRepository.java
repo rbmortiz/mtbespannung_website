@@ -34,7 +34,7 @@ public class AccountRepository {
                 firstname,
                 lastname,
                 email,
-                hashed_password
+                hashed_password,
             )
             VALUES ($1, $2, $3, $4)
             """;
@@ -49,7 +49,10 @@ public class AccountRepository {
                 )
             )
             .map(result -> 200)
-            .recover(err -> Future.succeededFuture(500));
+            .recover(err -> {
+                err.printStackTrace();
+                return Future.succeededFuture(500);
+            });
     }
 
     public Future<JsonObject> getUserByEmail(String email) {
