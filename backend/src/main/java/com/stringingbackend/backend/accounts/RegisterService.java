@@ -53,7 +53,11 @@ public class RegisterService {
                     return Future.succeededFuture(403);
                 }
 
+                System.out.println("Before hashing");
+
                 String hashedPassword = Hashing.hashPassword(password);
+
+                System.out.println("After hashing");
 
                 System.out.println("calling register");
 
