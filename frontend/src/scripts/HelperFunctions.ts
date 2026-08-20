@@ -54,7 +54,7 @@ export function redirectIfNoToken(): void {
     if(!token) window.location.replace("/src/pages/main.html");
 }
 
-export async function getFirstName(): Promise<void> {
+export async function setFirstName(): Promise<void> {
     const userText = getEl<HTMLAnchorElement>("userText");
     let token = localStorage.getItem("token");
 
