@@ -38,7 +38,7 @@ public class AccountRepository {
                 firstname,
                 lastname,
                 email,
-                hashed_password,
+                hashed_password
             )
             VALUES ($1, $2, $3, $4)
             """;
