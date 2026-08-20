@@ -1,4 +1,4 @@
-import { getEl, manageNavBarLinks } from "./HelperFunctions";
+import { manageNavBarLinks } from "./HelperFunctions";
 
 if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", init);

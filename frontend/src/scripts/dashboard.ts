@@ -1,4 +1,4 @@
-import { getEl, manageNavBarLinks, redirectIfNoToken } from "./HelperFunctions";
+import { manageNavBarLinks, redirectIfNoToken } from "./HelperFunctions";
 
 if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", init);
