@@ -29,6 +29,9 @@ public class RegisterHandler {
                     );
             })
             .onFailure(err -> {
+                System.err.println("RegisterHandler failed:");
+                err.printStackTrace();
+
                 ctx.response()
                     .setStatusCode(500)
                     .end("Interner Server Fehler");

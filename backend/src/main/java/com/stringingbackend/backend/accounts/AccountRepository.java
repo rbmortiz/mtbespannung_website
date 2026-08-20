@@ -16,6 +16,8 @@ public class AccountRepository {
 
     public Future<Boolean> isAccountFree(String email) {
 
+        System.out.println("Checking if isAccountFree" + email);
+
         String query = """
             SELECT user_id
             FROM users
@@ -28,6 +30,8 @@ public class AccountRepository {
     }
 
     public Future<Integer> register(String email, String firstName, String lastName, String password) {
+
+        System.out.println("AccountRepository.register called");
 
         String query = """
             INSERT INTO users(
@@ -48,8 +52,12 @@ public class AccountRepository {
                     password
                 )
             )
-            .map(result -> 200)
+            .map(result -> {
+                System.out.println("INSERT successful");
+                return 200;
+            })
             .recover(err -> {
+                System.out.println("INSERT failed");
                 err.printStackTrace();
                 return Future.succeededFuture(500);
             });
