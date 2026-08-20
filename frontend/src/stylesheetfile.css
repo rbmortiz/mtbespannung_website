@@ -1,0 +1,69 @@
+@font-face {
+    font-family: "JetBrainsMono";
+    src: url("/font/JetBrainsMono-Regular.woff2") format("woff2");
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
+:root {
+  --bs-body-font-family: "JetBrainsMono", sans-serif;
+  --bs-font-sans-serif: "JetBrainsMono", sans-serif;
+}
+
+body {
+    font-family: "JetBrainsMono", monospace !important;
+}
+
+.custom-navbar {
+  margin: 15px;
+  padding: 10px 15px;
+
+  background: rgba(45, 147, 206, 0.6);
+
+  border-radius: 16px;
+
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+
+  border: 1px solid rgba(255, 255, 255, 0.1);
+
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+}
+
+.custom-footer {
+  position: fixed;
+
+  left: 20px;
+  right: 20px;
+  bottom: 20px;
+
+  margin: 0 auto;
+
+  padding: 15px 20px;
+
+  background: rgba(45, 147, 206, 0.6);
+
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 18px;
+
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+
+  z-index: 1000;
+}
+
+.custom-footer a {
+  opacity: 0.8;
+  transition: opacity 0.2s ease;
+}
+
+.custom-footer a:hover {
+  opacity: 1;
+}
+
+.custom-brand {
+    margin-left: 20px;
+}

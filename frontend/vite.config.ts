@@ -6,7 +6,7 @@ export default defineConfig({
   appType: "mpa",
 
   server: {
-    port: 80,
+    port: 8080,
     strictPort: true,
   },
 
