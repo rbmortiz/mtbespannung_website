@@ -7,38 +7,55 @@ import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.RoutingContext;
 
 public class LoginService {
-    
+
     private final AccountRepository accountRepository;
 
-    public LoginService(AccountRepository accountRepository){
+    public LoginService(AccountRepository accountRepository) {
         this.accountRepository = accountRepository;
     }
 
-    public Future<Integer> loginUser(RoutingContext ctx){
+    public Future<JsonObject> loginUser(RoutingContext ctx) {
+
         JsonObject body = ctx.body().asJsonObject();
 
+        if (body == null) {
+            return Future.failedFuture("Missing body");
+        }
+
         String email = body.getString("email");
-
-        String firstName = body.getString("firstname");
-        String lastName = body.getString("lastname");
-
         String password = body.getString("password");
 
-        if(
-            email.isBlank() || email == null ||
-            firstName.isBlank() || firstName == null ||
-            lastName.isBlank() || lastName == null ||
-            password.isBlank() || password == null) return Future.succeededFuture(401);
-
-        String dbPassword = accountRepository.getPassword(email, firstName, lastName).await();
-
-        if(dbPassword.isBlank() || dbPassword == null) return Future.succeededFuture(500);
-
-        if(Hashing.verifyPassword(password, dbPassword)){
-            return Future.succeededFuture(200);
+        if (
+            email == null ||
+            email.isBlank() ||
+            password == null ||
+            password.isBlank()
+        ) {
+            return Future.failedFuture("Missing credentials");
         }
-        else if(!Hashing.verifyPassword(password, dbPassword)) return Future.succeededFuture(403);
 
-        return Future.succeededFuture(500);
+        return accountRepository.getUserByEmail(email)
+            .compose(user -> {
+
+                if (user == null) {
+                    return Future.failedFuture("Invalid credentials");
+                }
+
+                String hashedPassword =
+                    user.getString("hashedPassword");
+
+                boolean valid = Hashing.verifyPassword(
+                    password,
+                    hashedPassword
+                );
+
+                if (!valid) {
+                    return Future.failedFuture("Invalid credentials");
+                }
+
+                user.remove("hashedPassword");
+
+                return Future.succeededFuture(user);
+            });
     }
 }

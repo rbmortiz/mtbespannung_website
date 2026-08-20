@@ -1,6 +1,6 @@
 <nav class="navbar navbar-expand-md navbar-dark custom-navbar">
   <div class="container-fluid">
-    <a class="navbar-brand custom-brand" href="#">mtBespannung</a>
+    <a class="navbar-brand custom-brand" id="titleLink">{{title}}</a>
 
     <button
       class="navbar-toggler"
@@ -16,14 +16,20 @@
 
     <div class="collapse navbar-collapse" id="navbarNav">
       <ul class="navbar-nav ms-auto">
-        <li class="nav-item">
-          <a class="nav-link" href="#">Dashboard</a>
+        <li class="nav-item" id="mainLink">
+          <a class="nav-link" href="/src/pages/main.html">Hauptseite</a>
         </li>
-        <li class="nav-item">
-          <a class="nav-link" href="#">Bespannungen</a>
+        <li class="nav-item" id="dashboardLink">
+          <a class="nav-link" href="/src/pages/dashboard.html">Dashboard</a>
         </li>
-        <li class="nav-item">
-          <a class="nav-link" href="#">Trainerstunden</a>
+        <li class="nav-item" id="loginLink">
+          <a class="nav-link" href="/src/pages/loginRegister.html">Login/Register</a>
+        </li>
+        <li class="nav-item" id="bespannungenLink">
+          <a class="nav-link" href="/src/pages/bespannungen.html">Bespannungen</a>
+        </li>
+        <li class="nav-item"  id="trainerstundenLink">
+          <a class="nav-link" href="/src/pages/trainerstunden.html">Trainerstunden</a>
         </li>
       </ul>
     </div>

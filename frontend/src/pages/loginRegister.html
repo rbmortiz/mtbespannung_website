@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+
+{{> head title="mtBespannung"}}
+
+{{> navbar title="Login/Register"}}
+
+<main>
+
+    <div class="d-flex card custom-card mx-auto my-5 text-white">
+        <div class="d-flex card-body flex-column align-items-center">
+            <div id="loginError" class="alert alert-danger d-none" role="alert"></div>
+            <input id="emailInput" type="email" class="form-control mb-3" placeholder="E-Mail" required>
+            <input id="passwordInput" type="password" class="form-control mb-3" placeholder="Passwort" required>
+            <input id="firstNameInput" type="text" class="form-control mb-3 d-none" placeholder="Vorname">
+            <input id="lastNameInput" type="text" class="form-control mb-3 d-none" placeholder="Nachname">
+            <button id="loginButton" type="button" class="btn btn-primary mb-3">Login</button>
+            <p id="accountText" class="text-secondary">Haben sie noch kein Konto?</p>
+            <button type="button" id="registerPullupButton" class="btn btn-success">Register</button>
+            <button type="button" id="registerSendButton" class="btn btn-primary d-none">Register</button>
+        </div>
+    </div>
+    
+</main>
+
+<script type="module" src="../scripts/loginRegister.ts"></script>
+
+{{> footer}}

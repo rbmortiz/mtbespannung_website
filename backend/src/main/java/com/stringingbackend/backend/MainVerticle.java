@@ -3,7 +3,7 @@ package com.stringingbackend.backend;
 import io.vertx.core.VerticleBase;
 import io.vertx.core.Vertx;
 import io.vertx.ext.web.Router;
-
+import io.vertx.pgclient.PgBuilder;
 // Database imports
 import io.vertx.pgclient.PgConnectOptions;
 import io.vertx.sqlclient.Pool;
@@ -19,6 +19,10 @@ import com.stringingbackend.backend.accounts.LoginHandler;
 import com.stringingbackend.backend.accounts.LoginService;
 import com.stringingbackend.backend.accounts.RegisterHandler;
 import com.stringingbackend.backend.accounts.RegisterService;
+
+// CORS Handler
+import io.vertx.core.http.HttpMethod;
+import io.vertx.ext.web.handler.CorsHandler;
 
 // Misc imports
 import io.vertx.core.Future;
@@ -40,18 +44,35 @@ public class MainVerticle extends VerticleBase {
     // Router init
     Router router = Router.router(vertx);
 
+    router.route().handler(
+        CorsHandler.create()
+            .addOrigin("https://mtbespannung.de")
+            .allowedMethod(HttpMethod.GET)
+            .allowedMethod(HttpMethod.POST)
+            .allowedMethod(HttpMethod.PUT)
+            .allowedMethod(HttpMethod.DELETE)
+            .allowedMethod(HttpMethod.OPTIONS)
+            .allowedHeader("Content-Type")
+            .allowedHeader("Authorization")
+    );
+
     // Database
     PgConnectOptions connectOptions = new PgConnectOptions()
-      .setHost("localhost")
-      .setPort(5432)
-      .setDatabase("mtbespannung")
-      .setUser("postgres")
-      .setPassword("samplePassword");
+      .setHost(System.getenv("DB_HOST"))
+      .setPort(Integer.parseInt(System.getenv("DB_PORT")))
+      .setDatabase(System.getenv("DB_NAME"))
+      .setUser(System.getenv("DB_USER"))
+      .setPassword(System.getenv("DB_PASSWORD"));
 
     PoolOptions poolOptions = new PoolOptions()
       .setMaxSize(5);
 
-    pool = Pool.pool(vertx, connectOptions, poolOptions);
+    pool = PgBuilder
+      .pool()
+      .with(poolOptions)
+      .connectingTo(connectOptions)
+      .using(vertx)
+      .build();
 
     // JWT
     jwtAuth = JWTAuth.create(

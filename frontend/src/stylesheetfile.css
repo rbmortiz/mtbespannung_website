@@ -9,6 +9,8 @@
 :root {
   --bs-body-font-family: "JetBrainsMono", sans-serif;
   --bs-font-sans-serif: "JetBrainsMono", sans-serif;
+  --glass-background: rgba(45, 147, 206, 0.6);
+  --glass-border: rgba(255, 255, 255, 0.1);
 }
 
 body {
@@ -19,8 +21,8 @@ body {
   margin: 15px;
   padding: 10px 15px;
 
-  background: rgba(45, 147, 206, 0.6);
-
+  background: var(--glass-background);
+  border: 1px solid var(--glass-border);
   border-radius: 16px;
 
   backdrop-filter: blur(12px);
@@ -42,28 +44,28 @@ body {
 
   padding: 15px 20px;
 
-  background: rgba(45, 147, 206, 0.6);
+  background: var(--glass-background);
+  border: 1px solid var(--glass-border);
+  border-radius: 18px;
 
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 18px;
 
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
 
   z-index: 1000;
 }
 
-.custom-footer a {
-  opacity: 0.8;
-  transition: opacity 0.2s ease;
-}
+.custom-card {
+  max-width: 90%;
+  background: rgba(45, 147, 206, 0.6) !important;
 
-.custom-footer a:hover {
-  opacity: 1;
-}
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
 
-.custom-brand {
-    margin-left: 20px;
+  background: var(--glass-background) !important;
+  border: 1px solid var(--glass-border) !important;
+  border-radius: 18px;
+
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
 }

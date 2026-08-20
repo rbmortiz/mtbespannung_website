@@ -1,5 +1,6 @@
 package com.stringingbackend.backend.accounts;
 
+import io.vertx.core.Future;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.auth.jwt.JWTAuth;
 import io.vertx.ext.web.Router;
@@ -10,59 +11,62 @@ public class LoginHandler {
     private final LoginService loginService;
     private final JWTAuth jwtAuth;
 
-    public LoginHandler(LoginService loginService, JWTAuth jwtAuth){
+    public LoginHandler(LoginService loginService, JWTAuth jwtAuth) {
         this.loginService = loginService;
         this.jwtAuth = jwtAuth;
     }
 
-    public void registerRoutes(Router router){
+    public void registerRoutes(Router router) {
         router.post("/loginUser")
-            .handler(this::loginUser);
+            .handler(ctx -> loginUser(ctx));
     }
 
-    private void loginUser(RoutingContext ctx) {
+    private Future<Void> loginUser(RoutingContext ctx) {
 
-        loginService.loginUser(ctx)
-            .onSuccess(answer -> {
+        return loginService.loginUser(ctx)
+            .compose(user -> {
 
-                if(answer==200){
+                String token = jwtAuth.generateToken(
+                    new JsonObject()
+                        .put("email", user.getString("email"))
+                        .put("firstName", user.getString("firstName"))
+                        .put("lastName", user.getString("lastName"))
+                        .put("isAdmin", user.getBoolean("isAdmin"))
+                );
 
-                    JsonObject obj = ctx.body().asJsonObject();
+                JsonObject response = new JsonObject()
+                    .put("token", token);
 
-                    String email = obj.getString("email");
-                    String firstName = obj.getString("firstName");
-                    String lastName = obj.getString("lastName");
+                ctx.response()
+                    .setStatusCode(200)
+                    .putHeader("Content-Type", "application/json")
+                    .end(response.encode());
 
-                    String token = jwtAuth.generateToken(
-                        new JsonObject()
-                            .put("email", email)
-                            .put("firstName", firstName)
-                            .put("lastName", lastName)
-                    );
+                return Future.<Void>succeededFuture();
+            })
+            .recover(err -> {
 
-                    JsonObject response = new JsonObject()
-                        .put("token", token);
+                if (!ctx.response().ended()) {
+
+                    int statusCode =
+                        "Invalid credentials".equals(err.getMessage())
+                            ? 403
+                            : "Missing credentials".equals(err.getMessage())
+                                ? 400
+                                : 500;
 
                     ctx.response()
-                        .setStatusCode(200)
-                        .putHeader("Content-Type", "application/json")
-                        .end(response.encode());
-
-                    return;
+                        .setStatusCode(statusCode)
+                        .end(
+                            statusCode == 403
+                                ? "Login fehlgeschlagen"
+                                : statusCode == 400
+                                    ? "Fehlende Daten"
+                                    : "Interner Server Fehler"
+                        );
                 }
 
-                ctx.response()
-                    .setStatusCode(answer)
-                    .end(
-                        answer == 403 ? "Login fehlgeschlagen" :
-                        answer == 400 ? "Fehlende Daten" :
-                        "Interner Server Fehler"
-                    );
-            })
-            .onFailure(err -> {
-                ctx.response()
-                    .setStatusCode(500)
-                    .end("Interner Server Fehler");
+                return Future.<Void>succeededFuture();
             });
     }
 }

@@ -7,35 +7,52 @@ import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.RoutingContext;
 
 public class RegisterService {
-    
+
     private final AccountRepository accountRepository;
 
-    public RegisterService(AccountRepository accountRepository){
+    public RegisterService(AccountRepository accountRepository) {
         this.accountRepository = accountRepository;
     }
 
-    public Future<Integer> registerUser(RoutingContext ctx){
+    public Future<Integer> registerUser(RoutingContext ctx) {
+
         JsonObject body = ctx.body().asJsonObject();
 
-        String email = body.getString("email");
+        if (body == null) {
+            return Future.succeededFuture(400);
+        }
 
+        String email = body.getString("email");
         String firstName = body.getString("firstname");
         String lastName = body.getString("lastname");
-
         String password = body.getString("password");
 
-        if(
-            email.isBlank() || email == null ||
-            firstName.isBlank() || firstName == null ||
-            lastName.isBlank() || lastName == null ||
-            password.isBlank() || password == null) return Future.succeededFuture(401);
+        if (
+            email == null || email.isBlank() ||
+            firstName == null || firstName.isBlank() ||
+            lastName == null || lastName.isBlank() ||
+            password == null || password.isBlank()
+        ) {
+            return Future.succeededFuture(400);
+        }
 
-        if(!accountRepository.isAccountFree(email, firstName, lastName).await()) return Future.succeededFuture(403);
+        return accountRepository
+            .isAccountFree(email)
+            .compose(isFree -> {
 
-        String hashedPassword = Hashing.hashPassword(password);
+                if (!isFree) {
+                    return Future.succeededFuture(403);
+                }
 
-        Integer answer = accountRepository.register(email, firstName, lastName, hashedPassword).await();
+                String hashedPassword =
+                    Hashing.hashPassword(password);
 
-        return Future.succeededFuture(answer);
+                return accountRepository.register(
+                    email,
+                    firstName,
+                    lastName,
+                    hashedPassword
+                );
+            });
     }
 }
