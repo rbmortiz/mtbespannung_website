@@ -80,3 +80,10 @@ body {
   z-index: -1;
   pointer-events: none;
 }
+
+.go-back-button {
+  border: none;
+  background: none;
+  float: right;
+  color: grey;
+}

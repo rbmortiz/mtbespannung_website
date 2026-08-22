@@ -92,7 +92,7 @@ public class MainVerticle extends VerticleBase {
     LoginHandler loginHandler = new LoginHandler(loginService, jwtAuth);
 
     RegisterService registerService = new RegisterService(accountRepository);
-    RegisterHandler registerHandler = new RegisterHandler(registerService);
+    RegisterHandler registerHandler = new RegisterHandler(registerService, jwtAuth);
 
     // Route declaration
     router.route().handler(BodyHandler.create());

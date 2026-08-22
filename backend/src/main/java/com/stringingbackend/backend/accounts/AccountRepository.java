@@ -29,39 +29,55 @@ public class AccountRepository {
             .map(rows -> rows.size() == 0);
     }
 
-    public Future<Integer> register(String email, String firstName, String lastName, String password) {
+    public Future<JsonObject> register(String email, String firstName, String lastName, String password) {
 
-        System.out.println("AccountRepository.register called");
+    System.out.println("AccountRepository.register called");
 
-        String query = """
-            INSERT INTO users(
-                firstname,
-                lastname,
+    String query = """
+        INSERT INTO users (
+            firstname,
+            lastname,
+            email,
+            hashed_password
+        )
+        VALUES ($1, $2, $3, $4)
+        """;
+
+    return pool.preparedQuery(query)
+        .execute(
+            Tuple.of(
+                firstName,
+                lastName,
                 email,
-                hashed_password
+                password
             )
-            VALUES ($1, $2, $3, $4)
-            """;
+        )
+        .map(result -> {
 
-        return pool.preparedQuery(query)
-            .execute(
-                Tuple.of(
-                    firstName,
-                    lastName,
-                    email,
-                    password
-                )
-            )
-            .map(result -> {
-                System.out.println("INSERT successful");
-                return 200;
-            })
-            .recover(err -> {
-                System.out.println("INSERT failed");
-                err.printStackTrace();
-                return Future.succeededFuture(500);
-            });
-    }
+            System.out.println("INSERT successful");
+
+            return new JsonObject()
+                .put("statusCode", 200)
+                .put("email", email)
+                .put("firstName", firstName)
+                .put("lastName", lastName)
+                .put("isAdmin", false);
+        })
+        .recover(err -> {
+
+            System.out.println("INSERT failed");
+            err.printStackTrace();
+
+            return Future.succeededFuture(
+                new JsonObject()
+                    .put("statusCode", 500)
+                    .put("email", email)
+                    .put("firstName", firstName)
+                    .put("lastName", lastName)
+                    .put("isAdmin", false)
+            );
+        });
+}
 
     public Future<JsonObject> getUserByEmail(String email) {
 

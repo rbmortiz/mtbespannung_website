@@ -12,3 +12,11 @@ async function init(): Promise<void>{
     initRacketBackground();
     await setFirstName();
 }
+
+function displayUserContent(): void {
+
+}
+
+function displayAdminContent(): void {
+    
+}

@@ -3,20 +3,34 @@
 
 {{> head title="mtBespannung"}}
 
-{{> navbar title="Login/Register"}}
+{{> navbar title="Login/Registrieren"}}
 
 <main>
     <div class="d-flex card custom-card mx-auto my-5 text-white">
         <div class="d-flex card-body flex-column align-items-center">
+
             <div id="loginError" class="alert alert-danger d-none" role="alert"></div>
+
+            <div class="custom-button-div w-100 mb-2">
+                <button type="button" class="go-back-button d-none" id="goBackButton">&ShortLeftArrow; Zurück</button>
+            </div>
+
             <input id="emailInput" type="email" class="form-control mb-3" placeholder="E-Mail" required>
+
             <input id="passwordInput" type="password" class="form-control mb-3" placeholder="Passwort" required>
+
             <input id="firstNameInput" type="text" class="form-control mb-3 d-none" placeholder="Vorname">
+
             <input id="lastNameInput" type="text" class="form-control mb-3 d-none" placeholder="Nachname">
-            <button id="loginButton" type="button" class="btn btn-primary mb-3">Login</button>
+
+            <button id="loginButton" type="button" class="btn btn-primary mb-3">Einloggen</button>
+
             <p id="accountText" class="text-secondary">Haben sie noch kein Konto?</p>
-            <button type="button" id="registerPullupButton" class="btn btn-success">Register</button>
-            <button type="button" id="registerSendButton" class="btn btn-primary d-none">Register</button>
+
+            <button type="button" id="registerPullupButton" class="btn btn-success">Registrieren</button>
+
+            <button type="button" id="registerSendButton" class="btn btn-primary d-none">Registrieren</button>
+
         </div>
     </div>
     

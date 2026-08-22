@@ -8,6 +8,7 @@ const lastNameInput = getEl<HTMLInputElement>("lastNameInput");
 const loginButton = getEl<HTMLButtonElement>("loginButton");
 const registerPullupButton = getEl<HTMLButtonElement>("registerPullupButton");
 const registerSendButton = getEl<HTMLButtonElement>("registerSendButton");
+const goBackButton = getEl<HTMLButtonElement>("goBackButton");
 
 const accountText = getEl<HTMLParagraphElement>("accountText");
 
@@ -39,6 +40,10 @@ function init(){
     registerSendButton.addEventListener("click", () => {
         void sendRegister();
     });
+
+    goBackButton.addEventListener("click", () => {
+        void showRegisterFields(false);
+    });
 }
 
 function redirectIfLoggedIn(): void {
@@ -64,15 +69,20 @@ function showError(message: string): void {
   errorBox.classList.remove("d-none");
 }
 
+function showRegisterFields(showRegister: boolean): void{
+    displayElement(goBackButton, showRegister);
+    displayElement(registerPullupButton, !showRegister);
+    displayElement(accountText, !showRegister);
+    displayElement(loginButton, !showRegister);
+    displayElement(firstNameInput, showRegister);
+    displayElement(lastNameInput, showRegister);
+    displayElement(registerSendButton, showRegister);
+}
+
 // Button presses
 
 function registerPullupPress(): void {
-    displayElement(registerPullupButton, false);
-    displayElement(accountText, false);
-    displayElement(loginButton, false);
-    displayElement(firstNameInput, true);
-    displayElement(lastNameInput, true);
-    displayElement(registerSendButton, true);
+    showRegisterFields(true);
 
     firstNameInput.value = "";
     lastNameInput.value = "";
@@ -108,17 +118,33 @@ async function sendRegister(): Promise<void> {
             }
         );
 
-        if (response.ok) {
-            console.log("Register successful!");
+        // Successful registration
+        if (response.status === 200) {
+            const data = await response.json();
 
-            // Send user to login page
+            localStorage.setItem("token", data.token);
+
             window.location.replace("/src/pages/loginRegister.html");
-        } else {
-            const error = await response.text();
-
-            console.log("Register failed:", error);
-            showError(error);
+            return;
         }
+
+        if (response.status === 400) {
+            showError("Bitte fülle alle Felder aus.");
+            return;
+        }
+
+        if (response.status === 403) {
+            showError("Ein Account mit dieser E-Mail existiert bereits.");
+            return;
+        }
+
+        if (response.status === 500) {
+            showError("Interner Serverfehler.");
+            return;
+        }
+
+        console.error("Unexpected status:", response.status);
+        showError("Ein unbekannter Fehler ist aufgetreten.");
 
     } catch (error) {
         console.error("Could not reach backend:", error);

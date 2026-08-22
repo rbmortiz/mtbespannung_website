@@ -1,14 +1,18 @@
 package com.stringingbackend.backend.accounts;
 
 import io.vertx.ext.web.RoutingContext;
+import io.vertx.core.json.JsonObject;
+import io.vertx.ext.auth.jwt.JWTAuth;
 import io.vertx.ext.web.Router;
 
 public class RegisterHandler {
     
     private final RegisterService registerService;
+    private final JWTAuth jwtAuth;
 
-    public RegisterHandler(RegisterService registerService){
+    public RegisterHandler(RegisterService registerService, JWTAuth jwtAuth){
         this.registerService = registerService;
+        this.jwtAuth = jwtAuth;
     }
 
     public void registerRoutes(Router router){
@@ -17,24 +21,51 @@ public class RegisterHandler {
     }
 
     private void registerUser(RoutingContext ctx) {
-        registerService.registerUser(ctx)
-            .onSuccess(answer -> {
-                ctx.response()
-                    .setStatusCode(answer)
-                    .end(
-                        answer == 200 ? "Account wurde erstellt" :
-                        answer == 403 ? "Account bereits vorhanden" :
-                        answer == 400 ? "Fehlende Daten" :
-                        "Interner Server Fehler"
-                    );
-            })
-            .onFailure(err -> {
-                System.err.println("RegisterHandler failed:");
-                err.printStackTrace();
 
+    registerService.registerUser(ctx)
+        .onSuccess(answer -> {
+
+            int statusCode = answer.getInteger("statusCode");
+
+            if (statusCode == 200) {
+
+                String token = jwtAuth.generateToken(
+                    new JsonObject()
+                        .put("email", answer.getString("email"))
+                        .put("firstName", answer.getString("firstName"))
+                        .put("lastName", answer.getString("lastName"))
+                        .put("isAdmin", answer.getBoolean("isAdmin"))
+                );
+
+                JsonObject response = new JsonObject()
+                    .put("token", token);
+
+                ctx.response()
+                    .setStatusCode(200)
+                    .putHeader("Content-Type", "application/json")
+                    .end(response.encode());
+
+                return;
+            }
+
+            ctx.response()
+                .setStatusCode(statusCode)
+                .end(
+                    statusCode == 403 ? "Account bereits vorhanden" :
+                    statusCode == 400 ? "Fehlende Daten" :
+                    "Interner Server Fehler"
+                );
+        })
+        .onFailure(err -> {
+
+            System.err.println("RegisterHandler failed:");
+            err.printStackTrace();
+
+            if (!ctx.response().ended()) {
                 ctx.response()
                     .setStatusCode(500)
                     .end("Interner Server Fehler");
-            });
-    }
+            }
+        });
+}
 }
