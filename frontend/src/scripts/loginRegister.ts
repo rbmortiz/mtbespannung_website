@@ -1,4 +1,4 @@
-import { getEl, manageNavBarLinks } from "./HelperFunctions";
+import { getEl, manageNavBarLinks, initRacketBackground } from "./HelperFunctions";
 
 const emailInput = getEl<HTMLInputElement>("emailInput");
 const passwordInput = getEl<HTMLInputElement>("passwordInput");
@@ -23,6 +23,9 @@ function init(){
     //checks
     manageNavBarLinks();
     redirectIfLoggedIn();
+
+    //background init
+    initRacketBackground();
 
     // Button Events
     registerPullupButton.addEventListener("click", () => {

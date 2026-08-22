@@ -9,12 +9,13 @@
 :root {
   --bs-body-font-family: "JetBrainsMono", sans-serif;
   --bs-font-sans-serif: "JetBrainsMono", sans-serif;
-  --glass-background: rgba(45, 147, 206, 0.6);
+  --glass-background: rgba(45, 147, 206, 0.7);
   --glass-border: rgba(255, 255, 255, 0.1);
 }
 
 body {
-    font-family: "JetBrainsMono", monospace !important;
+  font-family: "JetBrainsMono", monospace !important;
+  background: #ffffff;
 }
 
 .custom-navbar {
@@ -57,15 +58,25 @@ body {
 }
 
 .custom-card {
-  max-width: 90%;
-  background: rgba(45, 147, 206, 0.6) !important;
+  max-width: 70%;
 
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
 
-  background: var(--glass-background) !important;
+  background: rgba(45, 147, 206, 0.5) !important;
   border: 1px solid var(--glass-border) !important;
   border-radius: 18px;
 
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+}
+
+.star-background {
+  position: fixed;
+  inset: 0;
+
+  width: 100%;
+  height: 100%;
+
+  z-index: -1;
+  pointer-events: none;
 }

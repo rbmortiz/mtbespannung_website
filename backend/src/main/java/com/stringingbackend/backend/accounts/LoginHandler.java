@@ -78,6 +78,7 @@ public class LoginHandler {
         JsonObject obj = ctx.user().principal();
 
         String firstName = obj.getString("firstName");
+        String isAdmin = obj.getString("email");
 
         if(firstName == null || firstName.isBlank()){
             ctx.response() 
@@ -86,7 +87,14 @@ public class LoginHandler {
             return;
         }
 
-        JsonObject ans = new JsonObject().put("firstName", firstName);
+        if(isAdmin == null || isAdmin.isBlank()){
+            ctx.response() 
+                .setStatusCode(304)
+                .end("Admin could not be decoded");
+            return;
+        }
+
+        JsonObject ans = new JsonObject().put("firstName", firstName).put("isAdmin", isAdmin);
 
         ctx.response()
             .setStatusCode(200)

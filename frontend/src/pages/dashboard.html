@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<canvas class="star-background" id="star-background"></canvas>
 
 {{> head title="Dashboard"}}
 
@@ -6,6 +7,15 @@
 
 <main>
     
+    <div class="d-flex card custom-card mx-auto my-5 text-white">
+        <div class="d-flex card-body flex-column align-items-center">
+            <form class="d-flex w-100" role="search">
+                <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search"/>
+                <button class="btn btn-outline-success" type="submit">Suchen</button>
+            </form>
+        </div>
+    </div>
+
 </main>
 
 <script type="module" src="../scripts/dashboard.ts"></script>

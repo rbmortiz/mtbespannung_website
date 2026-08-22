@@ -25,6 +25,9 @@ export default defineConfig({
         dashboard: resolve(import.meta.dirname, "src/pages/dashboard.html"),
         loginRegister: resolve(import.meta.dirname, "src/pages/loginRegister.html"),
         trainerstunden: resolve(import.meta.dirname, "src/pages/trainerstunden.html"),
+        aboutme: resolve(import.meta.dirname, "src/pages/aboutme.html"),
+        datenschutz: resolve(import.meta.dirname, "src/pages/datenschutz.html"),
+        impressum: resolve(import.meta.dirname, "src/pages/impressum.html")
       },
     },
   },
