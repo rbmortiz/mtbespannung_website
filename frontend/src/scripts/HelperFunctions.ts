@@ -54,41 +54,47 @@ export function redirectIfNoToken(): void {
     if(!token) window.location.replace("/src/pages/main.html");
 }
 
+interface UserInformation {
+  firstName: string;
+  isAdmin: boolean;
+}
+
 export async function setFirstName(): Promise<void> {
-    const userText = getEl<HTMLAnchorElement>("userText");
-    let token = localStorage.getItem("token");
+  const userText = getEl<HTMLAnchorElement>("userText");
+  const token = localStorage.getItem("token");
 
-    if(!token)return;
+  if (!token) return;
 
-    try {
-        const response = await fetch(
-            "https://api.mtbespannung.de/getUserInformation",
-            {
-                method: "GET",
-
-                headers: {
-                    "Authorization": `Bearer ${token}`
-                }
-            }
-        );
-
-        if (response.ok) {
-            const data = await response.json();
-            if(data.isAdmin === true){
-              userText.classList.replace("text-secondary", "text-success");
-              userText.innerHTML = `/${data.firstName}`;
-              console.log("username updated as Admin");
-              return;
-            }
-            userText.innerHTML = `/${data.firstName}`;
-            console.log("username updated as User");
-        } else {
-            console.log("Not Valid First Name found");
+  try {
+    const response = await fetch(
+      "https://api.mtbespannung.de/getUserInformation",
+      {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`
         }
+      }
+    );
 
-    } catch (error) {
-        console.error("Backend could not be reached:", error);
+    if (!response.ok) {
+      console.log("No valid user information found");
+      return;
     }
+
+    const data = await response.json() as UserInformation;
+
+    userText.textContent = `/${data.firstName}`;
+
+    if (data.isAdmin) {
+      userText.classList.replace("text-secondary", "text-success");
+      console.log("username updated as Admin");
+    } else {
+      console.log("username updated as User");
+    }
+
+  } catch (error) {
+    console.error("Backend could not be reached:", error);
+  }
 }
 
 export function initRacketBackground(): void {

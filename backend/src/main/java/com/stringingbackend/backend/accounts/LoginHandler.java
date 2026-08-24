@@ -74,22 +74,23 @@ public class LoginHandler {
             });
     }
 
-    private void getUserInformation(RoutingContext ctx){
-        JsonObject obj = ctx.user().principal();
+    private void getUserInformation(RoutingContext ctx) {
+    JsonObject obj = ctx.user().principal();
 
-        String firstName = obj.getString("firstName");
-        String lastName = obj.getString("lastName");
-        String email = obj.getString("email");
-        String isAdmin = obj.getString("isAdmin");
+    String firstName = obj.getString("firstName");
+    String lastName = obj.getString("lastName");
+    String email = obj.getString("email");
+    Boolean isAdmin = obj.getBoolean("isAdmin");
 
-        JsonObject ans = new JsonObject()
-            .put("firstName", firstName)
-            .put("isAdmin", isAdmin)
-            .put("email", email)
-            .put("lastName", lastName);
+    JsonObject ans = new JsonObject()
+        .put("firstName", firstName)
+        .put("lastName", lastName)
+        .put("email", email)
+        .put("isAdmin", isAdmin);
 
-        ctx.response()
-            .setStatusCode(200)
-            .end(ans.encode());
-    }
+    ctx.response()
+        .setStatusCode(200)
+        .putHeader("Content-Type", "application/json")
+        .end(ans.encode());
+}
 }
