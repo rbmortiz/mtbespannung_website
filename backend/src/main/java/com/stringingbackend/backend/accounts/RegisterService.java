@@ -64,7 +64,7 @@ public class RegisterService {
                         .put("email", email)
                         .put("firstName", firstName)
                         .put("lastName", lastName)
-                        .put("isAdmin", false)
+                        .put("role", "user")
                 );
             }
 
@@ -94,7 +94,7 @@ public class RegisterService {
                     .put("email", email)
                     .put("firstName", firstName)
                     .put("lastName", lastName)
-                    .put("isAdmin", false)
+                    .put("role", "user")
             );
         });
 }

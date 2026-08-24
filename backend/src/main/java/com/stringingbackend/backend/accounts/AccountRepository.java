@@ -31,55 +31,55 @@ public class AccountRepository {
 
     public Future<JsonObject> register(String email, String firstName, String lastName, String password) {
 
-    System.out.println("AccountRepository.register called");
+        System.out.println("AccountRepository.register called");
 
-    String query = """
-        INSERT INTO users (
-            firstname,
-            lastname,
-            email,
-            hashed_password
-        )
-        VALUES ($1, $2, $3, $4)
-        """;
-
-    return pool.preparedQuery(query)
-        .execute(
-            Tuple.of(
-                firstName,
-                lastName,
+        String query = """
+            INSERT INTO users (
+                firstname,
+                lastname,
                 email,
-                password
+                hashed_password
             )
-        )
-        .map(result -> {
+            VALUES ($1, $2, $3, $4)
+            """;
 
-            System.out.println("INSERT successful");
+        return pool.preparedQuery(query)
+            .execute(
+                Tuple.of(
+                    firstName,
+                    lastName,
+                    email,
+                    password
+                )
+            )
+            .map(result -> {
 
-            return new JsonObject()
-                .put("statusCode", 200)
-                .put("email", email)
-                .put("firstName", firstName)
-                .put("lastName", lastName)
-                .put("isAdmin", false);
-        })
-        .recover(err -> {
+                System.out.println("INSERT successful");
 
-            System.out.println("INSERT failed");
-            err.printStackTrace();
-
-            return Future.succeededFuture(
-                new JsonObject()
-                    .put("statusCode", 500)
+                return new JsonObject()
+                    .put("statusCode", 200)
                     .put("email", email)
                     .put("firstName", firstName)
                     .put("lastName", lastName)
-                    .put("isAdmin", false)
-            );
-        });
-}
+                    .put("role", "user");
+            })
+            .recover(err -> {
 
-    public Future<JsonObject> getUserByEmail(String email) {
+                System.out.println("INSERT failed");
+                err.printStackTrace();
+
+                return Future.succeededFuture(
+                    new JsonObject()
+                        .put("statusCode", 500)
+                        .put("email", email)
+                        .put("firstName", firstName)
+                        .put("lastName", lastName)
+                        .put("role", "user")
+                );
+            });
+    }
+
+    public Future<JsonObject> getUser(String email) {
 
         String query = """
             SELECT
@@ -88,7 +88,7 @@ public class AccountRepository {
                 lastname,
                 email,
                 hashed_password,
-                is_admin
+                role
             FROM users
             WHERE email = $1
             """;
@@ -112,7 +112,7 @@ public class AccountRepository {
                         "hashedPassword",
                         row.getString("hashed_password")
                     )
-                    .put("isAdmin", row.getBoolean("is_admin"));
+                    .put("role", row.getString("role"));
 
                 return Future.succeededFuture(user);
             });

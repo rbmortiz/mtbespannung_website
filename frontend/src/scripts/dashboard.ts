@@ -1,4 +1,4 @@
-import { manageNavBarLinks, /*redirectIfNoToken,*/ setFirstName, initRacketBackground } from "./HelperFunctions";
+import { manageNavBarLinks, redirectIfNoToken, setFirstName, initRacketBackground } from "./HelperFunctions";
 
 if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", init);
@@ -8,7 +8,7 @@ if (document.readyState === "loading") {
 
 async function init(): Promise<void>{
     manageNavBarLinks();
-    // redirectIfNoToken();
+    redirectIfNoToken();
     initRacketBackground();
     await setFirstName();
 }

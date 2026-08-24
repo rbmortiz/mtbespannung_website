@@ -34,7 +34,7 @@ public class RegisterHandler {
                         .put("email", answer.getString("email"))
                         .put("firstName", answer.getString("firstName"))
                         .put("lastName", answer.getString("lastName"))
-                        .put("isAdmin", answer.getBoolean("isAdmin"))
+                        .put("role", answer.getString("role"))
                 );
 
                 JsonObject response = new JsonObject()

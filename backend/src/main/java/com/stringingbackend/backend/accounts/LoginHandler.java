@@ -35,7 +35,7 @@ public class LoginHandler {
                         .put("email", user.getString("email"))
                         .put("firstName", user.getString("firstName"))
                         .put("lastName", user.getString("lastName"))
-                        .put("isAdmin", user.getBoolean("isAdmin"))
+                        .put("role", user.getString("role"))
                 );
 
                 JsonObject response = new JsonObject()
@@ -80,13 +80,13 @@ public class LoginHandler {
     String firstName = obj.getString("firstName");
     String lastName = obj.getString("lastName");
     String email = obj.getString("email");
-    Boolean isAdmin = obj.getBoolean("isAdmin");
+    String role = obj.getString("role");
 
     JsonObject ans = new JsonObject()
         .put("firstName", firstName)
         .put("lastName", lastName)
         .put("email", email)
-        .put("isAdmin", isAdmin);
+        .put("role", role);
 
     ctx.response()
         .setStatusCode(200)

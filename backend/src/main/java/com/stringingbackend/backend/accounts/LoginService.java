@@ -34,7 +34,7 @@ public class LoginService {
             return Future.failedFuture("Missing credentials");
         }
 
-        return accountRepository.getUserByEmail(email)
+        return accountRepository.getUser(email)
             .compose(user -> {
 
                 if (user == null) {

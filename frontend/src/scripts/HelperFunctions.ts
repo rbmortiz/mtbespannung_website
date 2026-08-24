@@ -56,7 +56,7 @@ export function redirectIfNoToken(): void {
 
 interface UserInformation {
   firstName: string;
-  isAdmin: boolean;
+  role: string;
 }
 
 export async function setFirstName(): Promise<void> {
@@ -85,8 +85,8 @@ export async function setFirstName(): Promise<void> {
 
     userText.textContent = `/${data.firstName}`;
 
-    if (data.isAdmin) {
-      userText.classList.replace("text-secondary", "text-success");
+    if (data.role === "admin") {
+      userText.classList.replace("text-secondary", "text-warning");
       console.log("username updated as Admin");
     } else {
       console.log("username updated as User");
