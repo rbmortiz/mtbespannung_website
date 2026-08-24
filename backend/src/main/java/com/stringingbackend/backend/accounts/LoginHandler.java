@@ -20,9 +20,9 @@ public class LoginHandler {
     public void registerRoutes(Router router) {
         router.post("/loginUser")
             .handler(ctx -> loginUser(ctx));
-        router.get("/getUser")
+        router.get("/getUserInformation")
             .handler(JWTAuthHandler.create(jwtAuth))
-            .handler(ctx -> getFirstName(ctx));
+            .handler(ctx -> getUserInformation(ctx));
     }
 
     private Future<Void> loginUser(RoutingContext ctx) {
@@ -74,27 +74,19 @@ public class LoginHandler {
             });
     }
 
-    private void getFirstName(RoutingContext ctx){
+    private void getUserInformation(RoutingContext ctx){
         JsonObject obj = ctx.user().principal();
 
         String firstName = obj.getString("firstName");
-        String isAdmin = obj.getString("email");
+        String lastName = obj.getString("lastName");
+        String email = obj.getString("email");
+        String isAdmin = obj.getString("isAdmin");
 
-        if(firstName == null || firstName.isBlank()){
-            ctx.response() 
-                .setStatusCode(304)
-                .end("First Name could not be decoded");
-            return;
-        }
-
-        if(isAdmin == null || isAdmin.isBlank()){
-            ctx.response() 
-                .setStatusCode(304)
-                .end("Admin could not be decoded");
-            return;
-        }
-
-        JsonObject ans = new JsonObject().put("firstName", firstName).put("isAdmin", isAdmin);
+        JsonObject ans = new JsonObject()
+            .put("firstName", firstName)
+            .put("isAdmin", isAdmin)
+            .put("email", email)
+            .put("lastName", lastName);
 
         ctx.response()
             .setStatusCode(200)

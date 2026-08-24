@@ -62,7 +62,7 @@ export async function setFirstName(): Promise<void> {
 
     try {
         const response = await fetch(
-            "https://api.mtbespannung.de/getUser",
+            "https://api.mtbespannung.de/getUserInformation",
             {
                 method: "GET",
 
@@ -74,8 +74,14 @@ export async function setFirstName(): Promise<void> {
 
         if (response.ok) {
             const data = await response.json();
+            if(data.isAdmin === true){
+              userText.classList.replace("text-secondary", "text-success");
+              userText.innerHTML = `/${data.firstName}`;
+              console.log("username updated as Admin");
+              return;
+            }
             userText.innerHTML = `/${data.firstName}`;
-            console.log("username updated");
+            console.log("username updated as User");
         } else {
             console.log("Not Valid First Name found");
         }
