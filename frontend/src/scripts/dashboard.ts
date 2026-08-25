@@ -86,30 +86,41 @@ function setPlaceholderItems(): void {
 }
 
 async function deleteUserAccount(): Promise<void> {
-    const token = `Bearer ${localStorage.getItem("token")}`;
+    const token = localStorage.getItem("token");
+
+    if (!token) {
+        showError("Du bist nicht angemeldet.");
+        return;
+    }
 
     try {
         const response = await fetch(
             "https://api.mtbespannung.de/deleteUser",
             {
-                method: "GET",
-
+                method: "DELETE",
                 headers: {
-                    "Authorization": token
+                    "Authorization": `Bearer ${token}`
                 }
             }
         );
 
-        if (response.ok) {
+        if (response.status === 200) {
             localStorage.removeItem("token");
             window.location.replace("/src/pages/loginRegister.html");
             return;
         }
 
+        if (response.status === 401) {
+            showError("Account wurde nicht gefunden.");
+            return;
+        }
+
+        if (response.status === 403) {
+            showError("Ungültige Benutzerdaten.");
+            return;
+        }
+
         showError("Account konnte nicht gelöscht werden");
-        console.error("account could not be deleted");
-        return;
-        
 
     } catch (error) {
         console.error("Could not reach backend:", error);

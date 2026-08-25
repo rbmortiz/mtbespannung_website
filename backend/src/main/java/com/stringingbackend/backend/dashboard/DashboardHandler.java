@@ -19,7 +19,7 @@ public class DashboardHandler {
         router.patch("/editUser")
             .handler(JWTAuthHandler.create(jwtAuth))
             .handler(this::editUser);
-        router.get("/deleteUser")
+        router.delete("/deleteUser")
             .handler(JWTAuthHandler.create(jwtAuth))
             .handler(this::deleteUser);
     }
@@ -107,7 +107,8 @@ public class DashboardHandler {
         dashboardService.deleteUser(ctx)
             .onSuccess(ans -> {
                 ctx.response()
-                    .setStatusCode(ans);
+                    .setStatusCode(ans)
+                    .end();
             })
             .onFailure(err -> {
                 System.out.println("backend problem");

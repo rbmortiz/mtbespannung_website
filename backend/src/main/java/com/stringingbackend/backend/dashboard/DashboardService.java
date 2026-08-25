@@ -56,8 +56,6 @@ public class DashboardService {
 
         String email = body.getString("email");
 
-        Integer ans = accountRepository.deleteUser(email).await();
-
-        return Future.succeededFuture(ans);
+        return accountRepository.deleteUser(email);
     }
 }
