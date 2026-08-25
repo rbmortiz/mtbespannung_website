@@ -51,11 +51,16 @@ public class DashboardService {
         );
     }
 
-    public Future<Integer> deleteUser(RoutingContext ctx){
-        JsonObject body = ctx.user().principal();
+    public Future<Integer> deleteUser(RoutingContext ctx) {
 
-        String email = body.getString("email");
+    JsonObject user = ctx.user().principal();
 
-        return accountRepository.deleteUser(email);
+    String email = user.getString("email");
+
+    if (email == null || email.isBlank()) {
+        return Future.succeededFuture(403);
     }
+
+    return accountRepository.deleteUser(email);
+}
 }

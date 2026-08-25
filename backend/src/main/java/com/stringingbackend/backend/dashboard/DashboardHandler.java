@@ -103,20 +103,25 @@ public class DashboardHandler {
             });
     }
 
-    private void deleteUser(RoutingContext ctx){
+    private void deleteUser(RoutingContext ctx) {
+
         dashboardService.deleteUser(ctx)
-            .onSuccess(ans -> {
+            .onSuccess(statusCode -> {
+
                 ctx.response()
-                    .setStatusCode(ans)
+                    .setStatusCode(statusCode)
                     .end();
             })
             .onFailure(err -> {
-                System.out.println("backend problem");
+
+                System.err.println("Deleting account failed:");
                 err.printStackTrace();
 
-                ctx.response()
-                    .setStatusCode(500)
-                    .end("Server could not be reached");
+                if (!ctx.response().ended()) {
+                    ctx.response()
+                        .setStatusCode(500)
+                        .end("Interner Server Fehler");
+                }
             });
     }
 }

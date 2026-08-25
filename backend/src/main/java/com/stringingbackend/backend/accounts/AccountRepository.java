@@ -294,12 +294,16 @@ public class AccountRepository {
             });
     }
 
-    public Future<Integer> deleteUser(String email){
-        if(email == null || email.isBlank()) return Future.succeededFuture(403);
+    public Future<Integer> deleteUser(String email) {
+
+        if (email == null || email.isBlank()) {
+            return Future.succeededFuture(403);
+        }
 
         String query = """
-                    DELETE FROM users WHERE email = $1;
-                """;
+            DELETE FROM users
+            WHERE email = $1
+            """;
 
         return pool.preparedQuery(query)
             .execute(Tuple.of(email))
