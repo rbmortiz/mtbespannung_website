@@ -6,8 +6,92 @@
 {{> navbar title="Dashboard"}}
 
 <main>
-    <div class="main-content">
-        
+    <div class="main-content" id="main-content">
+        <div class="row g-3 px-3">
+            <!-- Modal -->
+            <div class="modal fade" id="deleteAccountModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h1 class="modal-title fs-5" id="exampleModalLabel">Account löschen</h1>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            Möchten sie wirklich ihren Account löschen?
+                        </div>
+                        <div class="modal-footer align-items-center justify-content-center">
+                            <button type="button" class="btn btn-danger w-100" id="deleteAccountButton">Löschen</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="loginError" class="alert alert-danger d-none mx-auto text-center mt-4" role="alert" style="width: 70% !important"></div>
+
+            <div class="col-12 col-md-6">
+                <div class="card custom-card-dashboard text-white h-100">
+                    <div class="card-header p-0 m-0">
+                        <h5 class="py-2 pt-2 m-0 text-center">Benutzer verwalten</h5>
+                    </div>
+                    <div class="card-body text-center">
+                        <div class="d-flex align-items-center mb-2">
+                            <label for="email" class="form-label mb-0" style="min-width:100px">E-Mail: </label>
+                            <input type="email" class="form-control" id="email" placeholder="">
+                        </div>
+                        <div class="d-flex align-items-center mb-2">
+                            <label for="text" class="form-label mb-0" style="min-width:100px">Vorname: </label>
+                            <input type="text" class="form-control" id="firstName" placeholder="">
+                        </div>
+                        <div class="d-flex align-items-center mb-2">
+                            <label for="text" class="form-label mb-0" style="min-width:100px">Nachname: </label>
+                            <input type="text" class="form-control" id="lastName" placeholder="">
+                        </div>
+                        <div class="d-flex align-items-center mb-2">
+                            <label for="text" class="form-label mb-0" style="min-width:100px">Passwort: </label>
+                            <input type="text" class="form-control" placeholder="***********">
+                        </div>
+
+                        <button type="button" class="btn btn-success mt-2 w-100">Speichern</button>
+                        <button type="button" class="btn btn-warning mt-2 w-100">Ausloggen</button>
+                        <button type="button" class="btn btn-danger mt-2 w-100" data-bs-toggle="modal" data-bs-target="#deleteAccountModal">Account löschen</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-12 col-md-6">
+                <div class="card custom-card-dashboard text-white h-100">
+                    <div class="card-header p-0 m-0">
+                        <h5 class="py-2 pt-2 m-0 text-center">Bespannungen verwalten</h5>
+                    </div>
+                    <div class="card-body m-0 p-0">
+                        <div class="table-responsive table-scroll">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">Erstellt</th>
+                                        <th scope="col">Schlägername</th>
+                                        <th scope="col">Härte</th>
+                                        <th scope="col">Saite</th>
+                                        <th scope="col">Status</th>
+                                        <th scope="col">Infos</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>test</td>
+                                        <td>test</td>
+                                        <td>test</td>
+                                        <td>test</td>
+                                        <td>test</td>
+                                        <td>test</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </main>
 

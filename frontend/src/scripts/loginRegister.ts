@@ -1,4 +1,4 @@
-import { getEl, manageNavBarLinks, initRacketBackground } from "./HelperFunctions";
+import { getEl, manageNavBarLinks, initRacketBackground, showError } from "./HelperFunctions";
 
 const emailInput = getEl<HTMLInputElement>("emailInput");
 const passwordInput = getEl<HTMLInputElement>("passwordInput");
@@ -61,12 +61,6 @@ function displayElement(element: HTMLElement, display: boolean){
         if(!element.classList.contains("d-none")) return;
         else element.classList.remove("d-none");
     }
-}
-
-function showError(message: string): void {
-  const errorBox = getEl<HTMLDivElement>("loginError");
-  errorBox.textContent = message;
-  errorBox.classList.remove("d-none");
 }
 
 function showRegisterFields(showRegister: boolean): void{

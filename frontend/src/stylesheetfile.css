@@ -23,13 +23,11 @@ body {
   padding: 10px 15px;
 
   background: var(--glass-background);
-  border: 1px solid var(--glass-border);
+  border: 2px solid rgba(45, 147, 206, 0.8);
   border-radius: 16px;
 
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-
-  border: 1px solid rgba(255, 255, 255, 0.1);
 
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
 }
@@ -46,7 +44,7 @@ body {
   padding: 15px 20px;
 
   background: var(--glass-background);
-  border: 1px solid var(--glass-border);
+  border: 2px solid rgba(45, 147, 206, 0.8);
   border-radius: 18px;
 
   backdrop-filter: blur(12px);
@@ -58,16 +56,29 @@ body {
 }
 
 .custom-card {
-  max-width: 70%;
+  max-width: 80%;
 
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
 
   background: rgba(45, 147, 206, 0.5) !important;
-  border: 1px solid var(--glass-border) !important;
+  border: 2px solid rgba(45, 147, 206, 0.8) !important;
   border-radius: 18px;
 
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+}
+
+.custom-card-dashboard {
+
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+
+  background: rgba(45, 147, 206, 0.5) !important;
+  border: 2px solid rgba(45, 147, 206, 0.8) !important;
+  border-radius: 18px;
+
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+  overflow: hidden;
 }
 
 .star-background {
@@ -86,4 +97,16 @@ body {
   background: none;
   float: right;
   color: grey;
+}
+
+.custom-card-dashboard .card-header {
+  background: rgba(20, 90, 130, 0.6);
+}
+
+th {
+  background: rgba(45, 147, 206, 0.5) !important;
+}
+
+td {
+  background: rgba(45, 147, 206, 0.2) !important;
 }

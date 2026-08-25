@@ -335,3 +335,9 @@ export function initRacketBackground(): void {
   createRackets();
   drawRackets();
 }
+
+export function showError(message: string): void {
+  const errorBox = getEl<HTMLDivElement>("loginError");
+  errorBox.textContent = message;
+  errorBox.classList.remove("d-none");
+}

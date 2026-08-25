@@ -75,22 +75,22 @@ public class LoginHandler {
     }
 
     private void getUserInformation(RoutingContext ctx) {
-    JsonObject obj = ctx.user().principal();
+        JsonObject obj = ctx.user().principal();
 
-    String firstName = obj.getString("firstName");
-    String lastName = obj.getString("lastName");
-    String email = obj.getString("email");
-    String role = obj.getString("role");
+        String firstName = obj.getString("firstName");
+        String lastName = obj.getString("lastName");
+        String email = obj.getString("email");
+        String role = obj.getString("role");
 
-    JsonObject ans = new JsonObject()
-        .put("firstName", firstName)
-        .put("lastName", lastName)
-        .put("email", email)
-        .put("role", role);
+        JsonObject ans = new JsonObject()
+            .put("firstName", firstName)
+            .put("lastName", lastName)
+            .put("email", email)
+            .put("role", role);
 
-    ctx.response()
-        .setStatusCode(200)
-        .putHeader("Content-Type", "application/json")
-        .end(ans.encode());
-}
+        ctx.response()
+            .setStatusCode(200)
+            .putHeader("Content-Type", "application/json")
+            .end(ans.encode());
+    }
 }
