@@ -3,12 +3,12 @@ import { manageNavBarLinks, showError, redirectIfNoToken, setFirstName, initRack
 const emailInput = getEl<HTMLInputElement>("email");
 const firstNameInput = getEl<HTMLInputElement>("firstName");
 const lastNameInput = getEl<HTMLInputElement>("lastName");
-const mainContent = getEl<HTMLDivElement>("main-content");
+// const mainContent = getEl<HTMLDivElement>("main-content");
 
 let email: String;
 let firstName: String;
 let lastName: String;
-let role: String;
+// let role: String;
 
 
 if (document.readyState === "loading") {
@@ -24,8 +24,8 @@ async function init(): Promise<void>{
     await setFirstName();
     await setUserCredentials();
     
-    if(role === "admin")buildForAdmin();
-    else buildForUser();
+    // if(role === "admin")buildForAdmin();
+    // else buildForUser();
 
     setPlaceholderItems();
 }
@@ -45,18 +45,14 @@ async function setUserCredentials(): Promise<Boolean>{
             }
         );
 
-        // Successful registration
         if (response.status === 200) {
             const data = await response.json();
 
             email = data.email;
             firstName = data.firstName;
             lastName = data.lastName;
-            role = data.role;
+            // role = data.role;
         }
-
-        console.error("Kein gültiger token");
-        showError("Kein gültiger Account");
 
     } catch (error) {
         console.error("Could not reach backend:", error);
@@ -66,13 +62,13 @@ async function setUserCredentials(): Promise<Boolean>{
     return false;
 }
 
-function buildForAdmin(): void {
+/* function buildForAdmin(): void {
     mainContent.innerHTML = "";
 }
 
 function buildForUser(): void {
     return;
-}
+} */
 
 function setPlaceholderItems(): void {
     emailInput.placeholder = "" + (email === undefined ? "E-Mail" : email);
