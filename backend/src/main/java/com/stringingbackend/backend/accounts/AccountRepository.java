@@ -293,4 +293,30 @@ public class AccountRepository {
                 );
             });
     }
+
+    public Future<Integer> deleteUser(String email){
+        if(email.isBlank() || email == null) return Future.succeededFuture(403);
+
+        String query = """
+                    DELETE FROM users WHERE email = ?;
+                """;
+
+        return pool.preparedQuery(query)
+            .execute(Tuple.of(email))
+            .map(result -> {
+
+                if (result.rowCount() == 0) {
+                    return 401;
+                }
+
+                return 200;
+            })
+            .recover(err -> {
+
+                System.err.println("Deleting user failed:");
+                err.printStackTrace();
+
+                return Future.succeededFuture(500);
+            });
+    }
 }

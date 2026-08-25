@@ -19,6 +19,9 @@ public class DashboardHandler {
         router.patch("/editUser")
             .handler(JWTAuthHandler.create(jwtAuth))
             .handler(this::editUser);
+        router.get("/deleteUser")
+            .handler(JWTAuthHandler.create(jwtAuth))
+            .handler(this::deleteUser);
     }
 
     private void editUser(RoutingContext ctx) {
@@ -97,6 +100,22 @@ public class DashboardHandler {
                         .setStatusCode(500)
                         .end("Interner Server Fehler");
                 }
+            });
+    }
+
+    private void deleteUser(RoutingContext ctx){
+        dashboardService.deleteUser(ctx)
+            .onSuccess(ans -> {
+                ctx.response()
+                    .setStatusCode(ans);
+            })
+            .onFailure(err -> {
+                System.out.println("backend problem");
+                err.printStackTrace();
+
+                ctx.response()
+                    .setStatusCode(500)
+                    .end("Server could not be reached");
             });
     }
 }

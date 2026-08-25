@@ -50,4 +50,14 @@ public class DashboardService {
             newLastName
         );
     }
+
+    public Future<Integer> deleteUser(RoutingContext ctx){
+        JsonObject body = ctx.user().principal();
+
+        String email = body.getString("email");
+
+        Integer ans = accountRepository.deleteUser(email).await();
+
+        return Future.succeededFuture(ans);
+    }
 }

@@ -6,7 +6,7 @@
 {{> navbar title="Dashboard"}}
 
 <main>
-    <div class="main-content" id="main-content">
+    <div class="main-content">
         <div class="row g-3 px-3">
             <!-- Modal -->
             <div class="modal fade" id="deleteAccountModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -51,14 +51,14 @@
                             <input type="text" class="form-control" placeholder="***********">
                         </div>
 
-                        <button type="button" class="btn btn-success mt-2 w-100">Speichern</button>
-                        <button type="button" class="btn btn-warning mt-2 w-100">Ausloggen</button>
+                        <button type="button" class="btn btn-success mt-2 w-100" id="saveButton">Speichern</button>
+                        <button type="button" class="btn btn-warning mt-2 w-100" id="logoutButton">Ausloggen</button>
                         <button type="button" class="btn btn-danger mt-2 w-100" data-bs-toggle="modal" data-bs-target="#deleteAccountModal">Account löschen</button>
                     </div>
                 </div>
             </div>
 
-            <div class="col-12 col-md-6">
+            <div class="col-12 col-md-6" id="table">
                 <div class="card custom-card-dashboard text-white h-100">
                     <div class="card-header p-0 m-0">
                         <h5 class="py-2 pt-2 m-0 text-center">Bespannungen verwalten</h5>
