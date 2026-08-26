@@ -19,6 +19,8 @@ import com.stringingbackend.backend.accounts.LoginHandler;
 import com.stringingbackend.backend.accounts.LoginService;
 import com.stringingbackend.backend.accounts.RegisterHandler;
 import com.stringingbackend.backend.accounts.RegisterService;
+import com.stringingbackend.backend.dashboard.DashboardHandler;
+import com.stringingbackend.backend.dashboard.DashboardService;
 
 // CORS Handler
 import io.vertx.core.http.HttpMethod;
@@ -94,10 +96,14 @@ public class MainVerticle extends VerticleBase {
     RegisterService registerService = new RegisterService(accountRepository);
     RegisterHandler registerHandler = new RegisterHandler(registerService, jwtAuth);
 
+    DashboardService dashboardService = new DashboardService(accountRepository);
+    DashboardHandler dashboardHandler = new DashboardHandler(dashboardService, jwtAuth);
+
     // Route declaration
     router.route().handler(BodyHandler.create());
     loginHandler.registerRoutes(router);
     registerHandler.registerRoutes(router);
+    dashboardHandler.registerRoutes(router);
 
     router.get("/health").handler(ctx -> {
       ctx.response() 
