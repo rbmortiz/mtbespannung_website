@@ -54,6 +54,7 @@ public class MainVerticle extends VerticleBase {
             .allowedMethod(HttpMethod.PUT)
             .allowedMethod(HttpMethod.DELETE)
             .allowedMethod(HttpMethod.OPTIONS)
+            .allowedMethod(HttpMethod.UPDATE)
             .allowedHeader("Content-Type")
             .allowedHeader("Authorization")
     );

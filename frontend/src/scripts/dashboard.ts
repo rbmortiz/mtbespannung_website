@@ -36,6 +36,7 @@ async function init(): Promise<void>{
     });
 
     saveButton.addEventListener("click", () => {
+        console.log("updating user");
         void updateUser();
     });
     
@@ -175,7 +176,7 @@ async function updateUser(): Promise<void> {
         if (response.status === 200) {
             const data = await response.json();
             localStorage.setItem("token", data.token);
-            window.location.replace("/src/pages/loginRegister.html");
+            window.location.replace("/src/pages/dashboard.html");
             return;
         }
 
