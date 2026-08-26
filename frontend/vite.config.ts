@@ -27,7 +27,8 @@ export default defineConfig({
         trainerstunden: resolve(import.meta.dirname, "src/pages/trainerstunden.html"),
         aboutme: resolve(import.meta.dirname, "src/pages/aboutme.html"),
         datenschutz: resolve(import.meta.dirname, "src/pages/datenschutz.html"),
-        impressum: resolve(import.meta.dirname, "src/pages/impressum.html")
+        impressum: resolve(import.meta.dirname, "src/pages/impressum.html"),
+        infos: resolve(import.meta.dirname, "src/pages/infos.html")
       },
     },
   },
