@@ -26,21 +26,16 @@ public class DashboardService {
 
         String oldEmail = tokenUser.getString("email");
 
+        if (oldEmail == null || oldEmail.isBlank()) {
+            return Future.succeededFuture(
+                new JsonObject().put("statusCode", 401)
+            );
+        }
+
         String newEmail = body.getString("email");
         String newPassword = body.getString("password");
         String newFirstName = body.getString("firstName");
         String newLastName = body.getString("lastName");
-
-        if (
-            oldEmail == null || oldEmail.isBlank() ||
-            newEmail == null || newEmail.isBlank() ||
-            newFirstName == null || newFirstName.isBlank() ||
-            newLastName == null || newLastName.isBlank()
-        ) {
-            return Future.succeededFuture(
-                new JsonObject().put("statusCode", 400)
-            );
-        }
 
         return accountRepository.updateUser(
             oldEmail,

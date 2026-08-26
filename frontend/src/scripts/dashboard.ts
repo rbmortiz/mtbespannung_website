@@ -1,10 +1,12 @@
 import { manageNavBarLinks, showError, redirectIfNoToken, setFirstName, initRacketBackground, getEl } from "./HelperFunctions";
 
-const emailInput = getEl<HTMLInputElement>("email");
+const emailInput = getEl<HTMLInputElement>("emailField");
+const passwordInput = getEl<HTMLInputElement>("passwordField");
 const firstNameInput = getEl<HTMLInputElement>("firstName");
 const lastNameInput = getEl<HTMLInputElement>("lastName");
 const deleteAccountButton = getEl<HTMLDivElement>("deleteAccountButton");
 const logoutButton = getEl<HTMLButtonElement>("logoutButton");
+const saveButton = getEl<HTMLButtonElement>("saveButton");
 
 let email: String;
 let firstName: String;
@@ -31,7 +33,11 @@ async function init(): Promise<void>{
 
     logoutButton.addEventListener("click", () => {
         void logout();
-    })
+    });
+
+    saveButton.addEventListener("click", () => {
+        void updateUser();
+    });
     
     if(role === "admin")buildForAdmin();
     else buildForUser();
@@ -131,4 +137,72 @@ async function deleteUserAccount(): Promise<void> {
 function logout(): void {
     localStorage.removeItem("token");
     window.location.replace("/src/pages/loginRegister.html");
+}
+
+async function updateUser(): Promise<void> {
+    const token = localStorage.getItem("token");
+
+    if (!token) {
+        showError("Du bist nicht angemeldet.");
+        return;
+    }
+
+    const newMail = emailInput.value;
+    const newPassword = passwordInput.value;
+    const newFirstName = firstNameInput.value;
+    const newLastName = lastNameInput.value;
+
+    try {
+        const response = await fetch(
+            "https://api.mtbespannung.de/editUser",
+            {
+                method: "PATCH",
+
+                headers: {
+                    "Authorization": `Bearer ${token}`,
+                    "Content-Type": "application/json"
+                },
+
+                body: JSON.stringify({
+                    "email": newMail,
+                    "firstName": newFirstName,
+                    "lastName": newLastName,
+                    "password": newPassword
+                })
+            }
+        );
+
+        if (response.status === 200) {
+            const data = await response.json();
+            localStorage.setItem("token", data.token);
+            window.location.replace("/src/pages/loginRegister.html");
+            return;
+        }
+
+        if (response.status === 400) {
+            showError("Fehlende Daten.");
+            return;
+        }
+
+        if (response.status === 401) {
+            showError("Token ist nicht mehr gültig.");
+            return;
+        }
+
+        if (response.status === 404) {
+            showError("Benutzer wurde nicht gefunden.");
+            return;
+        }
+
+        if (response.status === 409) {
+            showError("Neue Email ist bereits vergeben.");
+            return;
+        }
+
+        showError("Account konnte nicht verändert werden");
+
+    } catch (error) {
+        console.error("Could not reach backend:", error);
+        showError("Server konnte nicht erreicht werden");
+    }
 }

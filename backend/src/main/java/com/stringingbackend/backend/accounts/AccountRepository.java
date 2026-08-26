@@ -1,5 +1,8 @@
 package com.stringingbackend.backend.accounts;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.stringingbackend.backend.accounts.tools.Hashing;
 
 import io.vertx.core.Future;
@@ -122,14 +125,11 @@ public class AccountRepository {
 
     public Future<JsonObject> updateUser(String oldEmail, String newEmail, String newPassword, String newFirstName, String newLastName) {
 
-        boolean changePassword =
-            newPassword != null && !newPassword.isBlank();
-
+        // Only check uniqueness if the email is actually being changed
         Future<Boolean> emailCheck;
 
-        if (oldEmail.equalsIgnoreCase(newEmail)) {
-            emailCheck = Future.succeededFuture(true);
-        } else {
+        if (newEmail != null && !newEmail.isBlank() && !newEmail.equalsIgnoreCase(oldEmail)) {
+
             String emailQuery = """
                 SELECT user_id
                 FROM users
@@ -139,6 +139,9 @@ public class AccountRepository {
             emailCheck = pool.preparedQuery(emailQuery)
                 .execute(Tuple.of(newEmail))
                 .map(rows -> rows.size() == 0);
+
+        } else {
+            emailCheck = Future.succeededFuture(true);
         }
 
         return emailCheck.compose(emailFree -> {
@@ -150,63 +153,62 @@ public class AccountRepository {
                 );
             }
 
-            String query;
-            Tuple values;
+            List<String> updates = new ArrayList<>();
+            List<Object> values = new ArrayList<>();
 
-            if (changePassword) {
+            int index = 1;
+
+            if (newEmail != null && !newEmail.isBlank()) {
+                updates.add("email = $" + index++);
+                values.add(newEmail);
+            }
+
+            if (newFirstName != null && !newFirstName.isBlank()) {
+                updates.add("firstname = $" + index++);
+                values.add(newFirstName);
+            }
+
+            if (newLastName != null && !newLastName.isBlank()) {
+                updates.add("lastname = $" + index++);
+                values.add(newLastName);
+            }
+
+            if (newPassword != null && !newPassword.isBlank()) {
 
                 String hashedPassword =
                     Hashing.hashPassword(newPassword);
 
-                query = """
-                    UPDATE users
-                    SET email = $1,
-                        firstname = $2,
-                        lastname = $3,
-                        hashed_password = $4
-                    WHERE email = $5
-                    RETURNING
-                        user_id,
-                        email,
-                        firstname,
-                        lastname,
-                        role
-                    """;
+                updates.add("hashed_password = $" + index++);
+                values.add(hashedPassword);
+            }
 
-                values = Tuple.of(
-                    newEmail,
-                    newFirstName,
-                    newLastName,
-                    hashedPassword,
-                    oldEmail
-                );
-
-            } else {
-
-                query = """
-                    UPDATE users
-                    SET email = $1,
-                        firstname = $2,
-                        lastname = $3
-                    WHERE email = $4
-                    RETURNING
-                        user_id,
-                        email,
-                        firstname,
-                        lastname,
-                        role
-                    """;
-
-                values = Tuple.of(
-                    newEmail,
-                    newFirstName,
-                    newLastName,
-                    oldEmail
+            // Nothing was supplied to update
+            if (updates.isEmpty()) {
+                return Future.succeededFuture(
+                    new JsonObject()
+                        .put("statusCode", 400)
                 );
             }
 
+            values.add(oldEmail);
+
+            String query = """
+                UPDATE users
+                SET %s
+                WHERE email = $%d
+                RETURNING
+                    user_id,
+                    email,
+                    firstname,
+                    lastname,
+                    role
+                """.formatted(
+                    String.join(", ", updates),
+                    index
+                );
+
             return pool.preparedQuery(query)
-                .execute(values)
+                .execute(Tuple.from(values))
                 .map(rows -> {
 
                     if (!rows.iterator().hasNext()) {
