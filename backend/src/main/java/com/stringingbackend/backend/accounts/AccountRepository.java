@@ -40,8 +40,8 @@ public class AccountRepository {
 
         String query = """
             INSERT INTO users (
-                firstname,
-                lastname,
+                first_name,
+                last_name,
                 email,
                 hashed_password
             )
@@ -89,8 +89,8 @@ public class AccountRepository {
         String query = """
             SELECT
                 user_id,
-                firstname,
-                lastname,
+                first_name,
+                last_name,
                 email,
                 hashed_password,
                 role
@@ -110,8 +110,8 @@ public class AccountRepository {
 
                 JsonObject user = new JsonObject()
                     .put("userId", row.getInteger("user_id"))
-                    .put("firstName", row.getString("firstname"))
-                    .put("lastName", row.getString("lastname"))
+                    .put("firstName", row.getString("first_name"))
+                    .put("lastName", row.getString("last_name"))
                     .put("email", row.getString("email"))
                     .put(
                         "hashedPassword",
@@ -164,12 +164,12 @@ public class AccountRepository {
             }
 
             if (newFirstName != null && !newFirstName.isBlank()) {
-                updates.add("firstname = $" + index++);
+                updates.add("first_name = $" + index++);
                 values.add(newFirstName);
             }
 
             if (newLastName != null && !newLastName.isBlank()) {
-                updates.add("lastname = $" + index++);
+                updates.add("last_name = $" + index++);
                 values.add(newLastName);
             }
 
@@ -199,8 +199,8 @@ public class AccountRepository {
                 RETURNING
                     user_id,
                     email,
-                    firstname,
-                    lastname,
+                    first_name,
+                    last_name,
                     role
                 """.formatted(
                     String.join(", ", updates),
@@ -222,8 +222,8 @@ public class AccountRepository {
                         .put("statusCode", 200)
                         .put("userId", row.getInteger("user_id"))
                         .put("email", row.getString("email"))
-                        .put("firstName", row.getString("firstname"))
-                        .put("lastName", row.getString("lastname"))
+                        .put("firstName", row.getString("first_name"))
+                        .put("lastName", row.getString("last_name"))
                         .put("role", row.getString("role"));
                 });
         })
@@ -325,4 +325,16 @@ public class AccountRepository {
                 return Future.succeededFuture(500);
             });
     }
+
+    /* public Future<Integer> getUserId(String email){
+        
+    }
+
+    public Future<JsonObject> showOwnStringingJobs(String email) {
+        if(email == null || email.isBlank()) return Future.succeededFuture(new JsonObject().put("statusCode", (Integer)304));
+
+        String query = """
+            SELECT * FROM stringing_orders WHERE user_id = $1
+        """;
+    } */
 }
