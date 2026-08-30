@@ -83,7 +83,7 @@ public class DashboardService {
                     return Future.succeededFuture(new JsonArray());
                 }
 
-                Integer id = user.getInteger("userId");
+                Integer id = user.getInteger("user_id");
 
                 if (id == null) {
                     return Future.failedFuture("User ID missing");
