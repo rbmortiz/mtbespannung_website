@@ -156,7 +156,7 @@ async function getStringTypes(token: String): Promise<void> {
 async function getUserStrings(token: String): Promise<void> {
     try {
         const response = await fetch("https://api.mtbespannung.de/getUserStringingJobs", {
-            method: "GET",
+            method: "POST",
 
             headers: {
                 "Authorization": `Bearer ${token}`
