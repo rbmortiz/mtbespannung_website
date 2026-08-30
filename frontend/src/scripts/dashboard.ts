@@ -22,7 +22,7 @@ interface StringingOrder {
     updated_at: string;
 }
 
-/* interface StringTypes {
+interface StringTypes {
     string_id: number;
     name: string;
     color: string;
@@ -31,14 +31,14 @@ interface StringingOrder {
     is_active: Boolean;
     created_at: string;
     updated_at: string;
-} */
+}
 
 let email: String;
 let firstName: String;
 let lastName: String;
 let role: String;
 
-/* let stringTypes: StringTypes[] = []; */
+let stringTypes: StringTypes[] = [];
 let userStrings: StringingOrder[] = [];
 
 
@@ -136,7 +136,7 @@ async function getStringTypes(token: String): Promise<void> {
         });
 
         if(response.status === 200){
-            /* stringTypes = await response.json() as StringTypes[]; */
+            stringTypes = await response.json() as StringTypes[];
             return;
         }
 
@@ -353,12 +353,73 @@ function showOrderDetails(order: StringingOrder): void {
     const created = new Date(order.created_at);
     const updated = new Date(order.updated_at);
 
-    getEl<HTMLInputElement>("modalRacketName").placeholder = order.racket_name;
+    getEl<HTMLSpanElement>("modalRacketName").innerHTML = order.racket_name;
+    getEl<HTMLSpanElement>("modalCreatedAt").innerHTML = created.toLocaleDateString("de-DE");
+    getEl<HTMLSpanElement>("modalUpdatedAt").innerHTML = updated.toLocaleDateString("de-DE");
+
     getEl<HTMLInputElement>("modalVerticalKG").placeholder = order.vertical_kg.toString();
     getEl<HTMLInputElement>("modalHorizontalKG").placeholder = order.horizontal_kg.toString();
-    getEl<HTMLInputElement>("modalString").placeholder = order.string_id.toString();
     getEl<HTMLInputElement>("modalInfos").placeholder = order.additional_info;
-    getEl<HTMLInputElement>("modalStatus").placeholder = order.status;
-    getEl<HTMLInputElement>("modalCreatedAt").placeholder = created.toLocaleDateString("de-DE");
-    getEl<HTMLInputElement>("modalUpdatedAt").placeholder = updated.toLocaleDateString("de-DE");
+
+    getEl<HTMLSpanElement>("modalString").innerHTML = order.string_id.toString();
+
+    switch(order.status){
+        case "pending":
+            getEl<HTMLSpanElement>("modalStatus").innerHTML = "Unerledigt";
+            getEl<HTMLSpanElement>("modalStatus").classList.add("text-secondary");
+            break;
+        case "in_progress":
+            getEl<HTMLSpanElement>("modalStatus").innerHTML = "In Bearbeitung";
+            getEl<HTMLSpanElement>("modalStatus").classList.add("text-warning");
+            break;
+        case "completed":
+            getEl<HTMLSpanElement>("modalStatus").innerHTML = "Bespannt";
+            getEl<HTMLSpanElement>("modalStatus").classList.add("text-info");
+            break;
+        case "delivered":
+            getEl<HTMLSpanElement>("modalStatus").innerHTML = "Zugestellt";
+            getEl<HTMLSpanElement>("modalStatus").classList.add("text-success");
+            break;
+        default:
+            break;
+    }
+
+    var stringColor: string = getColorOfStringId(order.string_id);
+    var stringName: string = getNameOfStringId(order.string_id);
+
+    getEl<HTMLSpanElement>("modalString").innerHTML = stringName;
+    getEl<HTMLSpanElement>("modalString").classList.add(stringColor);
+}
+
+function getColorOfStringId(id: number): string {
+    const racketString = stringTypes.find(
+        racketString => racketString.string_id === id
+    );
+
+    if(racketString === null || racketString === undefined) return "text-black";
+
+    switch(racketString.color){
+        case "red": 
+            return "text-danger";
+        case "blue": 
+            return "text-primary";
+        case "green":
+            return "text-success";
+        case "white":
+            return "text-white";
+        case "black": 
+            return "text-black";
+    }
+    
+    return "text-black";
+}
+
+function getNameOfStringId(id: number): string {
+    const racketString = stringTypes.find(
+        racketString => racketString.string_id === id
+    );
+
+    if(racketString === null || racketString === undefined) return "";
+    
+    return racketString.name;
 }

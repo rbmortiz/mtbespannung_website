@@ -39,9 +39,8 @@
                             <div class="modal-body">
                                 <div class="d-flex align-items-center gap-3 mb-2">
                                     <label for="modalRacketName" class="form-label mb-0 text-nowrap" style="min-width: 130px;">
-                                        Schlägername:
+                                        Schlägername: <span class="text-primary mx-auto" id="modalRacketName"></span>
                                     </label>
-                                    <input type="text" class="form-control" id="modalRacketName">
                                 </div>
 
                                 <div class="d-flex align-items-center gap-3 mb-2">
@@ -60,9 +59,8 @@
 
                                 <div class="d-flex align-items-center gap-3 mb-2">
                                     <label for="modalString" class="form-label mb-0 text-nowrap" style="min-width: 130px;">
-                                        Saite:
+                                        Saite: <span class="mx-auto" id="modalString"></span>
                                     </label>
-                                    <input type="text" class="form-control" id="modalString">
                                 </div>
 
                                 <div class="d-flex align-items-center gap-3 mb-2">
@@ -74,23 +72,20 @@
 
                                 <div class="d-flex align-items-center gap-3 mb-2">
                                     <label for="modalStatus" class="form-label mb-0 text-nowrap" style="min-width: 130px;">
-                                        Status:
+                                        Status: <span class="mx-auto" id="modalStatus"></span>
                                     </label>
-                                    <input type="text" class="form-control" id="modalStatus">
                                 </div>
 
                                 <div class="d-flex align-items-center gap-3 mb-2">
                                     <label for="modalCreatedAt" class="form-label mb-0 text-nowrap" style="min-width: 130px;">
-                                        Erstellt am:
+                                        Erstellt am: <span class="mx-auto" id="modalCreatedAt"></span>
                                     </label>
-                                    <input type="text" class="form-control" id="modalCreatedAt">
                                 </div>
 
                                 <div class="d-flex align-items-center gap-5 mb-2">
                                     <label for="modalUpdatedAt" class="form-label mb-0 text-nowrap" style="min-width: 130px;">
-                                        Aktualisiert am:
+                                        Aktualisiert am: <span class="mx-auto" id="modalUpdatedAt"></span>
                                     </label>
-                                    <input type="text" class="form-control" id="modalUpdatedAt">
                                 </div>
                             </div>
                         </div>
@@ -152,6 +147,7 @@
                                 </tbody>
                             </table>
                         </div>
+                        <button class="btn btn-primary moreInfoButton" data-order-id="${order.order_id}" data-bs-toggle="modal" data-bs-target="#moreInfoModal">Mehr Details</button>
                     </div>
                 </div>
             </div>
