@@ -32,41 +32,66 @@
                 <div class="modal-dialog modal-dialog-centered">
                     <div class="modal-content">
                         <div class="modal-header">
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                             <h5>Bespannungsauftrag</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
                         <div class="modal-body">
-                            <div class="d-flex align-items-center mb-2">
-                                <label for="text" class="form-label mb-0" style="min-width:100px">Schlägername: </label>
-                                <input type="text" class="form-control" id="modalRacketName" placeholder="">
-                            </div>
-                            <div class="d-flex align-items-center mb-2">
-                                <label for="text" class="form-label mb-0" style="min-width:100px">KG-Längs: </label>
-                                <input type="text" class="form-control" id="modalVerticalKG" placeholder="">
-                            </div>
-                            <div class="d-flex align-items-center mb-2">
-                                <label for="text" class="form-label mb-0" style="min-width:100px">KG-Quer: </label>
-                                <input type="text" class="form-control" id="modalHorizontalKG" placeholder="">
-                            </div>
-                            <div class="d-flex align-items-center mb-2">
-                                <label for="text" class="form-label mb-0" style="min-width:100px">Saite: </label>
-                                <input type="text" class="form-control" id="modalString" placeholder="">
-                            </div>
-                            <div class="d-flex align-items-center mb-2">
-                                <label for="text" class="form-label mb-0" style="min-width:100px">Infos: </label>
-                                <input type="text" class="form-control" id="modalInfos" placeholder="">
-                            </div>
-                            <div class="d-flex align-items-center mb-2">
-                                <label for="text" class="form-label mb-0" style="min-width:100px">Status: </label>
-                                <input type="text" class="form-control" id="modalStatus" placeholder="">
-                            </div>
-                            <div class="d-flex align-items-center mb-2">
-                                <label for="text" class="form-label mb-0" style="min-width:100px">Erstellt am: </label>
-                                <input type="text" class="form-control" id="modalCreatedAt" placeholder="">
-                            </div>
-                            <div class="d-flex align-items-center mb-2">
-                                <label for="text" class="form-label mb-0" style="min-width:100px">Aktualisiert am: </label>
-                                <input type="text" class="form-control" id="modalUpdatedAt" placeholder="">
+                            <div class="modal-body">
+                                <div class="d-flex align-items-center gap-3 mb-2">
+                                    <label for="modalRacketName" class="form-label mb-0 text-nowrap" style="min-width: 130px;">
+                                        Schlägername:
+                                    </label>
+                                    <input type="text" class="form-control" id="modalRacketName">
+                                </div>
+
+                                <div class="d-flex align-items-center gap-3 mb-2">
+                                    <label for="modalVerticalKG" class="form-label mb-0 text-nowrap" style="min-width: 130px;">
+                                        KG-Längs:
+                                    </label>
+                                    <input type="text" class="form-control" id="modalVerticalKG">
+                                </div>
+
+                                <div class="d-flex align-items-center gap-3 mb-2">
+                                    <label for="modalHorizontalKG" class="form-label mb-0 text-nowrap" style="min-width: 130px;">
+                                        KG-Quer:
+                                    </label>
+                                    <input type="text" class="form-control" id="modalHorizontalKG">
+                                </div>
+
+                                <div class="d-flex align-items-center gap-3 mb-2">
+                                    <label for="modalString" class="form-label mb-0 text-nowrap" style="min-width: 130px;">
+                                        Saite:
+                                    </label>
+                                    <input type="text" class="form-control" id="modalString">
+                                </div>
+
+                                <div class="d-flex align-items-center gap-3 mb-2">
+                                    <label for="modalInfos" class="form-label mb-0 text-nowrap" style="min-width: 130px;">
+                                        Infos:
+                                    </label>
+                                    <input type="text" class="form-control" id="modalInfos">
+                                </div>
+
+                                <div class="d-flex align-items-center gap-3 mb-2">
+                                    <label for="modalStatus" class="form-label mb-0 text-nowrap" style="min-width: 130px;">
+                                        Status:
+                                    </label>
+                                    <input type="text" class="form-control" id="modalStatus">
+                                </div>
+
+                                <div class="d-flex align-items-center gap-3 mb-2">
+                                    <label for="modalCreatedAt" class="form-label mb-0 text-nowrap" style="min-width: 130px;">
+                                        Erstellt am:
+                                    </label>
+                                    <input type="text" class="form-control" id="modalCreatedAt">
+                                </div>
+
+                                <div class="d-flex align-items-center gap-5 mb-2">
+                                    <label for="modalUpdatedAt" class="form-label mb-0 text-nowrap" style="min-width: 130px;">
+                                        Aktualisiert am:
+                                    </label>
+                                    <input type="text" class="form-control" id="modalUpdatedAt">
+                                </div>
                             </div>
                         </div>
                         <div class="modal-footer align-items-center justify-content-center">
@@ -120,12 +145,10 @@
                                     <tr>
                                         <th scope="col">Erstellt</th>
                                         <th scope="col">Schlägername</th>
-                                        <th scope="col">Status</th>
-                                        <th scope="col">Mehr Infos</th>
+                                        <th scope="col"></th>
                                     </tr>
                                 </thead>
                                 <tbody id="stringingTable">
-                                    
                                 </tbody>
                             </table>
                         </div>
