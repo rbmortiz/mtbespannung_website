@@ -109,7 +109,7 @@ public class AccountRepository {
                 Row row = rows.iterator().next();
 
                 JsonObject user = new JsonObject()
-                    .put("userId", row.getInteger("user_id"))
+                    .put("user_id", row.getInteger("user_id"))
                     .put("firstName", row.getString("first_name"))
                     .put("lastName", row.getString("last_name"))
                     .put("email", row.getString("email"))
@@ -325,16 +325,4 @@ public class AccountRepository {
                 return Future.succeededFuture(500);
             });
     }
-
-    /* public Future<Integer> getUserId(String email){
-        
-    }
-
-    public Future<JsonObject> showOwnStringingJobs(String email) {
-        if(email == null || email.isBlank()) return Future.succeededFuture(new JsonObject().put("statusCode", (Integer)304));
-
-        String query = """
-            SELECT * FROM stringing_orders WHERE user_id = $1
-        """;
-    } */
 }

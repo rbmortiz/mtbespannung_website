@@ -13,6 +13,7 @@ import io.vertx.ext.auth.PubSecKeyOptions;
 // JWTAuth
 import io.vertx.ext.auth.jwt.*;
 
+import com.stringingbackend.backend.Stringing.StringingRepository;
 // Service Imports
 import com.stringingbackend.backend.accounts.AccountRepository;
 import com.stringingbackend.backend.accounts.LoginHandler;
@@ -91,6 +92,7 @@ public class MainVerticle extends VerticleBase {
 
     // Service Creation
     AccountRepository accountRepository = new AccountRepository(pool);
+    StringingRepository stringingRepository = new StringingRepository(pool);
 
     LoginService loginService = new LoginService(accountRepository);
     LoginHandler loginHandler = new LoginHandler(loginService, jwtAuth);
@@ -98,7 +100,7 @@ public class MainVerticle extends VerticleBase {
     RegisterService registerService = new RegisterService(accountRepository);
     RegisterHandler registerHandler = new RegisterHandler(registerService, jwtAuth);
 
-    DashboardService dashboardService = new DashboardService(accountRepository);
+    DashboardService dashboardService = new DashboardService(accountRepository, stringingRepository);
     DashboardHandler dashboardHandler = new DashboardHandler(dashboardService, jwtAuth);
 
     // Route declaration

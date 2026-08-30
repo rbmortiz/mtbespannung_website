@@ -8,7 +8,8 @@
 <main>
     <div class="main-content">
         <div class="row g-3 px-3">
-            <!-- Modal -->
+
+            <!-- Delete Account Modal -->
             <div class="modal fade" id="deleteAccountModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
                 <div class="modal-dialog modal-dialog-centered">
                     <div class="modal-content">
@@ -21,6 +22,55 @@
                         </div>
                         <div class="modal-footer align-items-center justify-content-center">
                             <button type="button" class="btn btn-danger w-100" id="deleteAccountButton">Löschen</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- More Info Modal -->
+            <div class="modal fade" id="moreInfoModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            <h5>Bespannungsauftrag</h5>
+                        </div>
+                        <div class="modal-body">
+                            <div class="d-flex align-items-center mb-2">
+                                <label for="text" class="form-label mb-0" style="min-width:100px">Schlägername: </label>
+                                <input type="text" class="form-control" id="modalRacketName" placeholder="">
+                            </div>
+                            <div class="d-flex align-items-center mb-2">
+                                <label for="text" class="form-label mb-0" style="min-width:100px">KG-Längs: </label>
+                                <input type="text" class="form-control" id="modalVerticalKG" placeholder="">
+                            </div>
+                            <div class="d-flex align-items-center mb-2">
+                                <label for="text" class="form-label mb-0" style="min-width:100px">KG-Quer: </label>
+                                <input type="text" class="form-control" id="modalHorizontalKG" placeholder="">
+                            </div>
+                            <div class="d-flex align-items-center mb-2">
+                                <label for="text" class="form-label mb-0" style="min-width:100px">Saite: </label>
+                                <input type="text" class="form-control" id="modalString" placeholder="">
+                            </div>
+                            <div class="d-flex align-items-center mb-2">
+                                <label for="text" class="form-label mb-0" style="min-width:100px">Infos: </label>
+                                <input type="text" class="form-control" id="modalInfos" placeholder="">
+                            </div>
+                            <div class="d-flex align-items-center mb-2">
+                                <label for="text" class="form-label mb-0" style="min-width:100px">Status: </label>
+                                <input type="text" class="form-control" id="modalStatus" placeholder="">
+                            </div>
+                            <div class="d-flex align-items-center mb-2">
+                                <label for="text" class="form-label mb-0" style="min-width:100px">Erstellt am: </label>
+                                <input type="text" class="form-control" id="modalCreatedAt" placeholder="">
+                            </div>
+                            <div class="d-flex align-items-center mb-2">
+                                <label for="text" class="form-label mb-0" style="min-width:100px">Aktualisiert am: </label>
+                                <input type="text" class="form-control" id="modalUpdatedAt" placeholder="">
+                            </div>
+                        </div>
+                        <div class="modal-footer align-items-center justify-content-center">
+                            
                         </div>
                     </div>
                 </div>
@@ -70,21 +120,12 @@
                                     <tr>
                                         <th scope="col">Erstellt</th>
                                         <th scope="col">Schlägername</th>
-                                        <th scope="col">Härte</th>
-                                        <th scope="col">Saite</th>
                                         <th scope="col">Status</th>
-                                        <th scope="col">Infos</th>
+                                        <th scope="col">Mehr Infos</th>
                                     </tr>
                                 </thead>
-                                <tbody>
-                                    <tr>
-                                        <td>test</td>
-                                        <td>test</td>
-                                        <td>test</td>
-                                        <td>test</td>
-                                        <td>test</td>
-                                        <td>test</td>
-                                    </tr>
+                                <tbody id="stringingTable">
+                                    
                                 </tbody>
                             </table>
                         </div>

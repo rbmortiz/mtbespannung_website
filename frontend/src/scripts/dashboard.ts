@@ -8,10 +8,38 @@ const deleteAccountButton = getEl<HTMLDivElement>("deleteAccountButton");
 const logoutButton = getEl<HTMLButtonElement>("logoutButton");
 const saveButton = getEl<HTMLButtonElement>("saveButton");
 
+const stringingTable = getEl<HTMLTableSectionElement>("stringingTable");
+
+interface StringingOrder {
+    order_id: number;
+    racket_name: string;
+    additional_info: string;
+    horizontal_kg: number;
+    vertical_kg: number;
+    string_id: number;
+    status: string;
+    created_at: string;
+    updated_at: string;
+}
+
+/* interface StringTypes {
+    string_id: number;
+    name: string;
+    color: string;
+    description: string;
+    type: string;
+    is_active: Boolean;
+    created_at: string;
+    updated_at: string;
+} */
+
 let email: String;
 let firstName: String;
 let lastName: String;
 let role: String;
+
+/* let stringTypes: StringTypes[] = []; */
+let userStrings: StringingOrder[] = [];
 
 
 if (document.readyState === "loading") {
@@ -82,8 +110,75 @@ function buildForAdmin(): void {
 
 }
 
-function buildForUser(): void {
-    return;
+async function buildForUser(): Promise<void> {
+    var token = localStorage.getItem("token");
+
+    if(token === undefined || token === null){
+        showError("Konto wurde nicht gefunden");
+        console.error("No token was found");
+        return;
+    }
+
+    await getStringTypes(token);
+    await getUserStrings(token);
+
+    insertStringingTable();
+}
+
+async function getStringTypes(token: String): Promise<void> {
+    try {
+        const response = await fetch("https://api.mtbespannung.de/getStrings", {
+            method: "GET",
+
+            headers: {
+                "Authorization": `Bearer ${token}`
+            }
+        });
+
+        if(response.status === 200){
+            /* stringTypes = await response.json() as StringTypes[]; */
+            return;
+        }
+
+        if(response.status === 304){
+            console.log("No Strings could be found");
+        }
+
+        if(response.status === 500){
+            console.error("Database error, Strings could not be fetched");
+        }
+    } catch(error){
+        console.error("Could not reach backend: ", error);
+        showError("Server konnte nicht erreicht werden");
+    }
+}
+
+async function getUserStrings(token: String): Promise<void> {
+    try {
+        const response = await fetch("https://api.mtbespannung.de/getUserStringingJobs", {
+            method: "GET",
+
+            headers: {
+                "Authorization": `Bearer ${token}`
+            }
+        });
+
+        if(response.status === 200){
+            userStrings = await response.json() as StringingOrder[];
+            return;
+        }
+
+        if(response.status === 304){
+            console.log("No Stringing Orders found");
+        }
+
+        if(response.status === 500){
+            console.error("Serverfehler bei Benutzerbesaitungen anzeigen lassen");
+        }
+    } catch(error){
+        console.error("Could not reach backend: ", error);
+        showError("Server konnte nicht erreicht werden");
+    }
 }
 
 function setPlaceholderItems(): void {
@@ -206,4 +301,65 @@ async function updateUser(): Promise<void> {
         console.error("Could not reach backend:", error);
         showError("Server konnte nicht erreicht werden");
     }
+}
+
+function insertStringingTable(): void {
+    stringingTable.innerHTML = "";
+
+    for(const jsonObj of userStrings){
+        insertSingleEntry(jsonObj);
+    }
+
+    addMoreInfoListeners();
+}
+
+function insertSingleEntry(order: StringingOrder): void {
+    var created_at = new Date(order.created_at);
+
+    stringingTable.innerHTML += `
+        <tr>
+            <td>${created_at.toLocaleDateString("de-DE")}</td>
+            <td>${order.racket_name}</td>
+            <td>${order.status}</td>
+            <td><button class="btn btn-primary moreInfoButton" data-order-id="${order.order_id}" data-bs-toggle="modal" data-bs-target="#moreInfoModal">Mehr Details</button></td>
+        </tr>
+    `
+}
+
+function addMoreInfoListeners(): void {
+
+    const buttons = document.querySelectorAll<HTMLButtonElement>(".moreInfoButton");
+
+    for (const button of buttons) {
+
+        button.addEventListener("click", () => {
+
+            const orderId = Number(button.dataset.orderId);
+
+            const order = userStrings.find(
+                order => order.order_id === orderId
+            );
+
+            if (!order) {
+                return;
+            }
+
+            showOrderDetails(order);
+        });
+    }
+}
+
+function showOrderDetails(order: StringingOrder): void {
+
+    const created = new Date(order.created_at);
+    const updated = new Date(order.updated_at);
+
+    getEl<HTMLInputElement>("modalRacketName").placeholder = order.racket_name;
+    getEl<HTMLInputElement>("modalVerticalKG").placeholder = order.vertical_kg.toString();
+    getEl<HTMLInputElement>("modalHorizontalKG").placeholder = order.horizontal_kg.toString();
+    getEl<HTMLInputElement>("modalString").placeholder = order.string_id.toString();
+    getEl<HTMLInputElement>("modalInfos").placeholder = order.additional_info;
+    getEl<HTMLInputElement>("modalStatus").placeholder = order.status;
+    getEl<HTMLInputElement>("modalCreatedAt").placeholder = created.toLocaleDateString("de-DE");
+    getEl<HTMLInputElement>("modalUpdatedAt").placeholder = updated.toLocaleDateString("de-DE");
 }

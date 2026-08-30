@@ -22,6 +22,12 @@ public class DashboardHandler {
         router.delete("/deleteUser")
             .handler(JWTAuthHandler.create(jwtAuth))
             .handler(this::deleteUser);
+        router.get("/getStrings")
+            .handler(JWTAuthHandler.create(jwtAuth))
+            .handler(this::getStrings);
+        router.post("/getUserStringingJobs")
+            .handler(JWTAuthHandler.create(jwtAuth))
+            .handler(this::getStringingJobs);
     }
 
     private void editUser(RoutingContext ctx) {
@@ -122,6 +128,56 @@ public class DashboardHandler {
                         .setStatusCode(500)
                         .end("Interner Server Fehler");
                 }
+            });
+    }
+
+    private void getStrings(RoutingContext ctx){
+        dashboardService.getStrings(ctx)
+            .onSuccess(response -> {
+                if(response == null){
+                    ctx.response()
+                        .setStatusCode(500)
+                        .end("Database could not be reached");
+                    return;
+                }
+                else if(response.isEmpty()){
+                    ctx.response()
+                        .setStatusCode(304)
+                        .end("No Strings could be found");
+                    return;
+                }
+
+                ctx.response()
+                    .setStatusCode(200)
+                    .putHeader("Content-Type", "application/json")
+                    .end(response.encode());
+            })
+            .onFailure(err -> {
+                ctx.response()
+                    .setStatusCode(500)
+                    .end("No connection to Database");
+            });
+    }
+
+    private void getStringingJobs(RoutingContext ctx){
+        dashboardService.getStringingJobs(ctx)
+            .onSuccess(response -> {
+                if(response.isEmpty()){
+                    ctx.response()
+                        .setStatusCode(304)
+                        .end("No Stringing Orders could be found");
+                    return;
+                }
+
+                ctx.response()
+                    .setStatusCode(200)
+                    .putHeader("Content-Type", "application/json")
+                    .end(response.encode());
+            })
+            .onFailure(err -> {
+                ctx.response()
+                    .setStatusCode(500)
+                    .end("No connection to Database");
             });
     }
 }

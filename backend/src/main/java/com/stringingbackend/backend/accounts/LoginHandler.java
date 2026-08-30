@@ -19,10 +19,10 @@ public class LoginHandler {
 
     public void registerRoutes(Router router) {
         router.post("/loginUser")
-            .handler(ctx -> loginUser(ctx));
+            .handler(this::loginUser);
         router.get("/getUserInformation")
             .handler(JWTAuthHandler.create(jwtAuth))
-            .handler(ctx -> getUserInformation(ctx));
+            .handler(this::getUserInformation);
     }
 
     private Future<Void> loginUser(RoutingContext ctx) {
