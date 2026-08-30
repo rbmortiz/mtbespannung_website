@@ -175,9 +175,12 @@ public class DashboardHandler {
                     .end(response.encode());
             })
             .onFailure(err -> {
+                System.err.println("Getting stringing jobs failed:");
+                err.printStackTrace();
+
                 ctx.response()
                     .setStatusCode(500)
-                    .end("No connection to Database");
+                    .end("Interner Server Fehler");
             });
     }
 }

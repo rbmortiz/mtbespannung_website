@@ -5,6 +5,9 @@ import io.vertx.core.json.JsonObject;
 import io.vertx.sqlclient.Pool;
 import io.vertx.sqlclient.Row;
 import io.vertx.sqlclient.Tuple;
+
+import java.time.OffsetDateTime;
+
 import io.vertx.core.Future;
 
 public class StringingRepository {
@@ -35,8 +38,11 @@ public class StringingRepository {
                                 string.put("description", row.getString("description"));
                                 string.put("type", row.getString("type"));
                                 string.put("is_active", row.getBoolean("is_active"));
-                                string.put("created_at", row.getOffsetDateTime("created_at"));
-                                string.put("updated_at", row.getOffsetDateTime("updated_at"));
+
+                                OffsetDateTime createdAt = row.getOffsetDateTime("created_at");
+                                OffsetDateTime updatedAt = row.getOffsetDateTime("updated_at");
+                                string.put("created_at", createdAt.toString());
+                                string.put("updated_at", updatedAt.toString());
 
                                 ans.add(string);
                             }
@@ -72,8 +78,12 @@ public class StringingRepository {
                                 string.put("vertical_kg", row.getBigDecimal("vertical_kg").doubleValue());
                                 string.put("string_id", row.getInteger("string_id"));
                                 string.put("status", row.getString("status"));
-                                string.put("created_at", row.getOffsetDateTime("created_at"));
-                                string.put("updated_at", row.getOffsetDateTime("updated_at"));
+                                
+                                OffsetDateTime createdAt = row.getOffsetDateTime("created_at");
+                                OffsetDateTime updatedAt = row.getOffsetDateTime("updated_at");
+
+                                string.put("created_at", createdAt.toString());
+                                string.put("updated_at", updatedAt.toString());
 
                                 ans.add(string);
                             }

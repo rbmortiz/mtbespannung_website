@@ -67,16 +67,29 @@ public class DashboardService {
         return stringingRepository.getStrings();
     }
 
-    public Future<JsonArray> getStringingJobs(RoutingContext ctx){
-        JsonObject emailObject = ctx.user().principal();
-        String email = emailObject.getString("email");
-        if(email==null || email.isBlank()) return Future.succeededFuture(null);
+    public Future<JsonArray> getStringingJobs(RoutingContext ctx) {
 
-        JsonObject user = accountRepository.getUser(email).await();
+        JsonObject tokenUser = ctx.user().principal();
+        String email = tokenUser.getString("email");
 
-        Integer id = user.getInteger("user_id");
-        if(id == null) return Future.succeededFuture(new JsonArray());
+        if (email == null || email.isBlank()) {
+            return Future.failedFuture("Email missing from JWT");
+        }
 
-        return stringingRepository.getStringingJobs(id);
+        return accountRepository.getUser(email)
+            .compose(user -> {
+
+                if (user == null) {
+                    return Future.succeededFuture(new JsonArray());
+                }
+
+                Integer id = user.getInteger("userId");
+
+                if (id == null) {
+                    return Future.failedFuture("User ID missing");
+                }
+
+                return stringingRepository.getStringingJobs(id);
+            });
     }
 }
