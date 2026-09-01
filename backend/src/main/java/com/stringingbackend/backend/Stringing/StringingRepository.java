@@ -7,6 +7,8 @@ import io.vertx.sqlclient.Row;
 import io.vertx.sqlclient.Tuple;
 
 import java.time.OffsetDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 import io.vertx.core.Future;
 
@@ -96,4 +98,110 @@ public class StringingRepository {
                         return Future.failedFuture("Database error");
                     });
     }
+
+    public Future<Integer> isValidOrder(Integer id){
+        String query = """
+                SELECT * FROM stringing_orders WHERE order_id=$1
+            """;
+
+        if(id == null) return Future.succeededFuture(404);
+
+        return pool.preparedQuery(query)
+                    .execute(Tuple.of(id))
+                    .map(result -> {
+                        if(result.rowCount()>0){
+                            return 200;
+                        }
+                        return 404;
+                    })
+                    .recover(err -> {
+                        return Future.failedFuture("Database error");
+                    });
+    }
+
+    public Future<Integer> orderIsModifiable(Integer id) {
+        if (id == null) {
+            return Future.succeededFuture(404);
+        }
+
+        String query = """
+            SELECT status
+            FROM stringing_orders
+            WHERE order_id = $1
+            """;
+
+        return pool.preparedQuery(query)
+            .execute(Tuple.of(id))
+            .map(result -> {
+
+                if (!result.iterator().hasNext()) {
+                    return 404;
+                }
+
+                Row row = result.iterator().next();
+                String status = row.getString("status");
+
+                if ("pending".equals(status)) {
+                    return 200;
+                }
+
+                return 403;
+            });
+    }
+
+    public Future<Integer> updateOrder(Integer orderId, Integer kgVert, Integer kgHor, String infos) {
+
+        List<String> updates = new ArrayList<>();
+        List<Object> values = new ArrayList<>();
+
+        int index = 1;
+
+        if (kgVert != null) {
+            updates.add("vertical_kg = $" + index++);
+            values.add(kgVert);
+        }
+
+        if (kgHor != null) {
+            updates.add("horizontal_kg = $" + index++);
+            values.add(kgHor);
+        }
+
+        if (infos != null && !infos.isBlank()) {
+            updates.add("additional_info = $" + index++);
+            values.add(infos);
+        }
+
+        // No fields to update
+        if (updates.isEmpty()) {
+            return Future.succeededFuture(400);
+        }
+
+        values.add(orderId);
+
+        String query = """
+            UPDATE stringing_orders
+            SET %s
+            WHERE order_id = $%d
+            """.formatted(
+                String.join(", ", updates),
+                index
+            );
+
+        return pool.preparedQuery(query)
+            .execute(Tuple.from(values))
+            .map(result -> {
+
+                if (result.rowCount() == 0) {
+                    return 404;
+                }
+
+                return 200;
+            })
+            .recover(err -> {
+                err.printStackTrace();
+                return Future.succeededFuture(500);
+            });
+    }
 }
+
+

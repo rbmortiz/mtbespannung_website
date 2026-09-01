@@ -92,4 +92,37 @@ public class DashboardService {
                 return stringingRepository.getStringingJobs(id);
             });
     }
+
+    public Future<Integer> updateOrder(RoutingContext ctx) {
+
+        JsonObject body = ctx.body().asJsonObject();
+
+        Integer orderId = body.getInteger("order_id");
+        Integer kgVert = body.getInteger("kgVert");
+        Integer kgHor = body.getInteger("kgHor");
+        String infos = body.getString("infos");
+
+        return stringingRepository.isValidOrder(orderId)
+            .compose(response -> {
+
+                if (response != 200) {
+                    return Future.succeededFuture(response);
+                }
+
+                return stringingRepository.orderIsModifiable(orderId)
+                    .compose(res -> {
+
+                        if (res != 200) {
+                            return Future.succeededFuture(res);
+                        }
+
+                        return stringingRepository.updateOrder(
+                            orderId,
+                            kgVert,
+                            kgHor,
+                            infos
+                        );
+                    });
+            });
+    }
 }

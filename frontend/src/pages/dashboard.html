@@ -27,8 +27,26 @@
                 </div>
             </div>
 
-            <!-- More Info Modal -->
-            <div class="modal fade" id="moreInfoModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <!-- Info Account Modal -->
+            <div class="modal fade" id="infoModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h1 class="modal-title fs-5" id="exampleModalLabel">Account löschen</h1>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            Möchten sie wirklich ihren Account löschen?
+                        </div>
+                        <div class="modal-footer align-items-center justify-content-center">
+                            <button type="button" class="btn btn-danger w-100" id="deleteAccountButton">Löschen</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bespannung Modal -->
+            <div class="modal fade" id="stringingModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
                 <div class="modal-dialog modal-dialog-centered">
                     <div class="modal-content">
                         <div class="modal-header">
@@ -37,6 +55,9 @@
                         </div>
                         <div class="modal-body">
                             <div class="modal-body">
+
+                                <div id="patchOrderError" class="alert alert-danger d-none mx-auto text-center mt-4" role="alert" style="width: 70% !important"></div>
+
                                 <div class="d-flex align-items-center gap-3 mb-2">
                                     <label for="modalRacketName"
                                         class="form-label mb-0 text-nowrap d-flex"
@@ -50,14 +71,14 @@
                                     <label for="modalVerticalKG" class="form-label mb-0 text-nowrap" style="min-width: 130px;">
                                         KG-Längs:
                                     </label>
-                                    <input type="text" class="form-control" id="modalVerticalKG">
+                                    <input type="number" min="5" max="20" step="0.1" class="form-control" id="modalVerticalKG">
                                 </div>
 
                                 <div class="d-flex align-items-center gap-3 mb-2">
                                     <label for="modalHorizontalKG" class="form-label mb-0 text-nowrap" style="min-width: 130px;">
                                         KG-Quer:
                                     </label>
-                                    <input type="text" class="form-control" id="modalHorizontalKG">
+                                    <input type="number" min="5" max="20" step="0.1" class="form-control" id="modalHorizontalKG">
                                 </div>
 
                                 <div class="d-flex align-items-center gap-3 mb-2">
@@ -105,7 +126,7 @@
                             </div>
                         </div>
                         <div class="modal-footer align-items-center justify-content-center">
-                            
+                            <button type="button" class="btn btn-success w-100" style="max-width: 90%" id="patchOrderButton">Speichern</button>
                         </div>
                     </div>
                 </div>
@@ -136,9 +157,9 @@
                             <input type="text" class="form-control" id="passwordField" placeholder="***********">
                         </div>
 
-                        <button type="button" class="btn btn-success mt-2 w-100" id="saveButton">Speichern</button>
-                        <button type="button" class="btn btn-warning mt-2 w-100" id="logoutButton">Ausloggen</button>
-                        <button type="button" class="btn btn-danger mt-2 w-100" data-bs-toggle="modal" data-bs-target="#deleteAccountModal">Account löschen</button>
+                        <button type="button" class="btn btn-success mt-2 w-100" id="saveButton" style="max-width: 90% !important">Speichern</button>
+                        <button type="button" class="btn btn-warning mt-2 w-100 text-white" id="logoutButton" style="max-width: 90% !important">Ausloggen</button>
+                        <button type="button" class="btn btn-danger mt-2 w-100" data-bs-toggle="modal" data-bs-target="#deleteAccountModal" style="max-width: 90% !important">Account löschen</button>
                     </div>
                 </div>
             </div>

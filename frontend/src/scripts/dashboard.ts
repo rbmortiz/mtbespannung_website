@@ -7,6 +7,7 @@ const lastNameInput = getEl<HTMLInputElement>("lastName");
 const deleteAccountButton = getEl<HTMLDivElement>("deleteAccountButton");
 const logoutButton = getEl<HTMLButtonElement>("logoutButton");
 const saveButton = getEl<HTMLButtonElement>("saveButton");
+const patchOrderButton = getEl<HTMLButtonElement>("patchOrderButton");
 
 const stringingTable = getEl<HTMLTableSectionElement>("stringingTable");
 
@@ -67,6 +68,11 @@ async function init(): Promise<void>{
         console.log("updating user");
         void updateUser();
     });
+
+    patchOrderButton.addEventListener("click", () => {
+        console.log("updating order");
+        void updateOrderInformation();
+    })
     
     if(role === "admin")buildForAdmin();
     else buildForUser();
@@ -108,6 +114,12 @@ async function setUserCredentials(): Promise<Boolean>{
 
 function buildForAdmin(): void {
 
+}
+
+export function showPatchError(message: string): void {
+  const errorBox = getEl<HTMLDivElement>("patchOrderError");
+  errorBox.textContent = message;
+  errorBox.classList.remove("d-none");
 }
 
 async function buildForUser(): Promise<void> {
@@ -354,6 +366,7 @@ function showOrderDetails(order: StringingOrder): void {
     const updated = new Date(order.updated_at);
 
     getEl<HTMLSpanElement>("modalRacketName").innerHTML = order.racket_name;
+    getEl<HTMLSpanElement>("modalRacketName").setAttribute("order-id", order.order_id.toString());
     getEl<HTMLSpanElement>("modalCreatedAt").innerHTML = created.toLocaleDateString("de-DE");
     getEl<HTMLSpanElement>("modalUpdatedAt").innerHTML = updated.toLocaleDateString("de-DE");
 
@@ -384,37 +397,10 @@ function showOrderDetails(order: StringingOrder): void {
             break;
     }
 
-    var stringColor: string = getColorOfStringId(order.string_id);
-    var stringName: string = getNameOfStringId(order.string_id);
-
-    getEl<HTMLSpanElement>("modalString").innerHTML = stringName;
-    getEl<HTMLSpanElement>("modalString").classList.add(stringColor);
+    getEl<HTMLSpanElement>("modalString").innerHTML = getNameOfString(order.string_id);
 }
 
-function getColorOfStringId(id: number): string {
-    const racketString = stringTypes.find(
-        racketString => racketString.string_id === id
-    );
-
-    if(racketString === null || racketString === undefined) return "text-black";
-
-    switch(racketString.color){
-        case "red": 
-            return "text-danger";
-        case "blue": 
-            return "text-primary";
-        case "green":
-            return "text-success";
-        case "white":
-            return "text-white";
-        case "black": 
-            return "text-black";
-    }
-    
-    return "text-black";
-}
-
-function getNameOfStringId(id: number): string {
+function getNameOfString(id: number): string {
     const racketString = stringTypes.find(
         racketString => racketString.string_id === id
     );
@@ -422,4 +408,57 @@ function getNameOfStringId(id: number): string {
     if(racketString === null || racketString === undefined) return "";
     
     return racketString.name;
+}
+
+async function updateOrderInformation(): Promise<void> {
+    const token = localStorage.getItem("token");
+
+    var infos: string = getEl<HTMLInputElement>("modalInfos").value;
+    var orderId: number = Number(getEl<HTMLSpanElement>("modalRacketName").getAttribute("order-id"));
+
+    const kgVertInput = getEl<HTMLInputElement>("modalVerticalKG").value;
+
+    const kgHorInput = getEl<HTMLInputElement>("modalHorizontalKG").value;
+
+    const kgVert: number | null = kgVertInput === "" ? null : Number(kgVertInput);
+
+    const kgHor: number | null = kgHorInput === "" ? null : Number(kgHorInput);
+
+    try {
+        const response = await fetch("https://api.mtbespannung.de/updateOrder", {
+            method: "PATCH",
+
+            headers: {
+                "Authorization": `Bearer ${token}`,
+                "Content-Type": "application/json"
+            },
+
+            body: JSON.stringify({
+                "order_id": orderId,
+                "kgVert": kgVert,
+                "kgHor": kgHor,
+                "infos": infos
+            })
+        });
+
+        if(response.status === 400){
+            showPatchError("Fehlende Daten");
+            return;
+        }
+
+        if(response.status === 404){
+            showPatchError("Bespannungsorder existiert nicht");
+            return;
+        }
+
+        if(response.status === 403){
+            showPatchError("Bespannungsorder kann nicht mehr verändert werden");
+            return;
+        }
+
+        window.location.reload();
+    } catch (error){
+        console.error(error);
+        showError("Server konnte nicht erreicht werden");
+    }
 }

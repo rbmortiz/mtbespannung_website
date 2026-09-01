@@ -28,6 +28,9 @@ public class DashboardHandler {
         router.post("/getUserStringingJobs")
             .handler(JWTAuthHandler.create(jwtAuth))
             .handler(this::getStringingJobs);
+        router.patch("/updateOrder")
+            .handler(JWTAuthHandler.create(jwtAuth))
+            .handler(this::updateOrder);
     }
 
     private void editUser(RoutingContext ctx) {
@@ -181,6 +184,46 @@ public class DashboardHandler {
                 ctx.response()
                     .setStatusCode(500)
                     .end("Interner Server Fehler");
+            });
+    }
+
+    private void updateOrder(RoutingContext ctx) {
+        dashboardService.updateOrder(ctx)
+            .onSuccess(statusCode -> {
+                if (statusCode == 400) {
+                    ctx.response()
+                        .setStatusCode(400)
+                        .end("No valid fields to update");
+                    return;
+                }
+
+                if (statusCode == 403) {
+                    ctx.response()
+                        .setStatusCode(403)
+                        .end("Order can not be modified anymore");
+                    return;
+                }
+
+                if (statusCode == 404) {
+                    ctx.response()
+                        .setStatusCode(404)
+                        .end("Order not found");
+                    return;
+                }
+
+                ctx.response()
+                    .setStatusCode(200)
+                    .end("Order updated");
+            })
+            .onFailure(err -> {
+
+                err.printStackTrace();
+
+                if (!ctx.response().ended()) {
+                    ctx.response()
+                        .setStatusCode(500)
+                        .end("Database error");
+                }
             });
     }
 }
