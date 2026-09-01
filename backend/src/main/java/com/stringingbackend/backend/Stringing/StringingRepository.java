@@ -6,6 +6,7 @@ import io.vertx.sqlclient.Pool;
 import io.vertx.sqlclient.Row;
 import io.vertx.sqlclient.Tuple;
 
+import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -149,7 +150,7 @@ public class StringingRepository {
             });
     }
 
-    public Future<Integer> updateOrder(Integer orderId, Integer kgVert, Integer kgHor, String infos) {
+    public Future<Integer> updateOrder(Integer orderId, BigDecimal kgVert, BigDecimal kgHor, String infos) {
 
         List<String> updates = new ArrayList<>();
         List<Object> values = new ArrayList<>();

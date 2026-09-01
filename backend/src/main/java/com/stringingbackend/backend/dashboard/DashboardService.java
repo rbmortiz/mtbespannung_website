@@ -1,5 +1,7 @@
 package com.stringingbackend.backend.dashboard;
 
+import java.math.BigDecimal;
+
 import com.stringingbackend.backend.Stringing.StringingRepository;
 import com.stringingbackend.backend.accounts.AccountRepository;
 
@@ -98,9 +100,14 @@ public class DashboardService {
         JsonObject body = ctx.body().asJsonObject();
 
         Integer orderId = body.getInteger("order_id");
-        Integer kgVert = body.getInteger("kgVert");
-        Integer kgHor = body.getInteger("kgHor");
         String infos = body.getString("infos");
+
+        Number kgVertNumber = body.getNumber("kgVert");
+        Number kgHorNumber = body.getNumber("kgHor");
+
+        BigDecimal kgVert = kgVertNumber == null ? null : BigDecimal.valueOf(kgVertNumber.doubleValue());
+
+        BigDecimal kgHor = kgHorNumber == null ? null : BigDecimal.valueOf(kgHorNumber.doubleValue());
 
         return stringingRepository.isValidOrder(orderId)
             .compose(response -> {
