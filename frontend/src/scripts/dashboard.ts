@@ -332,7 +332,7 @@ function insertSingleEntry(order: StringingOrder): void {
         <tr>
             <td>${created_at.toLocaleDateString("de-DE")}</td>
             <td>${order.racket_name}</td>
-            <td><button class="btn btn-primary moreInfoButton" data-order-id="${order.order_id}" data-bs-toggle="modal" data-bs-target="#moreInfoModal">Mehr Details</button></td>
+            <td><button class="btn btn-primary moreInfoButton" data-order-id="${order.order_id}" data-bs-toggle="modal" data-bs-target="#stringingModal">Mehr Details</button></td>
         </tr>
     `
 }
