@@ -34,7 +34,7 @@ const racketNameContainer = getEl<HTMLDivElement>("racketNameContainer");
 const infosContainer = getEl<HTMLDivElement>("infosContainer");
 
 
-var stringTypes: StringTypes[];
+let stringTypes: StringTypes[] = [];
 // var squashStringTypes: StringTypes[];
 // var badmintonStringTypes: StringTypes[];
 
@@ -59,7 +59,7 @@ async function init(): Promise<void>{
     await getStringTypes();
     await setFirstName();
 
-    racketTypeInput.addEventListener("onchange", () => {
+    racketTypeInput.addEventListener("change", () => {
         siteTypeInput.innerHTML = "";
         addOptions(racketTypeInput.value);
     });
@@ -180,7 +180,7 @@ async function getStringTypes(): Promise<void> {
 
 function addOptions(sport: string): void {
     for(const str of stringTypes){
-        if(str.sport === sport){
+        if(str.sport.toLowerCase() === sport.toLowerCase()){
             siteTypeInput.innerHTML += `<option value="${str.string_id}">${str.name}</option>`;
         }
     }
