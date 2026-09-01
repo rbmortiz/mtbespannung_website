@@ -54,9 +54,9 @@ async function init(): Promise<void>{
         buildForGuestUser();
     } else {
         buildForUser();
-        await getStringTypes(token);
     }
 
+    await getStringTypes();
     await setFirstName();
 
     racketTypeInput.addEventListener("onchange", () => {
@@ -154,14 +154,10 @@ function buildForUser(): void {
     infosContainer.classList.add("mb-5");
 }
 
-async function getStringTypes(token: String): Promise<void> {
+async function getStringTypes(): Promise<void> {
     try {
         const response = await fetch("https://api.mtbespannung.de/getStrings", {
-            method: "GET",
-
-            headers: {
-                "Authorization": `Bearer ${token}`
-            }
+            method: "GET"
         });
 
         if(response.status === 200){
