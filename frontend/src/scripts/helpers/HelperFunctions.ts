@@ -1,3 +1,8 @@
+interface UserInformation {
+  firstName: string;
+  role: string;
+}
+
 export function getEl<T extends HTMLElement>(id: string): T {
     const el = document.getElementById(id);
 
@@ -52,11 +57,6 @@ export function manageNavBarLinks(): void {
 export function redirectIfNoToken(): void {
     let token = localStorage.getItem("token");
     if(!token) window.location.replace("/src/pages/main.html");
-}
-
-interface UserInformation {
-  firstName: string;
-  role: string;
 }
 
 export async function setFirstName(): Promise<void> {
@@ -336,8 +336,31 @@ export function initRacketBackground(): void {
   drawRackets();
 }
 
-export function showError(message: string): void {
-  const errorBox = getEl<HTMLDivElement>("loginError");
+export function showError(box: string, message: string): void {
+  const errorBox = getEl<HTMLDivElement>(box);
   errorBox.textContent = message;
   errorBox.classList.remove("d-none");
+}
+
+export function displayStringElement(htmlel: string, show: boolean): void {
+  var element = getEl<HTMLElement>(htmlel);
+
+  if(!show){
+        if(element.classList.contains("d-none")) return;
+        else element.classList.add("d-none");
+    } else {
+        if(!element.classList.contains("d-none")) return;
+        else element.classList.remove("d-none");
+    }
+}
+
+export function displayHTMLElement(htmlel: HTMLElement, show: boolean): void {
+
+  if(!show){
+        if(htmlel.classList.contains("d-none")) return;
+        else htmlel.classList.add("d-none");
+    } else {
+        if(!htmlel.classList.contains("d-none")) return;
+        else htmlel.classList.remove("d-none");
+    }
 }

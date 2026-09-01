@@ -26,52 +26,65 @@
         <p class="mt-3 text-center" style="width: 80%">Felder mit <span class="text-danger">*</span> müssen ausgefüllt werden</p>
         <p class="mt-2 text-center" style="width: 80%">Bei <span class="text-success">Unklarheiten</span> auf das Wort neben dem Feld klicken</p>
     </div>
-    <div class="card custom-card-dashboard text-white h-100 mx-3">
-        <div class="card-header p-0 m-0">
-            <h5 class="text-center my-2">Bespannungen aufgeben</h5>
-        </div>
-        <div class="card-body text-center p-0">
-            <div class="d-flex align-items-center mb-2 mx-3 mt-4">
-                <label for="text" class="form-label mb-0" style="min-width:150px" data-bs-toggle="modal" data-bs-target="#infoModal" type="button" id="firstNameInfo"><span class="text-danger">* </span>Vorname:</label>
-                <input type="text" class="form-control" id="firstName">
-            </div>
-            <div class="d-flex align-items-center mb-2 mx-3">
-                <label for="text" class="form-label mb-0" style="min-width:150px" data-bs-toggle="modal" data-bs-target="#infoModal" type="button" id="lastNameInfo"><span class="text-danger">* </span>Nachname:</label>
-                <input type="text" class="form-control" id="lastName">
-            </div>
-            <div class="d-flex align-items-center mb-2 mx-3">
-                <label for="text" class="form-label mb-0" style="min-width:150px" data-bs-toggle="modal" data-bs-target="#infoModal" type="button" id="emailInfo">E-Mail:</label>
-                <input type="text" class="form-control" id="email">
-            </div>
-            <div class="d-flex align-items-center mb-2 mx-3">
-                <label for="text" class="form-label mb-0" style="min-width:150px" data-bs-toggle="modal" data-bs-target="#infoModal" type="button" id="racketNameInfo"><span class="text-danger">* </span>Schlägername:</label>
-                <input type="text" class="form-control" id="racketName">
-            </div>
-            <div class="d-flex align-items-center mb-2 mx-3">
-                <label for="text" class="form-label mb-0" style="min-width:150px" data-bs-toggle="modal" data-bs-target="#infoModal" type="button" id="racketTypeInfo"><span class="text-danger">* </span>Schlägertyp:</label>
-                <input type="text" class="form-control" id="racketType">
-            </div>
-            <hr>
-            <div class="d-flex align-items-center mb-2 mx-3">
-                <label for="text" class="form-label mb-0" style="min-width:150px" data-bs-toggle="modal" data-bs-target="#infoModal" type="button" id="siteTypeInfo"><span class="text-danger">* </span>Saite:</label>
-                <input type="text" class="form-control" id="siteType">
-            </div>
-            <div class="d-flex align-items-center mb-2 mx-3">
-                <label for="text" class="form-label mb-0" style="min-width:150px" data-bs-toggle="modal" data-bs-target="#infoModal" type="button" id="horizontalKGInfo">Längs:</label>
-                <input type="text" class="form-control" id="horizontalKG">
-            </div>
-            <div class="d-flex align-items-center mb-2 mx-3">
-                <label for="text" class="form-label mb-0" style="min-width:150px" data-bs-toggle="modal" data-bs-target="#infoModal" type="button" id="verticalKGInfo">Quer:</label>
-                <input type="text" class="form-control" id="verticalKG">
-            </div>
-            <hr>
-            <div class="d-flex align-items-center mb-2 mx-3">
-                <label for="text" class="form-label mb-0" style="min-width:150px" data-bs-toggle="modal" data-bs-target="#infoModal" type="button" id="infosInfo">Infos:</label>
-                <input type="text" class="form-control" id="infos">
-            </div>
 
-            <button class="btn btn-success mb-4 mt-4 w-100" id="sendOrderWithoutAccount" style="max-width: 90%">Abschicken</button>
-            <button class="btn btn-success d-none mb-4 w-100" id="sendOrderAccount" style="max-width: 90%">Abschicken</button>
+    <div id="bespannungenError" class="alert alert-danger d-none mx-auto text-center mt-4" role="alert" style="width: 70% !important"></div>
+
+    <div class="d-flex w-100 justify-content-center align-items-center m-0 p-0">
+        <div class="d-flex card custom-card-dashboard text-white h-100 mx-3 w-100" style="max-width: 90%">
+            <div class="card-header p-0 m-0">
+                <h5 class="text-center my-2">Bespannungen aufgeben</h5>
+            </div>
+            <div class="card-body text-center p-0">
+                <div class="d-flex align-items-center mb-2 mx-3 mt-4" id="firstNameContainer">
+                    <label for="text" class="form-label mb-0" style="min-width:150px" data-bs-toggle="modal" data-bs-target="#infoModal" type="button" id="firstNameInfo"><span class="text-danger">* </span>Vorname:</label>
+                    <input type="text" class="form-control" id="firstName">
+                </div>
+                <div class="d-flex align-items-center mb-2 mx-3" id="lastNameContainer">
+                    <label for="text" class="form-label mb-0" style="min-width:150px" data-bs-toggle="modal" data-bs-target="#infoModal" type="button" id="lastNameInfo"><span class="text-danger">* </span>Nachname:</label>
+                    <input type="text" class="form-control" id="lastName">
+                </div>
+                <div class="d-flex align-items-center mb-2 mx-3" id="emailContainer">
+                    <label for="text" class="form-label mb-0" style="min-width:150px" data-bs-toggle="modal" data-bs-target="#infoModal" type="button" id="emailInfo">E-Mail:</label>
+                    <input type="text" class="form-control" id="email">
+                </div>
+                <div class="d-flex align-items-center mb-2 mx-3" id="racketNameContainer">
+                    <label for="text" class="form-label mb-0" style="min-width:150px" data-bs-toggle="modal" data-bs-target="#infoModal" type="button" id="racketNameInfo"><span class="text-danger">* </span>Schlägername:</label>
+                    <input type="text" class="form-control" id="racketName">
+                </div>
+                <div class="d-flex align-items-center mb-2 mx-3" id="racketTypeContainer">
+                    <label for="text" class="form-label mb-0" style="min-width:150px" data-bs-toggle="modal" data-bs-target="#infoModal" type="button" id="racketTypeInfo"><span class="text-danger">* </span>Schlägertyp:</label>
+                    
+                    <select class="form-select" id="racketType">
+                        <option value="null" selected></option>
+                        <option value="badminton">Badminton</option>
+                        <option value="squash">Squash</option>
+                    </select>
+                </div>
+                <hr>
+                <div class="d-flex align-items-center mb-2 mx-3" id="siteTypeContainer">
+                    <label for="text" class="form-label mb-0" style="min-width:150px" data-bs-toggle="modal" data-bs-target="#infoModal" type="button" id="siteTypeInfo"><span class="text-danger">* </span>Saite:</label>
+
+                    <select class="form-select" id="siteType">
+                        
+                    </select>
+                </div>
+                <div class="d-flex align-items-center mb-2 mx-3" id="horizontalKGContainer">
+                    <label for="text" class="form-label mb-0" style="min-width:150px" data-bs-toggle="modal" data-bs-target="#infoModal" type="button" id="horizontalKGInfo">Längs:</label>
+                    <input type="number" max="20" min="5" step="0.1" class="form-control" id="horizontalKG">
+                </div>
+                <div class="d-flex align-items-center mb-2 mx-3" id="verticalKGContainer">
+                    <label for="text" class="form-label mb-0" style="min-width:150px" data-bs-toggle="modal" data-bs-target="#infoModal" type="button" id="verticalKGInfo">Quer:</label>
+                    <input type="number" max="20" min="5" step="0.1" class="form-control" id="verticalKG">
+                </div>
+                <hr>
+                <div class="d-flex align-items-center mb-2 mx-3" id="infosContainer">
+                    <label for="text" class="form-label mb-0" style="min-width:150px" data-bs-toggle="modal" data-bs-target="#infoModal" type="button" id="infosInfo">Infos:</label>
+                    <input type="text" class="form-control" id="infos">
+                </div>
+
+                <button class="btn btn-success mb-4 mt-4 w-100" id="sendOrderWithoutAccount" style="max-width: 90%">Abschicken</button>
+                <button class="btn btn-success d-none mb-4 w-100" id="sendOrderWithAccount" style="max-width: 90%">Abschicken</button>
+            </div>
         </div>
     </div>
 </main>

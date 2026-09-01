@@ -36,6 +36,7 @@ public class StringingRepository {
                                 JsonObject string = new JsonObject();
 
                                 string.put("string_id", row.getInteger("string_id"));
+                                string.put("sport", row.getString("sport"));
                                 string.put("name", row.getString("name"));
                                 string.put("color", row.getString("color"));
                                 string.put("description", row.getString("description"));

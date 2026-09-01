@@ -1,4 +1,4 @@
-import { getEl, manageNavBarLinks, initRacketBackground, showError } from "./HelperFunctions";
+import { getEl, manageNavBarLinks, initRacketBackground, showError, displayHTMLElement } from "./helpers/HelperFunctions";
 
 const emailInput = getEl<HTMLInputElement>("emailInput");
 const passwordInput = getEl<HTMLInputElement>("passwordInput");
@@ -53,24 +53,14 @@ function redirectIfLoggedIn(): void {
     }
 }
 
-function displayElement(element: HTMLElement, display: boolean){
-    if(!display){
-        if(element.classList.contains("d-none")) return;
-        else element.classList.add("d-none");
-    } else {
-        if(!element.classList.contains("d-none")) return;
-        else element.classList.remove("d-none");
-    }
-}
-
 function showRegisterFields(showRegister: boolean): void{
-    displayElement(goBackButton, showRegister);
-    displayElement(registerPullupButton, !showRegister);
-    displayElement(accountText, !showRegister);
-    displayElement(loginButton, !showRegister);
-    displayElement(firstNameInput, showRegister);
-    displayElement(lastNameInput, showRegister);
-    displayElement(registerSendButton, showRegister);
+    displayHTMLElement(goBackButton, showRegister);
+    displayHTMLElement(registerPullupButton, !showRegister);
+    displayHTMLElement(accountText, !showRegister);
+    displayHTMLElement(loginButton, !showRegister);
+    displayHTMLElement(firstNameInput, showRegister);
+    displayHTMLElement(lastNameInput, showRegister);
+    displayHTMLElement(registerSendButton, showRegister);
 }
 
 // Button presses
@@ -123,26 +113,26 @@ async function sendRegister(): Promise<void> {
         }
 
         if (response.status === 400) {
-            showError("Bitte fülle alle Felder aus.");
+            showError("loginError", "Bitte fülle alle Felder aus.");
             return;
         }
 
         if (response.status === 403) {
-            showError("Ein Account mit dieser E-Mail existiert bereits.");
+            showError("loginError", "Ein Account mit dieser E-Mail existiert bereits.");
             return;
         }
 
         if (response.status === 500) {
-            showError("Interner Serverfehler.");
+            showError("loginError", "Interner Serverfehler.");
             return;
         }
 
         console.error("Unexpected status:", response.status);
-        showError("Ein unbekannter Fehler ist aufgetreten.");
+        showError("loginError", "Ein unbekannter Fehler ist aufgetreten.");
 
     } catch (error) {
         console.error("Could not reach backend:", error);
-        showError("Server konnte nicht erreicht werden");
+        showError("loginError", "Server konnte nicht erreicht werden");
     }
 }
 
@@ -178,12 +168,12 @@ async function sendLogin(): Promise<void> {
         } else {
             console.log("Login failed!");
 
-            showError("Login fehlgeschlagen");
+            showError("loginError", "Login fehlgeschlagen");
         }
 
     } catch (error) {
         console.error("Backend could not be reached:", error);
 
-        showError("Server konnte nicht erreicht werden");
+        showError("loginError", "Server konnte nicht erreicht werden");
     }
 }

@@ -13,7 +13,9 @@ import io.vertx.ext.auth.PubSecKeyOptions;
 // JWTAuth
 import io.vertx.ext.auth.jwt.*;
 
+import com.stringingbackend.backend.Stringing.StringingHandler;
 import com.stringingbackend.backend.Stringing.StringingRepository;
+import com.stringingbackend.backend.Stringing.StringingService;
 // Service Imports
 import com.stringingbackend.backend.accounts.AccountRepository;
 import com.stringingbackend.backend.accounts.LoginHandler;
@@ -100,14 +102,18 @@ public class MainVerticle extends VerticleBase {
     RegisterService registerService = new RegisterService(accountRepository);
     RegisterHandler registerHandler = new RegisterHandler(registerService, jwtAuth);
 
-    DashboardService dashboardService = new DashboardService(accountRepository, stringingRepository);
+    DashboardService dashboardService = new DashboardService(accountRepository);
     DashboardHandler dashboardHandler = new DashboardHandler(dashboardService, jwtAuth);
+
+    StringingService stringingService = new StringingService(accountRepository, stringingRepository);
+    StringingHandler stringingHandler = new StringingHandler(stringingService, jwtAuth);
 
     // Route declaration
     router.route().handler(BodyHandler.create());
     loginHandler.registerRoutes(router);
     registerHandler.registerRoutes(router);
     dashboardHandler.registerRoutes(router);
+    stringingHandler.registerRoutes(router);
 
     router.get("/health").handler(ctx -> {
       ctx.response() 

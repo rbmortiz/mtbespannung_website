@@ -1,4 +1,5 @@
-import { manageNavBarLinks, showError, redirectIfNoToken, setFirstName, initRacketBackground, getEl } from "./HelperFunctions";
+import { manageNavBarLinks, showError, redirectIfNoToken, setFirstName, initRacketBackground, getEl } from "./helpers/HelperFunctions";
+import type { StringTypes, StringingOrder } from "./helpers/interfaces"
 
 const emailInput = getEl<HTMLInputElement>("emailField");
 const passwordInput = getEl<HTMLInputElement>("passwordField");
@@ -10,29 +11,6 @@ const saveButton = getEl<HTMLButtonElement>("saveButton");
 const patchOrderButton = getEl<HTMLButtonElement>("patchOrderButton");
 
 const stringingTable = getEl<HTMLTableSectionElement>("stringingTable");
-
-interface StringingOrder {
-    order_id: number;
-    racket_name: string;
-    additional_info: string;
-    horizontal_kg: number;
-    vertical_kg: number;
-    string_id: number;
-    status: string;
-    created_at: string;
-    updated_at: string;
-}
-
-interface StringTypes {
-    string_id: number;
-    name: string;
-    color: string;
-    description: string;
-    type: string;
-    is_active: Boolean;
-    created_at: string;
-    updated_at: string;
-}
 
 let email: String;
 let firstName: String;
@@ -106,7 +84,7 @@ async function setUserCredentials(): Promise<Boolean>{
 
     } catch (error) {
         console.error("Could not reach backend:", error);
-        showError("Server konnte nicht erreicht werden");
+        showError("dashboardError","Server konnte nicht erreicht werden");
     }
 
     return false;
@@ -116,17 +94,11 @@ function buildForAdmin(): void {
 
 }
 
-export function showPatchError(message: string): void {
-  const errorBox = getEl<HTMLDivElement>("patchOrderError");
-  errorBox.textContent = message;
-  errorBox.classList.remove("d-none");
-}
-
 async function buildForUser(): Promise<void> {
     var token = localStorage.getItem("token");
 
     if(token === undefined || token === null){
-        showError("Konto wurde nicht gefunden");
+        showError("dashboardError","Konto wurde nicht gefunden");
         console.error("No token was found");
         return;
     }
@@ -161,7 +133,7 @@ async function getStringTypes(token: String): Promise<void> {
         }
     } catch(error){
         console.error("Could not reach backend: ", error);
-        showError("Server konnte nicht erreicht werden");
+        showError("dashboardError","Server konnte nicht erreicht werden");
     }
 }
 
@@ -189,7 +161,7 @@ async function getUserStrings(token: String): Promise<void> {
         }
     } catch(error){
         console.error("Could not reach backend: ", error);
-        showError("Server konnte nicht erreicht werden");
+        showError("dashboardError","Server konnte nicht erreicht werden");
     }
 }
 
@@ -203,7 +175,7 @@ async function deleteUserAccount(): Promise<void> {
     const token = localStorage.getItem("token");
 
     if (!token) {
-        showError("Du bist nicht angemeldet.");
+        showError("dashboardError","Du bist nicht angemeldet.");
         return;
     }
 
@@ -225,20 +197,20 @@ async function deleteUserAccount(): Promise<void> {
         }
 
         if (response.status === 401) {
-            showError("Account wurde nicht gefunden.");
+            showError("dashboardError","Account wurde nicht gefunden.");
             return;
         }
 
         if (response.status === 403) {
-            showError("Ungültige Benutzerdaten.");
+            showError("dashboardError","Ungültige Benutzerdaten.");
             return;
         }
 
-        showError("Account konnte nicht gelöscht werden");
+        showError("dashboardError","Account konnte nicht gelöscht werden");
 
     } catch (error) {
         console.error("Could not reach backend:", error);
-        showError("Server konnte nicht erreicht werden");
+        showError("dashboardError","Server konnte nicht erreicht werden");
     }
 }
 
@@ -251,7 +223,7 @@ async function updateUser(): Promise<void> {
     const token = localStorage.getItem("token");
 
     if (!token) {
-        showError("Du bist nicht angemeldet.");
+        showError("dashboardError","Du bist nicht angemeldet.");
         return;
     }
 
@@ -283,35 +255,35 @@ async function updateUser(): Promise<void> {
         if (response.status === 200) {
             const data = await response.json();
             localStorage.setItem("token", data.token);
-            window.location.replace("/src/pages/dashboard.html");
+            window.location.href = "/src/pages/dashboard.html";
             return;
         }
 
         if (response.status === 400) {
-            showError("Fehlende Daten.");
+            showError("dashboardError","Fehlende Daten.");
             return;
         }
 
         if (response.status === 401) {
-            showError("Token ist nicht mehr gültig.");
+            showError("dashboardError","Token ist nicht mehr gültig.");
             return;
         }
 
         if (response.status === 404) {
-            showError("Benutzer wurde nicht gefunden.");
+            showError("dashboardError","Benutzer wurde nicht gefunden.");
             return;
         }
 
         if (response.status === 409) {
-            showError("Neue Email ist bereits vergeben.");
+            showError("dashboardError","Neue Email ist bereits vergeben.");
             return;
         }
 
-        showError("Account konnte nicht verändert werden");
+        showError("dashboardError","Account konnte nicht verändert werden");
 
     } catch (error) {
         console.error("Could not reach backend:", error);
-        showError("Server konnte nicht erreicht werden");
+        showError("dashboardError","Server konnte nicht erreicht werden");
     }
 }
 
@@ -446,23 +418,23 @@ async function updateOrderInformation(): Promise<void> {
         });
 
         if(response.status === 400){
-            showPatchError("Fehlende Daten");
+            showError("patchOrderError", "Fehlende Daten");
             return;
         }
 
         if(response.status === 404){
-            showPatchError("Bespannungsorder existiert nicht");
+            showError("patchOrderError", "Bespannungsorder existiert nicht");
             return;
         }
 
         if(response.status === 403){
-            showPatchError("Bespannungsorder kann nicht mehr verändert werden");
+            showError("patchOrderError", "Bespannungsorder kann nicht mehr verändert werden");
             return;
         }
 
         window.location.reload();
     } catch (error){
         console.error(error);
-        showError("Server konnte nicht erreicht werden");
+        showError("dashboardError","Server konnte nicht erreicht werden");
     }
 }

@@ -1,4 +1,4 @@
-import { initRacketBackground, manageNavBarLinks, setFirstName } from "./HelperFunctions"
+import { initRacketBackground, manageNavBarLinks, setFirstName } from "./helpers/HelperFunctions"
 
 if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", init);

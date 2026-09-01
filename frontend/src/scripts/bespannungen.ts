@@ -1,7 +1,42 @@
-import { manageNavBarLinks, setFirstName, initRacketBackground, getEl } from "./HelperFunctions";
+import { manageNavBarLinks, setFirstName, initRacketBackground, getEl, displayHTMLElement, showError } from "./helpers/HelperFunctions";
+import type { StringTypes } from "./helpers/interfaces";
 
 const infoTextHeader = getEl<HTMLHeadingElement>("infoTextHeader");
 const infoTextBody = getEl<HTMLHeadingElement>("infoTextBody");
+
+const token = localStorage.getItem("token");
+
+// Form Input Elements
+
+/* const firstNameInput = getEl<HTMLInputElement>("firstName");
+const lastNameInput = getEl<HTMLInputElement>("lastName");
+const emailInput = getEl<HTMLInputElement>("email");
+const racketNameInput = getEl<HTMLInputElement>("racketName"); */
+const racketTypeInput = getEl<HTMLSelectElement>("racketType");
+const siteTypeInput = getEl<HTMLSelectElement>("siteType");
+// const horizontalKGInput = getEl<HTMLInputElement>("horizontalKG");
+// const verticalKGInput = getEl<HTMLInputElement>("verticalKG");
+// const infosInput = getEl<HTMLInputElement>("infos");
+
+const sendOrderWithoutAccountButton = getEl<HTMLInputElement>("sendOrderWithoutAccount");
+const sendOrderWithAccountButton = getEl<HTMLInputElement>("sendOrderWithAccount");
+
+// Container Elements
+
+const firstNameContainer = getEl<HTMLDivElement>("firstNameContainer");
+const lastNameContainer = getEl<HTMLDivElement>("lastNameContainer");
+const emailContainer = getEl<HTMLDivElement>("emailContainer");
+const racketNameContainer = getEl<HTMLDivElement>("racketNameContainer");
+// const racketTypeContainer = getEl<HTMLDivElement>("racketTypeContainer");
+// const siteTypeContainer = getEl<HTMLDivElement>("siteTypeContainer");
+// const horizontalKGContainer = getEl<HTMLDivElement>("horizontalKGContainer");
+// const verticalKGContainer = getEl<HTMLDivElement>("verticalKGContainer");
+const infosContainer = getEl<HTMLDivElement>("infosContainer");
+
+
+var stringTypes: StringTypes[];
+// var squashStringTypes: StringTypes[];
+// var badmintonStringTypes: StringTypes[];
 
 if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", init);
@@ -14,7 +49,20 @@ async function init(): Promise<void>{
 
     manageNavBarLinks();
     initRacketBackground();
+
+    if(token === null || token === undefined){
+        buildForGuestUser();
+    } else {
+        buildForUser();
+        await getStringTypes(token);
+    }
+
     await setFirstName();
+
+    racketTypeInput.addEventListener("onchange", () => {
+        siteTypeInput.innerHTML = "";
+        addOptions(racketTypeInput.value);
+    });
 }
 
 function setInfoFieldButtons(): void {
@@ -61,7 +109,7 @@ function setInfoFieldButtons(): void {
             Die Antworten auf solche Fragen finden sie in den <span class="text-success" type="button" id="goToInfos">Infos</span>
         `;
         getEl<HTMLSpanElement>("goToInfos").addEventListener("click", () => {
-            window.location.replace("/src/pages/infos.html")
+            window.location.href = "/src/pages/infos.html";
         });
     });
     getEl<HTMLLabelElement>("horizontalKGInfo").addEventListener("click", () => {
@@ -90,3 +138,64 @@ function racketVHInfoText(): void {
         Falls sie sich mit den Härten nicht auskennen, können sie gerne in das <span class="text-info">Info</span> Feld ihre Präferenz schreiben ("Etwas fester", "Etwas weicher", "Eher ausgeglichen").
     `;
 }
+
+function buildForGuestUser(): void {
+    
+}
+
+function buildForUser(): void {
+    displayHTMLElement(sendOrderWithAccountButton, true);
+    displayHTMLElement(sendOrderWithoutAccountButton, false);
+    displayHTMLElement(firstNameContainer, false);
+    displayHTMLElement(lastNameContainer, false);
+    displayHTMLElement(emailContainer, false);
+
+    racketNameContainer.classList.add("mt-5");
+    infosContainer.classList.add("mb-5");
+}
+
+async function getStringTypes(token: String): Promise<void> {
+    try {
+        const response = await fetch("https://api.mtbespannung.de/getStrings", {
+            method: "GET",
+
+            headers: {
+                "Authorization": `Bearer ${token}`
+            }
+        });
+
+        if(response.status === 200){
+            stringTypes = await response.json() as StringTypes[];
+            return;
+        }
+
+        if(response.status === 304){
+            console.log("No Strings could be found");
+        }
+
+        if(response.status === 500){
+            console.error("Database error, Strings could not be fetched");
+        }
+    } catch(error){
+        console.error("Could not reach backend: ", error);
+        showError("bespannungenError", "Server konnte nicht erreicht werden");
+    }
+}
+
+function addOptions(sport: string): void {
+    for(const str of stringTypes){
+        if(str.sport === sport){
+            siteTypeInput.innerHTML += `<option value="${str.string_id}">${str.name}</option>`;
+        }
+    }
+}
+
+
+//function overloading for the fetch request
+/*
+async function sendInput(firstName: string, lastName: string, email: string, racketName: string, racketType: string, racketString: string, vertKG: string, horKG: string, infos: string): Promise<void>;
+async function sendInput(racketName: string, racketType: string, racketString: string, vertKG: string, horKG: string, infos: string): Promise<void>;
+
+async function sendInput(){
+
+} */
