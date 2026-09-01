@@ -370,6 +370,10 @@ function showOrderDetails(order: StringingOrder): void {
     getEl<HTMLSpanElement>("modalCreatedAt").innerHTML = created.toLocaleDateString("de-DE");
     getEl<HTMLSpanElement>("modalUpdatedAt").innerHTML = updated.toLocaleDateString("de-DE");
 
+    getEl<HTMLInputElement>("modalVerticalKG").value = "";
+    getEl<HTMLInputElement>("modalHorizontalKG").value = "";
+    getEl<HTMLInputElement>("modalInfos").value = "";
+
     getEl<HTMLInputElement>("modalVerticalKG").placeholder = order.vertical_kg.toString();
     getEl<HTMLInputElement>("modalHorizontalKG").placeholder = order.horizontal_kg.toString();
     getEl<HTMLInputElement>("modalInfos").placeholder = order.additional_info;
