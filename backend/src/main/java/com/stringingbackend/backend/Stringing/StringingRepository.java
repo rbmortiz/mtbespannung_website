@@ -30,9 +30,6 @@ public class StringingRepository {
                 .execute(Tuple.of(firstName, lastName, email, racketName, infos, horKG, vertKG, stringId))
                 .map(result -> {
                     return 200;
-                })
-                .recover(err -> {
-                    return Future.failedFuture("Database error");
                 });
     }
 
@@ -46,9 +43,6 @@ public class StringingRepository {
                 .execute(Tuple.of(userId, firstName, lastName, email, racketName, infos, horKG, vertKG, stringId))
                 .map(result -> {
                     return 200;
-                })
-                .recover(err -> {
-                    return Future.failedFuture("Database error");
                 });
     }
 
@@ -107,11 +101,14 @@ public class StringingRepository {
                             for(Row row : result){
                                 JsonObject string = new JsonObject();
 
+                                BigDecimal horizontalKg = row.getBigDecimal("horizontal_kg");
+                                BigDecimal verticalKg = row.getBigDecimal("vertical_kg");
+
                                 string.put("order_id", row.getInteger("order_id"));
                                 string.put("racket_name", row.getString("racket_name"));
                                 string.put("additional_info", row.getString("additional_info"));
-                                string.put("horizontal_kg", row.getBigDecimal("horizontal_kg").doubleValue());
-                                string.put("vertical_kg", row.getBigDecimal("vertical_kg").doubleValue());
+                                string.put("horizontal_kg", horizontalKg == null ? null : horizontalKg.doubleValue());
+                                string.put("vertical_kg", verticalKg == null ? null : verticalKg.doubleValue());
                                 string.put("string_id", row.getInteger("string_id"));
                                 string.put("status", row.getString("status"));
                                 
@@ -147,25 +144,6 @@ public class StringingRepository {
                             return 200;
                         }
                         return 404;
-                    })
-                    .recover(err -> {
-                        return Future.failedFuture("Database error");
-                    });
-    }
-
-    public Future<Boolean> isOrderModifiable(Integer id){
-        String query = """
-            SELECT status FROM stringing_orders WHERE order_id=$1
-        """;
-
-        return pool.preparedQuery(query)
-                    .execute(Tuple.of(id))
-                    .map(result -> {
-                        Row row = result.iterator().next();
-                        String status = row.getString("status");
-
-                        if("pending".equals(status)) return true;
-                        return false;
                     })
                     .recover(err -> {
                         return Future.failedFuture("Database error");

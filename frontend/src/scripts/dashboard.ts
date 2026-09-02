@@ -173,6 +173,21 @@ async function deleteStringingOrder() {
             window.location.reload();
         }
 
+        if(response.status === 403){
+            showError("dashboardError", "Fehlende Daten");
+            console.error("Database error");
+        }
+
+        if(response.status === 404){
+            showError("dashboardError", "Account/Bespannung nicht gefunden");
+            console.error("Database error");
+        }
+
+        if(response.status === 401){
+            showError("dashboardError", "Bitte neu anmelden");
+            console.error("Database error");
+        }
+
         if(response.status === 500){
             console.error("Database error");
         }
@@ -205,6 +220,11 @@ async function getUserStrings(token: String): Promise<void> {
 
         if (response.status === 500) {
             console.error("Serverfehler bei Benutzerbesaitungen anzeigen lassen");
+        }
+
+        if(response.status === 401){
+            showError("dashboardError", "Bitte neu anmelden");
+            console.error("Database error");
         }
     } catch (error) {
         console.error("Could not reach backend: ", error);
@@ -474,8 +494,18 @@ async function updateOrderInformation(): Promise<void> {
             return;
         }
 
+        if (response.status === 401) {
+            showError("patchOrderError", "Bitte neu anmelden");
+            return;
+        }
+
         if (response.status === 403) {
             showError("patchOrderError", "Bespannungsorder kann nicht mehr verändert werden",);
+            return;
+        }
+
+        if (response.status === 500) {
+            showError("patchOrderError", "Datenbankfehler");
             return;
         }
 

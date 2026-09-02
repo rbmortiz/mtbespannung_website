@@ -207,8 +207,8 @@ async function sendInput(racketName: string, racketString: string, vertKG: strin
 
                 body: JSON.stringify({
                     "racket_name": racketName,
-                    "horizontal_kg": horKG,
-                    "vertical_kg": vertKG,
+                    "horizontal_kg": horKG === "" ? null : Number(horKG),
+                    "vertical_kg": vertKG === "" ? null : Number(vertKG),
                     "string_id": string_id, 
                     "additional_info": infos
                 })
@@ -230,6 +230,10 @@ async function sendInput(racketName: string, racketString: string, vertKG: strin
                 showError("bespannungenError", "Account konnte nicht gefunden werden");
             }
 
+            if(response.status === 401){
+                showError("bespannungenError", "Bitte neu anmelden");
+            }
+
         } catch (error) { 
             console.error(error);
             showError("bespannungenError", "Server konnte nicht erreicht werden");
@@ -249,8 +253,8 @@ async function sendInput(racketName: string, racketString: string, vertKG: strin
 
             body: JSON.stringify({
                 "racket_name": racketName,
-                "horizontal_kg": horKG,
-                "vertical_kg": vertKG,
+                "horizontal_kg": horKG === "" ? null : Number(horKG),
+                "vertical_kg": vertKG === "" ? null : Number(vertKG),
                 "string_id": string_id, 
                 "additional_info": infos,
 

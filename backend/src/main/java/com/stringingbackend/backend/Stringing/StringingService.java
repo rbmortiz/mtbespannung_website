@@ -18,30 +18,39 @@ public class StringingService {
         this.accountRepository = accountRepository;
     }
 
-    public Future<Integer> deleteStringingOrder(RoutingContext ctx){
+    public Future<Integer> deleteStringingOrder(RoutingContext ctx) {
+
         JsonObject data = ctx.user().principal();
         JsonObject body = ctx.body().asJsonObject();
 
         Integer stringId = body.getInteger("stringingOrderId");
+
         Integer userId = data.getInteger("userId");
         String email = data.getString("email");
 
-        if(stringId == null || userId == null || email == null){
+        if (stringId == null || userId == null || email == null) {
             return Future.succeededFuture(403);
         }
 
-        Boolean isAccountFree = accountRepository.isAccountFree(email).await();
-        if(isAccountFree)return Future.succeededFuture(404);
+        return accountRepository.isAccountFree(email)
+            .compose(isAccountFree -> {
 
-        Boolean canStringingJobBeModified = stringingRepository.isOrderModifiable(stringId).await();
-        if(!canStringingJobBeModified)return Future.succeededFuture(405);
+                if (isAccountFree) {
+                    return Future.succeededFuture(404);
+                }
 
-        return stringingRepository.deleteStringingOrder(userId, stringId)
-            .map(status -> {
-                return status;
+                return stringingRepository.orderIsModifiable(stringId);
             })
-            .recover(err -> {
-                return Future.failedFuture("Database error");
+            .compose(status -> {
+
+                if (status != 200) {
+                    return Future.succeededFuture(status);
+                }
+
+                return stringingRepository.deleteStringingOrder(
+                    userId,
+                    stringId
+                );
             });
     }
 
@@ -49,12 +58,19 @@ public class StringingService {
         JsonObject data = ctx.user().principal();
         JsonObject body = ctx.body().asJsonObject();
 
+        if (body == null) {
+            return Future.succeededFuture(403);
+        }
+
         Number kgVertNumber = body.getNumber("vertical_kg");
         Number kgHorNumber = body.getNumber("horizontal_kg");
 
         String racketName = body.getString("racket_name");
+
         BigDecimal vertKG = kgVertNumber == null ? null : BigDecimal.valueOf(kgVertNumber.doubleValue());
+
         BigDecimal horKG = kgHorNumber == null ? null : BigDecimal.valueOf(kgHorNumber.doubleValue());
+
         Integer stringId = body.getInteger("string_id");
         String infos = body.getString("additional_info");
 
@@ -63,19 +79,16 @@ public class StringingService {
         String lastName = data.getString("lastName");
         String email = data.getString("email");
 
-        if(firstName == null || lastName == null || email == null || racketName == null || stringId == null || userId == null){
-            return Future.succeededFuture(403);
-        }
+        if (firstName == null || lastName == null || email == null || racketName == null || stringId == null || userId == null) return Future.succeededFuture(403);
 
-        Boolean isAccountFree = accountRepository.isAccountFree(email).await();
-        if(isAccountFree)return Future.succeededFuture(404);
+        return accountRepository.isAccountFree(email)
+            .compose(isAccountFree -> {
 
-        return stringingRepository.newStringingOrderAccount(userId, email, firstName, lastName, racketName, stringId, infos, vertKG, horKG)   
-            .map(status -> {
-                return status;
-            })
-            .recover(err -> {
-                return Future.failedFuture("Database error");
+                if (isAccountFree) {
+                    return Future.succeededFuture(404);
+                }
+
+                return stringingRepository.newStringingOrderAccount(userId, email, firstName, lastName, racketName, stringId, infos, vertKG, horKG);
             });
     }
 
@@ -94,17 +107,9 @@ public class StringingService {
         String lastName = body.getString("customer_last_name");
         String email = body.getString("customer_email");
 
-        if(firstName == null || lastName == null || email == null || racketName == null || stringId == null){
-            return Future.succeededFuture(403);
-        }
+        if(firstName == null || lastName == null || email == null || racketName == null || stringId == null) return Future.succeededFuture(403);
 
-        return stringingRepository.newStringingOrder(email, firstName, lastName, racketName, stringId, infos, vertKG, horKG)   
-            .map(status -> {
-                return status;
-            })
-            .recover(err -> {
-                return Future.failedFuture("Database error");
-            });
+        return stringingRepository.newStringingOrder(email, firstName, lastName, racketName, stringId, infos, vertKG, horKG);
     }
 
     public Future<JsonArray> getStringingJobs(RoutingContext ctx) {
@@ -141,6 +146,10 @@ public class StringingService {
 
         JsonObject body = ctx.body().asJsonObject();
 
+        if (body == null) {
+            return Future.succeededFuture(400);
+        }
+
         Integer orderId = body.getInteger("order_id");
         String infos = body.getString("infos");
 
@@ -151,30 +160,14 @@ public class StringingService {
 
         BigDecimal kgHor = kgHorNumber == null ? null : BigDecimal.valueOf(kgHorNumber.doubleValue());
 
-        Boolean canStringingJobBeModified = stringingRepository.isOrderModifiable(orderId).await();
-        if(!canStringingJobBeModified)return Future.succeededFuture(403);
+        return stringingRepository.orderIsModifiable(orderId)
+            .compose(status -> {
 
-        return stringingRepository.isValidOrder(orderId)
-            .compose(response -> {
-
-                if (response != 200) {
-                    return Future.succeededFuture(response);
+                if (status != 200) {
+                    return Future.succeededFuture(status);
                 }
 
-                return stringingRepository.orderIsModifiable(orderId)
-                    .compose(res -> {
-
-                        if (res != 200) {
-                            return Future.succeededFuture(res);
-                        }
-
-                        return stringingRepository.updateOrder(
-                            orderId,
-                            kgVert,
-                            kgHor,
-                            infos
-                        );
-                    });
+                return stringingRepository.updateOrder(orderId, kgVert, kgHor, infos);
             });
     }
 }
