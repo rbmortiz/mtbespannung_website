@@ -23,6 +23,62 @@ public class StringingHandler {
         router.patch("/updateOrder")
             .handler(JWTAuthHandler.create(jwtAuth))
             .handler(this::updateOrder);
+        router.post("/newStringingOrderAccount")
+            .handler(JWTAuthHandler.create(jwtAuth))
+            .handler(this::newStringingOrderAccount);
+        router.post("/newStringingOrder")
+            .handler(this::newStringingOrder);
+        router.delete("/deleteStringingOrder")
+            .handler(JWTAuthHandler.create(jwtAuth))
+            .handler(this::deleteStringingOrder);
+    }
+
+    private void newStringingOrderAccount(RoutingContext ctx){
+        stringingService.newStringingOrderAccount(ctx)
+            .onSuccess(response -> {
+                ctx.response()
+                    .setStatusCode(response)
+                    .end();
+            })
+            .onFailure(err -> {
+                err.printStackTrace();
+
+                ctx.response()
+                    .setStatusCode(500)
+                    .end("Database error");
+            });
+    }
+
+    private void newStringingOrder(RoutingContext ctx){
+        stringingService.newStringingOrder(ctx)
+            .onSuccess(response -> {
+                ctx.response()
+                    .setStatusCode(response)
+                    .end();
+            })
+            .onFailure(err -> {
+                err.printStackTrace();
+
+                ctx.response()
+                    .setStatusCode(500)
+                    .end("Database error");
+            });
+    }
+
+    private void deleteStringingOrder(RoutingContext ctx){
+        stringingService.deleteStringingOrder(ctx)
+            .onSuccess(response -> {
+                ctx.response()
+                    .setStatusCode(response)
+                    .end();
+            })
+            .onFailure(err -> {
+                err.printStackTrace();
+
+                ctx.response()
+                    .setStatusCode(500)
+                    .end("Database error");
+            });
     }
 
     private void getStrings(RoutingContext ctx){

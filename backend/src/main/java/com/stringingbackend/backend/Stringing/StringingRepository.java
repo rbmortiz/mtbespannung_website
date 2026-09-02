@@ -20,6 +20,38 @@ public class StringingRepository {
         this.pool = pool;
     }
 
+    public Future<Integer> newStringingOrder(String email, String firstName, String lastName, String racketName, Integer stringId, String infos, BigDecimal vertKG, BigDecimal horKG){
+        String query = """
+            INSERT INTO stringing_orders(customer_first_name, customer_last_name, customer_email, 
+            racket_name, additional_info, horizontal_kg, vertical_kg, string_id) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+        """;
+
+        return pool.preparedQuery(query)
+                .execute(Tuple.of(firstName, lastName, email, racketName, infos, horKG, vertKG, stringId))
+                .map(result -> {
+                    return 200;
+                })
+                .recover(err -> {
+                    return Future.failedFuture("Database error");
+                });
+    }
+
+    public Future<Integer> newStringingOrderAccount(Integer userId, String email, String firstName, String lastName, String racketName, Integer stringId, String infos, BigDecimal vertKG, BigDecimal horKG){
+        String query = """
+            INSERT INTO stringing_orders(user_id, customer_first_name, customer_last_name, customer_email, 
+            racket_name, additional_info, horizontal_kg, vertical_kg, string_id) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+        """;
+
+        return pool.preparedQuery(query)
+                .execute(Tuple.of(userId, firstName, lastName, email, racketName, infos, horKG, vertKG, stringId))
+                .map(result -> {
+                    return 200;
+                })
+                .recover(err -> {
+                    return Future.failedFuture("Database error");
+                });
+    }
+
     public Future<JsonArray> getStrings() {
 
         String query = """
@@ -119,6 +151,40 @@ public class StringingRepository {
                     .recover(err -> {
                         return Future.failedFuture("Database error");
                     });
+    }
+
+    public Future<Boolean> isOrderModifiable(Integer id){
+        String query = """
+            SELECT status FROM stringing_orders WHERE order_id=$1
+        """;
+
+        return pool.preparedQuery(query)
+                    .execute(Tuple.of(id))
+                    .map(result -> {
+                        Row row = result.iterator().next();
+                        String status = row.getString("status");
+
+                        if("pending".equals(status)) return true;
+                        return false;
+                    })
+                    .recover(err -> {
+                        return Future.failedFuture("Database error");
+                    });
+    }
+
+    public Future<Integer> deleteStringingOrder(Integer userId, Integer orderId){
+        String query = """
+            DELETE FROM stringing_orders WHERE user_id=$1 AND order_id=$2
+        """;
+
+        return pool.preparedQuery(query)
+            .execute(Tuple.of(userId, orderId))
+            .map(result -> {
+                return 200;
+            })
+            .recover(error -> {
+                return Future.failedFuture(error);
+            });
     }
 
     public Future<Integer> orderIsModifiable(Integer id) {

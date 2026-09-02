@@ -8,15 +8,15 @@ const token = localStorage.getItem("token");
 
 // Form Input Elements
 
-/* const firstNameInput = getEl<HTMLInputElement>("firstName");
+const firstNameInput = getEl<HTMLInputElement>("firstName");
 const lastNameInput = getEl<HTMLInputElement>("lastName");
 const emailInput = getEl<HTMLInputElement>("email");
-const racketNameInput = getEl<HTMLInputElement>("racketName"); */
+const racketNameInput = getEl<HTMLInputElement>("racketName");
 const racketTypeInput = getEl<HTMLSelectElement>("racketType");
 const siteTypeInput = getEl<HTMLSelectElement>("siteType");
-// const horizontalKGInput = getEl<HTMLInputElement>("horizontalKG");
-// const verticalKGInput = getEl<HTMLInputElement>("verticalKG");
-// const infosInput = getEl<HTMLInputElement>("infos");
+const horizontalKGInput = getEl<HTMLInputElement>("horizontalKG");
+const verticalKGInput = getEl<HTMLInputElement>("verticalKG");
+const infosInput = getEl<HTMLInputElement>("infos");
 
 const sendOrderWithoutAccountButton = getEl<HTMLInputElement>("sendOrderWithoutAccount");
 const sendOrderWithAccountButton = getEl<HTMLInputElement>("sendOrderWithAccount");
@@ -27,16 +27,10 @@ const firstNameContainer = getEl<HTMLDivElement>("firstNameContainer");
 const lastNameContainer = getEl<HTMLDivElement>("lastNameContainer");
 const emailContainer = getEl<HTMLDivElement>("emailContainer");
 const racketNameContainer = getEl<HTMLDivElement>("racketNameContainer");
-// const racketTypeContainer = getEl<HTMLDivElement>("racketTypeContainer");
-// const siteTypeContainer = getEl<HTMLDivElement>("siteTypeContainer");
-// const horizontalKGContainer = getEl<HTMLDivElement>("horizontalKGContainer");
-// const verticalKGContainer = getEl<HTMLDivElement>("verticalKGContainer");
 const infosContainer = getEl<HTMLDivElement>("infosContainer");
 
 
 let stringTypes: StringTypes[] = [];
-// var squashStringTypes: StringTypes[];
-// var badmintonStringTypes: StringTypes[];
 
 if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", init);
@@ -140,7 +134,10 @@ function racketVHInfoText(): void {
 }
 
 function buildForGuestUser(): void {
-    
+    sendOrderWithoutAccountButton.addEventListener("click", () => {
+        void sendInput(firstNameInput.value, lastNameInput.value, emailInput.value, racketNameInput.value, siteTypeInput.value, 
+            verticalKGInput.value, horizontalKGInput.value, infosInput.value);
+    });
 }
 
 function buildForUser(): void {
@@ -152,6 +149,11 @@ function buildForUser(): void {
 
     racketNameContainer.classList.add("mt-5");
     infosContainer.classList.add("mb-5");
+
+    sendOrderWithAccountButton.addEventListener("click", () => {
+        void sendInput(racketNameInput.value, siteTypeInput.value, 
+            verticalKGInput.value, horizontalKGInput.value, infosInput.value);
+    });
 }
 
 async function getStringTypes(): Promise<void> {
@@ -187,11 +189,109 @@ function addOptions(sport: string): void {
 }
 
 
-//function overloading for the fetch request
-/*
-async function sendInput(firstName: string, lastName: string, email: string, racketName: string, racketType: string, racketString: string, vertKG: string, horKG: string, infos: string): Promise<void>;
-async function sendInput(racketName: string, racketType: string, racketString: string, vertKG: string, horKG: string, infos: string): Promise<void>;
+// function overloading for the fetch request
 
-async function sendInput(){
+async function sendInput(firstName: string, lastName: string, email: string, racketName: string, 
+    racketString: string, vertKG: string, horKG: string, infos: string): Promise<void>;
 
-} */
+async function sendInput(racketName: string, racketString: string, 
+    vertKG: string, horKG: string, infos: string): Promise<void>;
+
+async function sendInput(racketName: string, racketString: string, vertKG: string, 
+    horKG: string, infos: string, firstName?: string, lastName?: string, email?:string): Promise<void>{
+
+    if(firstName === undefined || lastName === undefined || email === undefined){
+        let string_id: Number = 0;
+
+        for(const item of stringTypes){
+            if(item.name === racketString){
+                string_id = item.string_id;
+            }
+        }
+
+        try {
+            const response = await fetch("https://api.mtbespannung.de/newStringingOrderAccount", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${token}`
+                },
+
+                body: JSON.stringify({
+                    "racket_name": racketName,
+                    "horizontal_kg": horKG,
+                    "vertical_kg": vertKG,
+                    "string_id": string_id, 
+                    "additional_info": infos
+                })
+            })
+
+            if(response.ok){
+                window.location.reload();
+            }
+
+            if(response.status === 500){
+                showError("bespannungenError", "Datenbank konnte nicht erreicht werden.");
+            }
+
+            if(response.status === 403){
+                showError("bespannungenError", "Fehlende Daten");
+            }
+
+            if(response.status === 404){
+                showError("bespannungenError", "Account konnte nicht gefunden werden");
+            }
+
+        } catch (error) { 
+            console.error(error);
+            showError("bespannungenError", "Server konnte nicht erreicht werden");
+        }
+
+        return;
+    }
+
+    let string_id: Number = 0;
+
+    for(const item of stringTypes){
+        if(item.name === racketString){
+            string_id = item.string_id;
+        }
+    }
+
+    try {
+        const response = await fetch("https://api.mtbespannung.de/newStringingOrder", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+
+            body: JSON.stringify({
+                "racket_name": racketName,
+                "horizontal_kg": horKG,
+                "vertical_kg": vertKG,
+                "string_id": string_id, 
+                "additional_info": infos,
+
+                "customer_first_name": firstName,
+                "customer_last_name": lastName,
+                "customer_email": email
+            })
+        })
+
+        if(response.ok){
+            window.location.reload();
+        }
+
+        if(response.status === 500){
+            showError("bespannungenError", "Datenbank konnte nicht erreicht werden.");
+        }
+
+        if(response.status === 403){
+            showError("bespannungenError", "Fehlende Daten");
+        }
+        
+    } catch (error) { 
+        console.error(error);
+        showError("bespannungenError", "Server konnte nicht erreicht werden");
+    }
+}

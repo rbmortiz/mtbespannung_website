@@ -1,5 +1,12 @@
-import { manageNavBarLinks, showError, redirectIfNoToken, setFirstName, initRacketBackground, getEl } from "./helpers/HelperFunctions";
-import type { StringTypes, StringingOrder } from "./helpers/interfaces"
+import {
+    manageNavBarLinks,
+    showError,
+    redirectIfNoToken,
+    setFirstName,
+    initRacketBackground,
+    getEl,
+} from "./helpers/HelperFunctions";
+import type { StringTypes, StringingOrder } from "./helpers/interfaces";
 
 const emailInput = getEl<HTMLInputElement>("emailField");
 const passwordInput = getEl<HTMLInputElement>("passwordField");
@@ -8,7 +15,9 @@ const lastNameInput = getEl<HTMLInputElement>("lastName");
 const deleteAccountButton = getEl<HTMLDivElement>("deleteAccountButton");
 const logoutButton = getEl<HTMLButtonElement>("logoutButton");
 const saveButton = getEl<HTMLButtonElement>("saveButton");
+
 const patchOrderButton = getEl<HTMLButtonElement>("patchOrderButton");
+const deleteOrderButton = getEl<HTMLButtonElement>("deleteOrderButton");
 
 const stringingTable = getEl<HTMLTableSectionElement>("stringingTable");
 
@@ -20,14 +29,13 @@ let role: String;
 let stringTypes: StringTypes[] = [];
 let userStrings: StringingOrder[] = [];
 
-
 if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", init);
 } else {
     init();
 }
 
-async function init(): Promise<void>{
+async function init(): Promise<void> {
     manageNavBarLinks();
     redirectIfNoToken();
     initRacketBackground();
@@ -50,15 +58,20 @@ async function init(): Promise<void>{
     patchOrderButton.addEventListener("click", () => {
         console.log("updating order");
         void updateOrderInformation();
-    })
-    
-    if(role === "admin")buildForAdmin();
+    });
+
+    deleteOrderButton.addEventListener("click", () => {
+        console.log("deleting order");
+        void deleteStringingOrder();
+    });
+
+    if (role === "admin") buildForAdmin();
     else buildForUser();
 
     setPlaceholderItems();
 }
 
-async function setUserCredentials(): Promise<Boolean>{
+async function setUserCredentials(): Promise<Boolean> {
     const token = `Bearer ${localStorage.getItem("token")}`;
 
     try {
@@ -68,9 +81,9 @@ async function setUserCredentials(): Promise<Boolean>{
                 method: "GET",
 
                 headers: {
-                    "Authorization": token
-                }
-            }
+                    Authorization: token,
+                },
+            },
         );
 
         if (response.status === 200) {
@@ -81,24 +94,21 @@ async function setUserCredentials(): Promise<Boolean>{
             lastName = data.lastName;
             role = data.role;
         }
-
     } catch (error) {
         console.error("Could not reach backend:", error);
-        showError("dashboardError","Server konnte nicht erreicht werden");
+        showError("dashboardError", "Server konnte nicht erreicht werden");
     }
 
     return false;
 }
 
-function buildForAdmin(): void {
-
-}
+function buildForAdmin(): void { }
 
 async function buildForUser(): Promise<void> {
     var token = localStorage.getItem("token");
 
-    if(token === undefined || token === null){
-        showError("dashboardError","Konto wurde nicht gefunden");
+    if (token === undefined || token === null) {
+        showError("dashboardError", "Konto wurde nicht gefunden");
         console.error("No token was found");
         return;
     }
@@ -115,80 +125,116 @@ async function getStringTypes(token: String): Promise<void> {
             method: "GET",
 
             headers: {
-                "Authorization": `Bearer ${token}`
-            }
+                Authorization: `Bearer ${token}`,
+            },
         });
 
-        if(response.status === 200){
-            stringTypes = await response.json() as StringTypes[];
+        if (response.status === 200) {
+            stringTypes = (await response.json()) as StringTypes[];
             return;
         }
 
-        if(response.status === 304){
+        if (response.status === 304) {
             console.log("No Strings could be found");
         }
 
-        if(response.status === 500){
+        if (response.status === 500) {
             console.error("Database error, Strings could not be fetched");
         }
-    } catch(error){
+    } catch (error) {
         console.error("Could not reach backend: ", error);
-        showError("dashboardError","Server konnte nicht erreicht werden");
+        showError("dashboardError", "Server konnte nicht erreicht werden");
     }
 }
 
-async function getUserStrings(token: String): Promise<void> {
+async function deleteStringingOrder() {
     try {
-        const response = await fetch("https://api.mtbespannung.de/getUserStringingJobs", {
-            method: "POST",
+        const token = localStorage.getItem("token");
 
-            headers: {
-                "Authorization": `Bearer ${token}`
-            }
-        });
+        var orderId: number = Number(
+            getEl<HTMLSpanElement>("modalRacketName").getAttribute("order-id"),
+        );
 
-        if(response.status === 200){
-            userStrings = await response.json() as StringingOrder[];
-            return;
-        }
+        const response = await fetch("https://api.mtbespannung.de/deleteStringingOrder",
+            {
+                method: "DELETE",
 
-        if(response.status === 304){
-            console.log("No Stringing Orders found");
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+
+                body: JSON.stringify({
+                    "stringingOrderId": orderId
+                })
+            } 
+        );
+
+        if(response.ok){
+            window.location.reload();
         }
 
         if(response.status === 500){
+            console.error("Database error");
+        }
+    } catch (error) {
+        console.error(error);
+        console.log("Server error");
+    }
+}
+async function getUserStrings(token: String): Promise<void> {
+    try {
+        const response = await fetch(
+            "https://api.mtbespannung.de/getUserStringingJobs",
+            {
+                method: "POST",
+
+                headers: {
+                    Authorization: `Bearer ${token}`
+                },
+            },
+        );
+
+        if (response.status === 200) {
+            userStrings = (await response.json()) as StringingOrder[];
+            return;
+        }
+
+        if (response.status === 304) {
+            console.log("No Stringing Orders found");
+        }
+
+        if (response.status === 500) {
             console.error("Serverfehler bei Benutzerbesaitungen anzeigen lassen");
         }
-    } catch(error){
+    } catch (error) {
         console.error("Could not reach backend: ", error);
-        showError("dashboardError","Server konnte nicht erreicht werden");
+        showError("dashboardError", "Server konnte nicht erreicht werden");
     }
 }
 
 function setPlaceholderItems(): void {
     emailInput.placeholder = "" + (email === undefined ? "E-Mail" : email);
-    firstNameInput.placeholder = "" + (firstName === undefined ? "Vorname" : firstName);
-    lastNameInput.placeholder = "" + (lastName === undefined ? "Nachname" : lastName);
+    firstNameInput.placeholder =
+        "" + (firstName === undefined ? "Vorname" : firstName);
+    lastNameInput.placeholder =
+        "" + (lastName === undefined ? "Nachname" : lastName);
 }
 
 async function deleteUserAccount(): Promise<void> {
     const token = localStorage.getItem("token");
 
     if (!token) {
-        showError("dashboardError","Du bist nicht angemeldet.");
+        showError("dashboardError", "Du bist nicht angemeldet.");
         return;
     }
 
     try {
-        const response = await fetch(
-            "https://api.mtbespannung.de/deleteUser",
-            {
-                method: "DELETE",
-                headers: {
-                    "Authorization": `Bearer ${token}`
-                }
-            }
-        );
+        const response = await fetch("https://api.mtbespannung.de/deleteUser", {
+            method: "DELETE",
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        });
 
         if (response.status === 200) {
             localStorage.removeItem("token");
@@ -197,20 +243,19 @@ async function deleteUserAccount(): Promise<void> {
         }
 
         if (response.status === 401) {
-            showError("dashboardError","Account wurde nicht gefunden.");
+            showError("dashboardError", "Account wurde nicht gefunden.");
             return;
         }
 
         if (response.status === 403) {
-            showError("dashboardError","Ungültige Benutzerdaten.");
+            showError("dashboardError", "Ungültige Benutzerdaten.");
             return;
         }
 
-        showError("dashboardError","Account konnte nicht gelöscht werden");
-
+        showError("dashboardError", "Account konnte nicht gelöscht werden");
     } catch (error) {
         console.error("Could not reach backend:", error);
-        showError("dashboardError","Server konnte nicht erreicht werden");
+        showError("dashboardError", "Server konnte nicht erreicht werden");
     }
 }
 
@@ -223,7 +268,7 @@ async function updateUser(): Promise<void> {
     const token = localStorage.getItem("token");
 
     if (!token) {
-        showError("dashboardError","Du bist nicht angemeldet.");
+        showError("dashboardError", "Du bist nicht angemeldet.");
         return;
     }
 
@@ -233,24 +278,21 @@ async function updateUser(): Promise<void> {
     const newLastName = lastNameInput.value;
 
     try {
-        const response = await fetch(
-            "https://api.mtbespannung.de/editUser",
-            {
-                method: "PATCH",
+        const response = await fetch("https://api.mtbespannung.de/editUser", {
+            method: "PATCH",
 
-                headers: {
-                    "Authorization": `Bearer ${token}`,
-                    "Content-Type": "application/json"
-                },
+            headers: {
+                Authorization: `Bearer ${token}`,
+                "Content-Type": "application/json",
+            },
 
-                body: JSON.stringify({
-                    "email": newMail,
-                    "firstName": newFirstName,
-                    "lastName": newLastName,
-                    "password": newPassword
-                })
-            }
-        );
+            body: JSON.stringify({
+                email: newMail,
+                firstName: newFirstName,
+                lastName: newLastName,
+                password: newPassword,
+            }),
+        });
 
         if (response.status === 200) {
             const data = await response.json();
@@ -260,37 +302,36 @@ async function updateUser(): Promise<void> {
         }
 
         if (response.status === 400) {
-            showError("dashboardError","Fehlende Daten.");
+            showError("dashboardError", "Fehlende Daten.");
             return;
         }
 
         if (response.status === 401) {
-            showError("dashboardError","Token ist nicht mehr gültig.");
+            showError("dashboardError", "Token ist nicht mehr gültig.");
             return;
         }
 
         if (response.status === 404) {
-            showError("dashboardError","Benutzer wurde nicht gefunden.");
+            showError("dashboardError", "Benutzer wurde nicht gefunden.");
             return;
         }
 
         if (response.status === 409) {
-            showError("dashboardError","Neue Email ist bereits vergeben.");
+            showError("dashboardError", "Neue Email ist bereits vergeben.");
             return;
         }
 
-        showError("dashboardError","Account konnte nicht verändert werden");
-
+        showError("dashboardError", "Account konnte nicht verändert werden");
     } catch (error) {
         console.error("Could not reach backend:", error);
-        showError("dashboardError","Server konnte nicht erreicht werden");
+        showError("dashboardError", "Server konnte nicht erreicht werden");
     }
 }
 
 function insertStringingTable(): void {
     stringingTable.innerHTML = "";
 
-    for(const jsonObj of userStrings){
+    for (const jsonObj of userStrings) {
         insertSingleEntry(jsonObj);
     }
 
@@ -306,22 +347,18 @@ function insertSingleEntry(order: StringingOrder): void {
             <td>${order.racket_name}</td>
             <td><button class="btn btn-primary moreInfoButton" data-order-id="${order.order_id}" data-bs-toggle="modal" data-bs-target="#stringingModal">Mehr Details</button></td>
         </tr>
-    `
+    `;
 }
 
 function addMoreInfoListeners(): void {
-
-    const buttons = document.querySelectorAll<HTMLButtonElement>(".moreInfoButton");
+    const buttons =
+        document.querySelectorAll<HTMLButtonElement>(".moreInfoButton");
 
     for (const button of buttons) {
-
         button.addEventListener("click", () => {
-
             const orderId = Number(button.dataset.orderId);
 
-            const order = userStrings.find(
-                order => order.order_id === orderId
-            );
+            const order = userStrings.find((order) => order.order_id === orderId);
 
             if (!order) {
                 return;
@@ -333,26 +370,32 @@ function addMoreInfoListeners(): void {
 }
 
 function showOrderDetails(order: StringingOrder): void {
-
     const created = new Date(order.created_at);
     const updated = new Date(order.updated_at);
 
     getEl<HTMLSpanElement>("modalRacketName").innerHTML = order.racket_name;
-    getEl<HTMLSpanElement>("modalRacketName").setAttribute("order-id", order.order_id.toString());
-    getEl<HTMLSpanElement>("modalCreatedAt").innerHTML = created.toLocaleDateString("de-DE");
-    getEl<HTMLSpanElement>("modalUpdatedAt").innerHTML = updated.toLocaleDateString("de-DE");
+    getEl<HTMLSpanElement>("modalRacketName").setAttribute(
+        "order-id",
+        order.order_id.toString(),
+    );
+    getEl<HTMLSpanElement>("modalCreatedAt").innerHTML =
+        created.toLocaleDateString("de-DE");
+    getEl<HTMLSpanElement>("modalUpdatedAt").innerHTML =
+        updated.toLocaleDateString("de-DE");
 
     getEl<HTMLInputElement>("modalVerticalKG").value = "";
     getEl<HTMLInputElement>("modalHorizontalKG").value = "";
     getEl<HTMLInputElement>("modalInfos").value = "";
 
-    getEl<HTMLInputElement>("modalVerticalKG").placeholder = order.vertical_kg.toString();
-    getEl<HTMLInputElement>("modalHorizontalKG").placeholder = order.horizontal_kg.toString();
+    getEl<HTMLInputElement>("modalVerticalKG").placeholder =
+        order.vertical_kg.toString();
+    getEl<HTMLInputElement>("modalHorizontalKG").placeholder =
+        order.horizontal_kg.toString();
     getEl<HTMLInputElement>("modalInfos").placeholder = order.additional_info;
 
     getEl<HTMLSpanElement>("modalString").innerHTML = order.string_id.toString();
 
-    switch(order.status){
+    switch (order.status) {
         case "pending":
             getEl<HTMLSpanElement>("modalStatus").innerHTML = "Unerledigt";
             getEl<HTMLSpanElement>("modalStatus").classList.add("text-secondary");
@@ -373,16 +416,18 @@ function showOrderDetails(order: StringingOrder): void {
             break;
     }
 
-    getEl<HTMLSpanElement>("modalString").innerHTML = getNameOfString(order.string_id);
+    getEl<HTMLSpanElement>("modalString").innerHTML = getNameOfString(
+        order.string_id,
+    );
 }
 
 function getNameOfString(id: number): string {
     const racketString = stringTypes.find(
-        racketString => racketString.string_id === id
+        (racketString) => racketString.string_id === id,
     );
 
-    if(racketString === null || racketString === undefined) return "";
-    
+    if (racketString === null || racketString === undefined) return "";
+
     return racketString.name;
 }
 
@@ -390,7 +435,9 @@ async function updateOrderInformation(): Promise<void> {
     const token = localStorage.getItem("token");
 
     var infos: string = getEl<HTMLInputElement>("modalInfos").value;
-    var orderId: number = Number(getEl<HTMLSpanElement>("modalRacketName").getAttribute("order-id"));
+    var orderId: number = Number(
+        getEl<HTMLSpanElement>("modalRacketName").getAttribute("order-id"),
+    );
 
     const kgVertInput = getEl<HTMLInputElement>("modalVerticalKG").value;
 
@@ -405,36 +452,36 @@ async function updateOrderInformation(): Promise<void> {
             method: "PATCH",
 
             headers: {
-                "Authorization": `Bearer ${token}`,
-                "Content-Type": "application/json"
+                Authorization: `Bearer ${token}`,
+                "Content-Type": "application/json",
             },
 
             body: JSON.stringify({
-                "order_id": orderId,
-                "kgVert": kgVert,
-                "kgHor": kgHor,
-                "infos": infos
-            })
+                order_id: orderId,
+                kgVert: kgVert,
+                kgHor: kgHor,
+                infos: infos,
+            }),
         });
 
-        if(response.status === 400){
+        if (response.status === 400) {
             showError("patchOrderError", "Fehlende Daten");
             return;
         }
 
-        if(response.status === 404){
+        if (response.status === 404) {
             showError("patchOrderError", "Bespannungsorder existiert nicht");
             return;
         }
 
-        if(response.status === 403){
-            showError("patchOrderError", "Bespannungsorder kann nicht mehr verändert werden");
+        if (response.status === 403) {
+            showError("patchOrderError", "Bespannungsorder kann nicht mehr verändert werden",);
             return;
         }
 
         window.location.reload();
-    } catch (error){
+    } catch (error) {
         console.error(error);
-        showError("dashboardError","Server konnte nicht erreicht werden");
+        showError("dashboardError", "Server konnte nicht erreicht werden");
     }
 }

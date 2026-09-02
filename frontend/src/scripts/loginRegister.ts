@@ -11,6 +11,7 @@ const registerSendButton = getEl<HTMLButtonElement>("registerSendButton");
 const goBackButton = getEl<HTMLButtonElement>("goBackButton");
 
 const accountText = getEl<HTMLParagraphElement>("accountText");
+let sendToReg: boolean = false;
 
 
 if (document.readyState === "loading") {
@@ -43,6 +44,15 @@ function init(){
 
     goBackButton.addEventListener("click", () => {
         void showRegisterFields(false);
+        sendToReg = false;
+    });
+
+    // Keyboard "Enter" Event handling
+    document.addEventListener("keydown", (event) => {
+        if(event.key === "Enter") {
+            if(sendToReg) sendRegister();
+            else if(!sendToReg) sendLogin();
+        }
     });
 }
 
@@ -67,6 +77,7 @@ function showRegisterFields(showRegister: boolean): void{
 
 function registerPullupPress(): void {
     showRegisterFields(true);
+    sendToReg = true;
 
     firstNameInput.value = "";
     lastNameInput.value = "";
