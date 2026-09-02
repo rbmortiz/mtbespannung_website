@@ -407,13 +407,20 @@ function showOrderDetails(order: StringingOrder): void {
     getEl<HTMLInputElement>("modalHorizontalKG").value = "";
     getEl<HTMLInputElement>("modalInfos").value = "";
 
-    getEl<HTMLInputElement>("modalVerticalKG").placeholder =
-        order.vertical_kg.toString();
-    getEl<HTMLInputElement>("modalHorizontalKG").placeholder =
-        order.horizontal_kg.toString();
-    getEl<HTMLInputElement>("modalInfos").placeholder = order.additional_info;
+    getEl<HTMLInputElement>("modalVerticalKG").placeholder = order.vertical_kg === null ? "" : order.vertical_kg.toString();
+    getEl<HTMLInputElement>("modalHorizontalKG").placeholder = order.horizontal_kg === null ? "" : order.horizontal_kg.toString();
+
+    getEl<HTMLInputElement>("modalInfos").placeholder = (order.additional_info === null || order.additional_info === undefined) ? "" : order.additional_info;
 
     getEl<HTMLSpanElement>("modalString").innerHTML = order.string_id.toString();
+
+
+    getEl<HTMLSpanElement>("modalStatus").classList.remove(
+        "text-secondary",
+        "text-warning",
+        "text-info",
+        "text-success"
+    );
 
     switch (order.status) {
         case "pending":

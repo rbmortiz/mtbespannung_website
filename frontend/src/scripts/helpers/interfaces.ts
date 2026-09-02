@@ -13,9 +13,9 @@ export interface StringTypes {
 export interface StringingOrder {
     order_id: number;
     racket_name: string;
-    additional_info: string;
-    horizontal_kg: number;
-    vertical_kg: number;
+    additional_info: string | null;
+    horizontal_kg: number | null;
+    vertical_kg: number | null;
     string_id: number;
     status: string;
     created_at: string;
