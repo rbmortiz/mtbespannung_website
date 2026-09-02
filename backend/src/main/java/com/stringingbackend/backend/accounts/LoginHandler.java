@@ -32,6 +32,7 @@ public class LoginHandler {
 
                 String token = jwtAuth.generateToken(
                     new JsonObject()
+                        .put("userId", user.getInteger("user_id"))
                         .put("email", user.getString("email"))
                         .put("firstName", user.getString("firstName"))
                         .put("lastName", user.getString("lastName"))
