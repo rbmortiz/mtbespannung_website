@@ -49,8 +49,8 @@ public class StringingService {
         JsonObject data = ctx.user().principal();
         JsonObject body = ctx.body().asJsonObject();
 
-        Number kgVertNumber = body.getNumber("kgVert");
-        Number kgHorNumber = body.getNumber("kgHor");
+        Number kgVertNumber = body.getNumber("vertical_kg");
+        Number kgHorNumber = body.getNumber("horizontal_kg");
 
         String racketName = body.getString("racket_name");
         BigDecimal vertKG = kgVertNumber == null ? null : BigDecimal.valueOf(kgVertNumber.doubleValue());
@@ -81,8 +81,8 @@ public class StringingService {
 
     public Future<Integer> newStringingOrder(RoutingContext ctx) {
         JsonObject body = ctx.body().asJsonObject();
-        Number kgVertNumber = body.getNumber("kgVert");
-        Number kgHorNumber = body.getNumber("kgHor");
+        Number kgVertNumber = body.getNumber("vertical_kg");
+        Number kgHorNumber = body.getNumber("horizontal_kg");
 
         String racketName = body.getString("racket_name");
         BigDecimal vertKG = kgVertNumber == null ? null : BigDecimal.valueOf(kgVertNumber.doubleValue());

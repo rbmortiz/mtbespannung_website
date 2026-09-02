@@ -135,8 +135,8 @@ function racketVHInfoText(): void {
 
 function buildForGuestUser(): void {
     sendOrderWithoutAccountButton.addEventListener("click", () => {
-        void sendInput(firstNameInput.value, lastNameInput.value, emailInput.value, racketNameInput.value, siteTypeInput.value, 
-            verticalKGInput.value, horizontalKGInput.value, infosInput.value);
+        void sendInput(racketNameInput.value, siteTypeInput.value, 
+            verticalKGInput.value, horizontalKGInput.value, infosInput.value, firstNameInput.value, lastNameInput.value, emailInput.value);
     });
 }
 
@@ -191,23 +191,11 @@ function addOptions(sport: string): void {
 
 // function overloading for the fetch request
 
-async function sendInput(firstName: string, lastName: string, email: string, racketName: string, 
-    racketString: string, vertKG: string, horKG: string, infos: string): Promise<void>;
-
-async function sendInput(racketName: string, racketString: string, 
-    vertKG: string, horKG: string, infos: string): Promise<void>;
-
 async function sendInput(racketName: string, racketString: string, vertKG: string, 
     horKG: string, infos: string, firstName?: string, lastName?: string, email?:string): Promise<void>{
 
     if(firstName === undefined || lastName === undefined || email === undefined){
-        let string_id: Number = 0;
-
-        for(const item of stringTypes){
-            if(item.name === racketString){
-                string_id = item.string_id;
-            }
-        }
+        const string_id: number = Number(racketString);
 
         try {
             const response = await fetch("https://api.mtbespannung.de/newStringingOrderAccount", {
@@ -250,13 +238,7 @@ async function sendInput(racketName: string, racketString: string, vertKG: strin
         return;
     }
 
-    let string_id: Number = 0;
-
-    for(const item of stringTypes){
-        if(item.name === racketString){
-            string_id = item.string_id;
-        }
-    }
+    const string_id: number = Number(racketString);
 
     try {
         const response = await fetch("https://api.mtbespannung.de/newStringingOrder", {
