@@ -46,6 +46,8 @@ public class AccountRepository {
                 hashed_password
             )
             VALUES ($1, $2, $3, $4)
+            RETURNING
+                user_id,
             """;
 
         return pool.preparedQuery(query)
@@ -61,8 +63,11 @@ public class AccountRepository {
 
                 System.out.println("INSERT successful");
 
+                Row row = result.iterator().next();
+
                 return new JsonObject()
                     .put("statusCode", 200)
+                    .put("user_id", row.getInteger("user_id"))
                     .put("email", email)
                     .put("firstName", firstName)
                     .put("lastName", lastName)

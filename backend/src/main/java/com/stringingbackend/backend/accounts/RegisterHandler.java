@@ -31,6 +31,7 @@ public class RegisterHandler {
 
                 String token = jwtAuth.generateToken(
                     new JsonObject()
+                        .put("userId", answer.getInteger("user_id"))
                         .put("email", answer.getString("email"))
                         .put("firstName", answer.getString("firstName"))
                         .put("lastName", answer.getString("lastName"))
