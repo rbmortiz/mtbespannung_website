@@ -5,6 +5,7 @@ export interface StringTypes {
     color: string;
     description: string;
     type: string;
+    price: number;
     is_active: Boolean;
     created_at: string;
     updated_at: string;

@@ -71,6 +71,9 @@ public class StringingRepository {
 
                                 OffsetDateTime createdAt = row.getOffsetDateTime("created_at");
                                 OffsetDateTime updatedAt = row.getOffsetDateTime("updated_at");
+                                BigDecimal price = row.getBigDecimal("price");
+
+                                string.put("price", price.doubleValue());
                                 string.put("created_at", createdAt.toString());
                                 string.put("updated_at", updatedAt.toString());
 

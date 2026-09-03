@@ -17,6 +17,7 @@ const siteTypeInput = getEl<HTMLSelectElement>("siteType");
 const horizontalKGInput = getEl<HTMLInputElement>("horizontalKG");
 const verticalKGInput = getEl<HTMLInputElement>("verticalKG");
 const infosInput = getEl<HTMLInputElement>("infos");
+// const priceTagInput = getEl<HTMLInputElement>("priceTag");
 
 const sendOrderWithoutAccountButton = getEl<HTMLInputElement>("sendOrderWithoutAccount");
 const sendOrderWithAccountButton = getEl<HTMLInputElement>("sendOrderWithAccount");
@@ -28,6 +29,7 @@ const lastNameContainer = getEl<HTMLDivElement>("lastNameContainer");
 const emailContainer = getEl<HTMLDivElement>("emailContainer");
 const racketNameContainer = getEl<HTMLDivElement>("racketNameContainer");
 const infosContainer = getEl<HTMLDivElement>("infosContainer");
+const priceTagContainer = getEl<HTMLDivElement>("priceTagContainer");
 
 
 let stringTypes: StringTypes[] = [];
@@ -52,14 +54,19 @@ async function init(): Promise<void>{
 
     await getStringTypes();
     await setFirstName();
+}
 
+function setInfoFieldButtons(): void {
     racketTypeInput.addEventListener("change", () => {
         siteTypeInput.innerHTML = "";
         addOptions(racketTypeInput.value);
     });
-}
 
-function setInfoFieldButtons(): void {
+    siteTypeInput.addEventListener("change", () => {
+        displayHTMLElement(priceTagContainer, true);
+        calculatePriceOfStringingJob();
+    });
+
     getEl<HTMLLabelElement>("firstNameInfo").addEventListener("click", () => {
         infoTextHeader.innerHTML = "Vorname";
         infoTextBody.innerHTML = `
@@ -183,9 +190,14 @@ async function getStringTypes(): Promise<void> {
 function addOptions(sport: string): void {
     for(const str of stringTypes){
         if(str.sport.toLowerCase() === sport.toLowerCase()){
-            siteTypeInput.innerHTML += `<option value="${str.string_id}">${str.name}</option>`;
+            siteTypeInput.innerHTML += `<option value="${str.string_id}">${str.name}<span class="text-secondary"> ${str.price}</span></option>`;
         }
     }
+}
+
+function calculatePriceOfStringingJob(): void {
+    let site: number = Number(siteTypeInput.value);
+    site++;
 }
 
 
@@ -215,7 +227,7 @@ async function sendInput(racketName: string, racketString: string, vertKG: strin
             })
 
             if(response.ok){
-                window.location.reload();
+                window.location.replace("/src/pages/main.html");
             }
 
             if(response.status === 500){
@@ -265,7 +277,7 @@ async function sendInput(racketName: string, racketString: string, vertKG: strin
         })
 
         if(response.ok){
-            window.location.reload();
+            window.location.replace("/src/pages/main.html");
         }
 
         if(response.status === 500){

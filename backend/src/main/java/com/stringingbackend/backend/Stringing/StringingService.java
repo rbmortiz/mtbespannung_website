@@ -79,6 +79,12 @@ public class StringingService {
         String lastName = data.getString("lastName");
         String email = data.getString("email");
 
+        System.out.println(stringId);
+        System.out.println(userId);
+        System.out.println(email);
+        System.out.println(firstName);
+        System.out.println(lastName);
+
         if (firstName == null || lastName == null || email == null || racketName == null || stringId == null || userId == null) return Future.succeededFuture(403);
 
         return accountRepository.isAccountFree(email)
@@ -106,6 +112,11 @@ public class StringingService {
         String firstName = body.getString("customer_first_name");
         String lastName = body.getString("customer_last_name");
         String email = body.getString("customer_email");
+
+        System.out.println(stringId);
+        System.out.println(email);
+        System.out.println(firstName);
+        System.out.println(lastName);
 
         if(firstName == null || lastName == null || email == null || racketName == null || stringId == null) return Future.succeededFuture(403);
 
