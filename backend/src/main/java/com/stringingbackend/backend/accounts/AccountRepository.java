@@ -47,7 +47,7 @@ public class AccountRepository {
             )
             VALUES ($1, $2, $3, $4)
             RETURNING
-                user_id,
+                user_id
             """;
 
         return pool.preparedQuery(query)
