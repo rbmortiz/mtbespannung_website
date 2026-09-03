@@ -174,7 +174,7 @@ async function deleteStringingOrder() {
         }
 
         if(response.status === 403){
-            showError("dashboardError", "Fehlende Daten");
+            showError("dashboardError", "Bespannung ist in Bearbeitung/Bespannt/Zugestellt");
             console.error("Database error");
         }
 

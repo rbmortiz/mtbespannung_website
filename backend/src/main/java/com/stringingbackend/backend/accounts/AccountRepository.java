@@ -21,7 +21,7 @@ public class AccountRepository {
 
     public Future<Boolean> isAccountFree(String email) {
 
-        System.out.println("Checking if isAccountFree" + email);
+        System.out.println("Checking if isAccountFree: " + email);
 
         String query = """
             SELECT user_id

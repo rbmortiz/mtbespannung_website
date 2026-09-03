@@ -32,9 +32,7 @@ public class StringingService {
         System.out.println(userId);
         System.out.println(email);
 
-        if (stringId == null || userId == null || email == null) {
-            return Future.succeededFuture(403);
-        }
+        if (stringId == null || userId == null || email == null) return Future.succeededFuture(403);
 
         return accountRepository.isAccountFree(email)
             .compose(isAccountFree -> {
@@ -44,17 +42,6 @@ public class StringingService {
                 }
 
                 return stringingRepository.orderIsModifiable(stringId);
-            })
-            .compose(status -> {
-
-                if (status != 200) {
-                    return Future.succeededFuture(status);
-                }
-
-                return stringingRepository.deleteStringingOrder(
-                    userId,
-                    stringId
-                );
             });
     }
 
