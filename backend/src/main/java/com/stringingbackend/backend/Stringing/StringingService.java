@@ -40,8 +40,17 @@ public class StringingService {
                 if (isAccountFree) {
                     return Future.succeededFuture(404);
                 }
-
+                System.out.println("Executing orderIsModifiable for: " + email);
                 return stringingRepository.orderIsModifiable(stringId);
+            })
+            .compose(status -> {
+
+                if (status != 200) {
+                    return Future.succeededFuture(status);
+                }
+
+                System.out.println("Executing deleteStringingOrder for: " + userId + ", " + stringId);
+                return stringingRepository.deleteStringingOrder(userId, stringId);
             });
     }
 

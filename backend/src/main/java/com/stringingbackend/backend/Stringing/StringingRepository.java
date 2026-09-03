@@ -158,6 +158,10 @@ public class StringingRepository {
         return pool.preparedQuery(query)
             .execute(Tuple.of(userId, orderId))
             .map(result -> {
+                if(result.rowCount() == 0){
+                    return 404;
+                }
+
                 return 200;
             })
             .recover(error -> {
