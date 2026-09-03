@@ -28,6 +28,10 @@ public class StringingService {
         Integer userId = data.getInteger("userId");
         String email = data.getString("email");
 
+        System.out.println(stringId);
+        System.out.println(userId);
+        System.out.println(email);
+
         if (stringId == null || userId == null || email == null) {
             return Future.succeededFuture(403);
         }
