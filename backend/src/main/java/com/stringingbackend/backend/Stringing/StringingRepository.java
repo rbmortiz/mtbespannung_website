@@ -252,6 +252,7 @@ public class StringingRepository {
 
                                 BigDecimal horizontalKg = row.getBigDecimal("horizontal_kg");
                                 BigDecimal verticalKg = row.getBigDecimal("vertical_kg");
+                                BigDecimal price = row.getBigDecimal("price");
 
                                 string.put("order_id", row.getInteger("order_id"));
                                 string.put("racket_name", row.getString("racket_name"));
@@ -260,6 +261,7 @@ public class StringingRepository {
                                 string.put("vertical_kg", verticalKg == null ? null : verticalKg.doubleValue());
                                 string.put("string_id", row.getInteger("string_id"));
                                 string.put("status", row.getString("status"));
+                                string.put("price", price == null ? null : price.doubleValue());
                                 
                                 OffsetDateTime createdAt = row.getOffsetDateTime("created_at");
                                 OffsetDateTime updatedAt = row.getOffsetDateTime("updated_at");
