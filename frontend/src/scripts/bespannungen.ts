@@ -62,6 +62,11 @@ function setInfoFieldButtons(): void {
         addOptions(racketTypeInput.value);
     });
 
+    racketTypeInput.addEventListener("click", () => {
+        siteTypeInput.innerHTML = "";
+        priceTagContainer.classList.add("d-none");
+    });
+
     siteTypeInput.addEventListener("change", () => {
         displayHTMLElement(priceTagContainer, true);
         calculatePriceOfStringingJob();
@@ -188,6 +193,9 @@ async function getStringTypes(): Promise<void> {
 }
 
 function addOptions(sport: string): void {
+
+    siteTypeInput.innerHTML += `<option data-price="0" value="0">Saite auswählen</option>`
+
     for(const str of stringTypes){
         if(str.sport.toLowerCase() === sport.toLowerCase()){
             siteTypeInput.innerHTML += `<option data-price="${str.price}" value="${str.string_id}">${str.name} (${str.price}€)</option>`;

@@ -443,11 +443,11 @@ function showOrderDetails(order: StringingOrder): void {
             break;
     }
 
-    getEl<HTMLSpanElement>("modalPrice").innerHTML = order.price.toString();
-
     getEl<HTMLSpanElement>("modalString").innerHTML = getNameOfString(
         order.string_id,
     );
+
+    getEl<HTMLSpanElement>("modalPrice").innerHTML = "" + order.price;
 }
 
 function getNameOfString(id: number): string {
