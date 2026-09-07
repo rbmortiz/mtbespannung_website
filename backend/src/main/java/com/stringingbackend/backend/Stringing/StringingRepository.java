@@ -91,30 +91,105 @@ public class StringingRepository {
                     });
     }
 
-    public Future<Integer> newStringingOrder(String email, String firstName, String lastName, String racketName, Integer stringId, String infos, BigDecimal vertKG, BigDecimal horKG){
-        String query = """
-            INSERT INTO stringing_orders(customer_first_name, customer_last_name, customer_email, 
-            racket_name, additional_info, horizontal_kg, vertical_kg, string_id) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
-        """;
+    public Future<Integer> newStringingOrder(String email, String firstName, String lastName, String racketName, Integer stringId, String infos, BigDecimal vertKG, BigDecimal horKG) {
 
-        return pool.preparedQuery(query)
-                .execute(Tuple.of(firstName, lastName, email, racketName, infos, horKG, vertKG, stringId))
-                .map(result -> {
-                    return 200;
-                });
+        String query = """
+            INSERT INTO stringing_orders(
+                customer_first_name,
+                customer_last_name,
+                customer_email,
+                racket_name,
+                additional_info,
+                horizontal_kg,
+                vertical_kg,
+                string_id,
+                price
+            )
+            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+            """;
+
+        return getPriceOfString(stringId)
+            .compose(priceObj -> {
+
+                if (priceObj.isEmpty()) {
+                    return Future.succeededFuture(404);
+                }
+
+                Number priceNumber = priceObj.getNumber("price");
+
+                if (priceNumber == null) {
+                    return Future.succeededFuture(500);
+                }
+
+                BigDecimal price =
+                    BigDecimal.valueOf(priceNumber.doubleValue());
+
+                return pool.preparedQuery(query)
+                    .execute(Tuple.of(firstName, lastName, email, racketName, infos, horKG, vertKG, stringId, price))
+                    .map(result -> 200);
+            });
     }
 
     public Future<Integer> newStringingOrderAccount(Integer userId, String email, String firstName, String lastName, String racketName, Integer stringId, String infos, BigDecimal vertKG, BigDecimal horKG){
         String query = """
-            INSERT INTO stringing_orders(user_id, customer_first_name, customer_last_name, customer_email, 
-            racket_name, additional_info, horizontal_kg, vertical_kg, string_id) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+            INSERT INTO stringing_orders(
+                user_id,
+                customer_first_name,
+                customer_last_name,
+                customer_email,
+                racket_name,
+                additional_info,
+                horizontal_kg,
+                vertical_kg,
+                string_id,
+                price
+            )
+            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+            """;
+
+        return getPriceOfString(stringId)
+            .compose(priceObj -> {
+
+                if (priceObj.isEmpty()) {
+                    return Future.succeededFuture(404);
+                }
+
+                Number priceNumber = priceObj.getNumber("price");
+
+                if (priceNumber == null) {
+                    return Future.succeededFuture(500);
+                }
+
+                BigDecimal price =
+                    BigDecimal.valueOf(priceNumber.doubleValue());
+
+                return pool.preparedQuery(query)
+                    .execute(Tuple.of(userId, firstName, lastName, email, racketName, infos, horKG, vertKG, stringId, price))
+                    .map(result -> 200);
+            });
+    }
+
+    public Future<JsonObject> getPriceOfString(Integer string_id){
+        String query = """
+            SELECT price FROM strings WHERE string_id = $1
         """;
 
         return pool.preparedQuery(query)
-                .execute(Tuple.of(userId, firstName, lastName, email, racketName, infos, horKG, vertKG, stringId))
-                .map(result -> {
-                    return 200;
-                });
+                    .execute(Tuple.of(string_id))
+                    .map(rows -> {
+                        if(rows.rowCount() != 1){
+                            return new JsonObject();
+                        }
+
+                        Row row = rows.iterator().next();
+                        BigDecimal price = row.getBigDecimal("price");
+
+                        return new JsonObject().put("price", price == null ? null : price.doubleValue());
+                    })
+                    .recover(err -> {
+                        err.printStackTrace();
+                        return Future.failedFuture(err);
+                    });
     }
 
     public Future<JsonArray> getStrings() {

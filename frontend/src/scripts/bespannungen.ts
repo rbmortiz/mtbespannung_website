@@ -17,7 +17,7 @@ const siteTypeInput = getEl<HTMLSelectElement>("siteType");
 const horizontalKGInput = getEl<HTMLInputElement>("horizontalKG");
 const verticalKGInput = getEl<HTMLInputElement>("verticalKG");
 const infosInput = getEl<HTMLInputElement>("infos");
-// const priceTagInput = getEl<HTMLInputElement>("priceTag");
+const priceTagInput = getEl<HTMLInputElement>("priceTag");
 
 const sendOrderWithoutAccountButton = getEl<HTMLInputElement>("sendOrderWithoutAccount");
 const sendOrderWithAccountButton = getEl<HTMLInputElement>("sendOrderWithAccount");
@@ -190,14 +190,14 @@ async function getStringTypes(): Promise<void> {
 function addOptions(sport: string): void {
     for(const str of stringTypes){
         if(str.sport.toLowerCase() === sport.toLowerCase()){
-            siteTypeInput.innerHTML += `<option value="${str.string_id}">${str.name}<span class="text-secondary"> ${str.price}</span></option>`;
+            siteTypeInput.innerHTML += `<option value="${str.string_id}">${str.name}<span class="text-secondary"> (${str.price}€)</span></option>`;
         }
     }
 }
 
 function calculatePriceOfStringingJob(): void {
-    let site: number = Number(siteTypeInput.value);
-    site++;
+    let site: string = (Number(siteTypeInput.value)+15).toString();
+    priceTagInput.innerHTML = site;
 }
 
 
