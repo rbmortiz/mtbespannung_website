@@ -19,7 +19,7 @@ export interface StringingOrder {
     vertical_kg: number | null;
     string_id: number;
     status: string;
-    price: number;
+    price: number | null;
     created_at: string;
     updated_at: string;
 }

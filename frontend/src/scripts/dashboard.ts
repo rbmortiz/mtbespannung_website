@@ -372,8 +372,7 @@ function insertSingleEntry(order: StringingOrder): void {
 }
 
 function addMoreInfoListeners(): void {
-    const buttons =
-        document.querySelectorAll<HTMLButtonElement>(".moreInfoButton");
+    const buttons = document.querySelectorAll<HTMLButtonElement>(".moreInfoButton");
 
     for (const button of buttons) {
         button.addEventListener("click", () => {
@@ -391,6 +390,8 @@ function addMoreInfoListeners(): void {
 }
 
 function showOrderDetails(order: StringingOrder): void {
+    console.log(order);
+
     const created = new Date(order.created_at);
     const updated = new Date(order.updated_at);
 
@@ -448,7 +449,7 @@ function showOrderDetails(order: StringingOrder): void {
         order.string_id,
     );
 
-    getEl<HTMLSpanElement>("modalPrice").innerHTML = "" + order.price;
+    getEl<HTMLSpanElement>("modalPrice").innerHTML = "" + order.price?.toString();
 }
 
 function getNameOfString(id: number): string {
