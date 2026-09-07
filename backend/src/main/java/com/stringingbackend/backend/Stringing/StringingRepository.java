@@ -121,8 +121,8 @@ public class StringingRepository {
                     return Future.succeededFuture(500);
                 }
 
-                BigDecimal price =
-                    BigDecimal.valueOf(priceNumber.doubleValue());
+                BigDecimal price = BigDecimal.valueOf(priceNumber.doubleValue());
+                price = price.add(new BigDecimal(15));
 
                 return pool.preparedQuery(query)
                     .execute(Tuple.of(firstName, lastName, email, racketName, infos, horKG, vertKG, stringId, price))
@@ -160,8 +160,8 @@ public class StringingRepository {
                     return Future.succeededFuture(500);
                 }
 
-                BigDecimal price =
-                    BigDecimal.valueOf(priceNumber.doubleValue());
+                BigDecimal price = BigDecimal.valueOf(priceNumber.doubleValue());
+                price = price.add(BigDecimal.valueOf(15));
 
                 return pool.preparedQuery(query)
                     .execute(Tuple.of(userId, firstName, lastName, email, racketName, infos, horKG, vertKG, stringId, price))
@@ -219,7 +219,7 @@ public class StringingRepository {
                                 OffsetDateTime updatedAt = row.getOffsetDateTime("updated_at");
                                 BigDecimal price = row.getBigDecimal("price");
 
-                                string.put("price", price.doubleValue());
+                                string.put("price", price == null ? null : price.doubleValue());
                                 string.put("created_at", createdAt.toString());
                                 string.put("updated_at", updatedAt.toString());
 

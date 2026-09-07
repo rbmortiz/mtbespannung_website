@@ -190,13 +190,13 @@ async function getStringTypes(): Promise<void> {
 function addOptions(sport: string): void {
     for(const str of stringTypes){
         if(str.sport.toLowerCase() === sport.toLowerCase()){
-            siteTypeInput.innerHTML += `<option value="${str.string_id}">${str.name}<span class="text-secondary"> (${str.price}€)</span></option>`;
+            siteTypeInput.innerHTML += `<option data-price="${str.price}" value="${str.string_id}">${str.name}<span class="text-secondary"> (${str.price}€)</span></option>`;
         }
     }
 }
 
 function calculatePriceOfStringingJob(): void {
-    let site: string = (Number(siteTypeInput.value)+15).toString();
+    let site: string = (Number(siteTypeInput.dataset.price)+15).toString();
     priceTagInput.innerHTML = site;
 }
 

@@ -422,8 +422,6 @@ function showOrderDetails(order: StringingOrder): void {
         "text-success"
     );
 
-    getEl<HTMLInputElement>("modalPrice").innerHTML = order.price.toString();
-
     switch (order.status) {
         case "pending":
             getEl<HTMLSpanElement>("modalStatus").innerHTML = "Unerledigt";
@@ -444,6 +442,8 @@ function showOrderDetails(order: StringingOrder): void {
         default:
             break;
     }
+
+    getEl<HTMLSpanElement>("modalPrice").innerHTML = order.price.toString();
 
     getEl<HTMLSpanElement>("modalString").innerHTML = getNameOfString(
         order.string_id,
