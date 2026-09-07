@@ -1,4 +1,4 @@
-package com.stringingbackend.backend.dashboard;
+package com.stringingbackend.backend.accounts;
 
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.auth.jwt.JWTAuth;
@@ -6,12 +6,12 @@ import io.vertx.ext.web.Router;
 import io.vertx.ext.web.RoutingContext;
 import io.vertx.ext.web.handler.JWTAuthHandler;
 
-public class DashboardHandler {
-    private final DashboardService dashboardService;
+public class UserHandler {
+    private final UserService userService;
     private final JWTAuth jwtAuth;
 
-    public DashboardHandler(DashboardService dashboardService, JWTAuth jwtAuth){
-        this.dashboardService = dashboardService;
+    public UserHandler(UserService userService, JWTAuth jwtAuth){
+        this.userService = userService;
         this.jwtAuth = jwtAuth;
     }
 
@@ -22,11 +22,14 @@ public class DashboardHandler {
         router.delete("/deleteUser")
             .handler(JWTAuthHandler.create(jwtAuth))
             .handler(this::deleteUser);
+        router.get("/getUserInformation")
+            .handler(JWTAuthHandler.create(jwtAuth))
+            .handler(this::getUserInformation);
     }
 
     private void editUser(RoutingContext ctx) {
 
-        dashboardService.updateUser(ctx)
+        userService.updateUser(ctx)
             .onSuccess(user -> {
 
                 Integer statusCode = user.getInteger("statusCode");
@@ -105,9 +108,8 @@ public class DashboardHandler {
 
     private void deleteUser(RoutingContext ctx) {
 
-        dashboardService.deleteUser(ctx)
+        userService.deleteUser(ctx)
             .onSuccess(statusCode -> {
-
                 ctx.response()
                     .setStatusCode(statusCode)
                     .end();
@@ -123,5 +125,25 @@ public class DashboardHandler {
                         .end("Interner Server Fehler");
                 }
             });
+    }
+
+    private void getUserInformation(RoutingContext ctx) {
+        JsonObject obj = ctx.user().principal();
+
+        String firstName = obj.getString("firstName");
+        String lastName = obj.getString("lastName");
+        String email = obj.getString("email");
+        String role = obj.getString("role");
+
+        JsonObject ans = new JsonObject()
+            .put("firstName", firstName)
+            .put("lastName", lastName)
+            .put("email", email)
+            .put("role", role);
+
+        ctx.response()
+            .setStatusCode(200)
+            .putHeader("Content-Type", "application/json")
+            .end(ans.encode());
     }
 }

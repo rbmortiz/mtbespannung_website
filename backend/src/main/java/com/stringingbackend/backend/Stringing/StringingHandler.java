@@ -31,6 +31,66 @@ public class StringingHandler {
         router.delete("/deleteStringingOrder")
             .handler(JWTAuthHandler.create(jwtAuth))
             .handler(this::deleteStringingOrder);
+        router.get("/getAdminDashboard")
+            .handler(JWTAuthHandler.create(jwtAuth))
+            .handler(this::getAdminStringingOrders);
+        router.get("/getAdminUsers")
+            .handler(JWTAuthHandler.create(jwtAuth))
+            .handler(this::getAdminUsers);
+    }
+
+    private void getAdminStringingOrders(RoutingContext ctx){
+        if(ctx.user().principal().getString("role").equals("admin")){
+            stringingService.getAdminStringingOrders(ctx)
+            .onSuccess(obj -> {
+                if(obj==null || obj.isEmpty()){
+                    ctx.response()
+                        .setStatusCode(404)
+                        .end("No stringing orders have been found");
+                }
+                ctx.response()
+                    .setStatusCode(200)
+                    .end(obj.encode());
+            })
+            .onFailure(err -> {
+                err.printStackTrace();
+                ctx.response()
+                    .setStatusCode(500)
+                    .end(err.getLocalizedMessage());
+            });
+            return;
+        }
+
+        ctx.response()
+            .setStatusCode(403)
+            .end("User is not permitted");
+    }
+
+    private void getAdminUsers(RoutingContext ctx){
+        if(ctx.user().principal().getString("role").equals("admin")){
+            stringingService.getAdminUsers(ctx)
+            .onSuccess(obj -> {
+                if(obj==null || obj.isEmpty()){
+                    ctx.response()
+                        .setStatusCode(404)
+                        .end("No Users have been found");
+                }
+                ctx.response()
+                    .setStatusCode(200)
+                    .end(obj.encode());
+            })
+            .onFailure(err -> {
+                err.printStackTrace();
+                ctx.response()
+                    .setStatusCode(500)
+                    .end(err.getLocalizedMessage());
+            });
+            return;
+        }
+
+        ctx.response()
+            .setStatusCode(403)
+            .end("User is not permitted");
     }
 
     private void newStringingOrderAccount(RoutingContext ctx){

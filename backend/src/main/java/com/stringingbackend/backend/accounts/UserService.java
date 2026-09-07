@@ -1,15 +1,13 @@
-package com.stringingbackend.backend.dashboard;
-
-import com.stringingbackend.backend.accounts.AccountRepository;
+package com.stringingbackend.backend.accounts;
 
 import io.vertx.core.Future;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.RoutingContext;
 
-public class DashboardService {
+public class UserService {
     private final AccountRepository accountRepository;
 
-    public DashboardService(AccountRepository accountRepository){
+    public UserService(AccountRepository accountRepository){
         this.accountRepository = accountRepository;
     }
 

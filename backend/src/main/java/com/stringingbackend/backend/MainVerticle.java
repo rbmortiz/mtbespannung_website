@@ -16,14 +16,15 @@ import io.vertx.ext.auth.jwt.*;
 import com.stringingbackend.backend.Stringing.StringingHandler;
 import com.stringingbackend.backend.Stringing.StringingRepository;
 import com.stringingbackend.backend.Stringing.StringingService;
+
 // Service Imports
 import com.stringingbackend.backend.accounts.AccountRepository;
 import com.stringingbackend.backend.accounts.LoginHandler;
 import com.stringingbackend.backend.accounts.LoginService;
 import com.stringingbackend.backend.accounts.RegisterHandler;
 import com.stringingbackend.backend.accounts.RegisterService;
-import com.stringingbackend.backend.dashboard.DashboardHandler;
-import com.stringingbackend.backend.dashboard.DashboardService;
+import com.stringingbackend.backend.accounts.UserHandler;
+import com.stringingbackend.backend.accounts.UserService;
 
 // CORS Handler
 import io.vertx.core.http.HttpMethod;
@@ -102,8 +103,8 @@ public class MainVerticle extends VerticleBase {
     RegisterService registerService = new RegisterService(accountRepository);
     RegisterHandler registerHandler = new RegisterHandler(registerService, jwtAuth);
 
-    DashboardService dashboardService = new DashboardService(accountRepository);
-    DashboardHandler dashboardHandler = new DashboardHandler(dashboardService, jwtAuth);
+    UserService userService = new UserService(accountRepository);
+    UserHandler userHandler = new UserHandler(userService, jwtAuth);
 
     StringingService stringingService = new StringingService(accountRepository, stringingRepository);
     StringingHandler stringingHandler = new StringingHandler(stringingService, jwtAuth);
@@ -112,7 +113,7 @@ public class MainVerticle extends VerticleBase {
     router.route().handler(BodyHandler.create());
     loginHandler.registerRoutes(router);
     registerHandler.registerRoutes(router);
-    dashboardHandler.registerRoutes(router);
+    userHandler.registerRoutes(router);
     stringingHandler.registerRoutes(router);
 
     router.get("/health").handler(ctx -> {

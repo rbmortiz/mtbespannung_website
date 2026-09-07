@@ -20,6 +20,77 @@ public class StringingRepository {
         this.pool = pool;
     }
 
+    public Future<JsonArray> getAdminUsers(){
+        String query = """
+            SELECT * FROM stringing_orders
+        """;
+
+        return pool.query(query)
+                    .execute()
+                    .map(rows -> {
+                        JsonArray orders = new JsonArray();
+
+                        for(Row row : rows){
+
+                            BigDecimal verticalKg = row.getBigDecimal("vertical_kg");
+                            BigDecimal horizontalKg = row.getBigDecimal("horizontal_kg");
+
+                            OffsetDateTime createdAt = row.getOffsetDateTime("created_at");
+                            OffsetDateTime updatedAt = row.getOffsetDateTime("updated_at");
+
+                            orders.add(
+                                new JsonObject()
+                                    .put("order_id", row.getInteger("order_id"))
+                                    .put("user_id", row.getInteger("user_id"))
+                                    .put("customer_first_name", row.getString("customer_first_name"))
+                                    .put("customer_last_name", row.getString("customer_last_name"))
+                                    .put("customer_email", row.getString("customer_email"))
+                                    .put("racket_name", row.getString("racket_name"))
+                                    .put("additional_info", row.getString("additional_info"))
+                                    .put("vertical_kg", verticalKg == null ? null : verticalKg.doubleValue())
+                                    .put("horizontal_kg", horizontalKg == null ? null : horizontalKg.doubleValue())
+                                    .put("string_id", row.getInteger("string_id"))
+                                    .put("status", row.getString("status"))
+                                    .put("created_at", createdAt == null ? null : createdAt.toString())
+                                    .put("updated_at", updatedAt == null ? null : updatedAt.toString())
+                            );
+                        }
+
+                        return orders;
+                    });
+    }
+
+    public Future<JsonArray> getAdminStringingOrders(){
+        String query = """
+            SELECT * FROM users
+        """;
+
+        return pool.query(query)
+                    .execute()
+                    .map(rows -> {
+                        JsonArray users = new JsonArray();
+
+                        for(Row row : rows){
+
+                            OffsetDateTime createdAt = row.getOffsetDateTime("created_at");
+                            OffsetDateTime updatedAt = row.getOffsetDateTime("updated_at");
+
+                            users.add(
+                                new JsonObject()
+                                    .put("user_id", row.getInteger("user_id"))
+                                    .put("first_name", row.getString("first_name"))
+                                    .put("last_name", row.getString("last_name"))
+                                    .put("email", row.getString("email"))
+                                    .put("role", row.getString("role"))
+                                    .put("created_at", createdAt == null ? null : createdAt.toString())
+                                    .put("updated_at", updatedAt == null ? null : updatedAt.toString())
+                            );
+                        }
+
+                        return users;
+                    });
+    }
+
     public Future<Integer> newStringingOrder(String email, String firstName, String lastName, String racketName, Integer stringId, String infos, BigDecimal vertKG, BigDecimal horKG){
         String query = """
             INSERT INTO stringing_orders(customer_first_name, customer_last_name, customer_email, 

@@ -3,7 +3,6 @@ package com.stringingbackend.backend.accounts;
 import io.vertx.core.Future;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.auth.jwt.JWTAuth;
-import io.vertx.ext.web.handler.JWTAuthHandler;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.RoutingContext;
 
@@ -20,9 +19,6 @@ public class LoginHandler {
     public void registerRoutes(Router router) {
         router.post("/loginUser")
             .handler(this::loginUser);
-        router.get("/getUserInformation")
-            .handler(JWTAuthHandler.create(jwtAuth))
-            .handler(this::getUserInformation);
     }
 
     private Future<Void> loginUser(RoutingContext ctx) {
@@ -73,25 +69,5 @@ public class LoginHandler {
 
                 return Future.<Void>succeededFuture();
             });
-    }
-
-    private void getUserInformation(RoutingContext ctx) {
-        JsonObject obj = ctx.user().principal();
-
-        String firstName = obj.getString("firstName");
-        String lastName = obj.getString("lastName");
-        String email = obj.getString("email");
-        String role = obj.getString("role");
-
-        JsonObject ans = new JsonObject()
-            .put("firstName", firstName)
-            .put("lastName", lastName)
-            .put("email", email)
-            .put("role", role);
-
-        ctx.response()
-            .setStatusCode(200)
-            .putHeader("Content-Type", "application/json")
-            .end(ans.encode());
     }
 }

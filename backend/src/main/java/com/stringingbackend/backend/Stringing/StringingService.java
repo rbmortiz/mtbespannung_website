@@ -18,6 +18,20 @@ public class StringingService {
         this.accountRepository = accountRepository;
     }
 
+    public Future<JsonArray> getAdminUsers(RoutingContext ctx){
+        return stringingRepository.getAdminUsers()
+            .compose(data -> {
+                return Future.succeededFuture(data);
+            });
+    }
+
+    public Future<JsonArray> getAdminStringingOrders(RoutingContext ctx){
+        return stringingRepository.getAdminStringingOrders()
+            .compose(data -> {
+                return Future.succeededFuture(data);
+            });
+    }
+
     public Future<Integer> deleteStringingOrder(RoutingContext ctx) {
 
         JsonObject data = ctx.user().principal();
