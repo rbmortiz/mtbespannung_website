@@ -131,6 +131,7 @@ async function getStringTypes(token: String): Promise<void> {
 
         if (response.status === 200) {
             stringTypes = (await response.json()) as StringTypes[];
+            console.log(stringTypes.at(0));
             return;
         }
 
