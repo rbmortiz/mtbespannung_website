@@ -38,6 +38,8 @@ public class StringingRepository {
                             OffsetDateTime createdAt = row.getOffsetDateTime("created_at");
                             OffsetDateTime updatedAt = row.getOffsetDateTime("updated_at");
 
+                            BigDecimal price = row.getBigDecimal("price");
+
                             orders.add(
                                 new JsonObject()
                                     .put("order_id", row.getInteger("order_id"))
@@ -51,6 +53,7 @@ public class StringingRepository {
                                     .put("horizontal_kg", horizontalKg == null ? null : horizontalKg.doubleValue())
                                     .put("string_id", row.getInteger("string_id"))
                                     .put("status", row.getString("status"))
+                                    .put("price", price == null ? null : price.doubleValue())
                                     .put("created_at", createdAt == null ? null : createdAt.toString())
                                     .put("updated_at", updatedAt == null ? null : updatedAt.toString())
                             );
