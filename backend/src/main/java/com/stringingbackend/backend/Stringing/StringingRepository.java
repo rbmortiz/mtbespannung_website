@@ -20,7 +20,7 @@ public class StringingRepository {
         this.pool = pool;
     }
 
-    public Future<JsonArray> getAdminUsers(){
+    public Future<JsonArray> getAdminStringingOrders(){
         String query = """
             SELECT * FROM stringing_orders
         """;
@@ -60,7 +60,7 @@ public class StringingRepository {
                     });
     }
 
-    public Future<JsonArray> getAdminStringingOrders(){
+    public Future<JsonArray> getAdminUsers(){
         String query = """
             SELECT * FROM users
         """;

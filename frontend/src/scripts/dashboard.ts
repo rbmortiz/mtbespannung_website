@@ -150,6 +150,7 @@ async function adminGetUserStringingOrders(token: String): Promise<void> {
 
         if (response.status === 200) {
             userStrings = (await response.json()) as StringingOrder[];
+            console.log(userStrings[0]);
             return;
         }
 
@@ -189,6 +190,7 @@ async function adminGetUsers(token: String): Promise<void> {
 
         if (response.status === 200) {
             users = (await response.json()) as users[];
+            console.log(users[0]);
             return;
         }
 
