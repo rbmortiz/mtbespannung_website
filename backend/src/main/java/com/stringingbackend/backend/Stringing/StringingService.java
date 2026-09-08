@@ -56,15 +56,6 @@ public class StringingService {
                 if (isAccountFree) {
                     return Future.succeededFuture(404);
                 }
-                System.out.println("Executing orderIsModifiable for: " + email);
-                return stringingRepository.orderIsModifiable(stringId, userId);
-            })
-            .compose(status -> {
-
-                if (status != 200) {
-                    return Future.succeededFuture(status);
-                }
-
                 System.out.println("Executing deleteStringingOrder for: " + userId + ", " + stringId);
                 return stringingRepository.adminDeleteStringingOrder(stringId);
             });
@@ -211,17 +202,9 @@ public class StringingService {
         BigDecimal kgHor = kgHorNumber == null ? null : BigDecimal.valueOf(kgHorNumber.doubleValue());
 
         if("admin".equals(userRole)){
-            return stringingRepository.orderIsModifiable(orderId, userId)
-                .compose(status -> {
+            String orderStatus = body.getString("status");
 
-                    if (status != 200) {
-                        return Future.succeededFuture(status);
-                    }
-
-                    String orderStatus = body.getString("status");
-
-                    return stringingRepository.adminUpdateOrder(orderId, kgVert, kgHor, infos, orderStatus);
-                });
+            return stringingRepository.adminUpdateOrder(orderId, kgVert, kgHor, infos, orderStatus);
         }
 
         return stringingRepository.orderIsModifiable(orderId, userId)
