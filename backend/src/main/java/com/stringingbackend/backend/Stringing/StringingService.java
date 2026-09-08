@@ -41,12 +41,34 @@ public class StringingService {
 
         Integer userId = data.getInteger("userId");
         String email = data.getString("email");
+        String userRole = data.getString("role");
 
         System.out.println(stringId);
         System.out.println(userId);
         System.out.println(email);
 
         if (stringId == null || userId == null || email == null) return Future.succeededFuture(403);
+
+        if("admin".equals(userRole)){
+            return accountRepository.isAccountFree(email)
+            .compose(isAccountFree -> {
+
+                if (isAccountFree) {
+                    return Future.succeededFuture(404);
+                }
+                System.out.println("Executing orderIsModifiable for: " + email);
+                return stringingRepository.orderIsModifiable(stringId, userId);
+            })
+            .compose(status -> {
+
+                if (status != 200) {
+                    return Future.succeededFuture(status);
+                }
+
+                System.out.println("Executing deleteStringingOrder for: " + userId + ", " + stringId);
+                return stringingRepository.adminDeleteStringingOrder(stringId);
+            });
+        }
 
         return accountRepository.isAccountFree(email)
             .compose(isAccountFree -> {
@@ -55,7 +77,7 @@ public class StringingService {
                     return Future.succeededFuture(404);
                 }
                 System.out.println("Executing orderIsModifiable for: " + email);
-                return stringingRepository.orderIsModifiable(stringId);
+                return stringingRepository.orderIsModifiable(stringId, userId);
             })
             .compose(status -> {
 
@@ -170,8 +192,12 @@ public class StringingService {
     public Future<Integer> updateOrder(RoutingContext ctx) {
 
         JsonObject body = ctx.body().asJsonObject();
+        JsonObject data = ctx.user().principal();
 
-        if (body == null) {
+        String userRole = data.getString("role");
+        Integer userId = data.getInteger("userId");
+
+        if (body == null || userId == null) {
             return Future.succeededFuture(400);
         }
 
@@ -182,10 +208,23 @@ public class StringingService {
         Number kgHorNumber = body.getNumber("kgHor");
 
         BigDecimal kgVert = kgVertNumber == null ? null : BigDecimal.valueOf(kgVertNumber.doubleValue());
-
         BigDecimal kgHor = kgHorNumber == null ? null : BigDecimal.valueOf(kgHorNumber.doubleValue());
 
-        return stringingRepository.orderIsModifiable(orderId)
+        if("admin".equals(userRole)){
+            return stringingRepository.orderIsModifiable(orderId, userId)
+                .compose(status -> {
+
+                    if (status != 200) {
+                        return Future.succeededFuture(status);
+                    }
+
+                    String orderStatus = body.getString("status");
+
+                    return stringingRepository.adminUpdateOrder(orderId, kgVert, kgHor, infos, orderStatus);
+                });
+        }
+
+        return stringingRepository.orderIsModifiable(orderId, userId)
             .compose(status -> {
 
                 if (status != 200) {

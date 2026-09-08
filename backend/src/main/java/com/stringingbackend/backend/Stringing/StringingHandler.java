@@ -31,7 +31,7 @@ public class StringingHandler {
         router.delete("/deleteStringingOrder")
             .handler(JWTAuthHandler.create(jwtAuth))
             .handler(this::deleteStringingOrder);
-        router.get("/getAdminDashboard")
+        router.get("/getAdminStringingOrders")
             .handler(JWTAuthHandler.create(jwtAuth))
             .handler(this::getAdminStringingOrders);
         router.get("/getAdminUsers")

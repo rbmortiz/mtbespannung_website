@@ -6,7 +6,7 @@ import {
     initRacketBackground,
     getEl,
 } from "./helpers/HelperFunctions";
-import type { StringTypes, StringingOrder } from "./helpers/interfaces";
+import type { StringTypes, StringingOrder, users } from "./helpers/interfaces";
 
 const emailInput = getEl<HTMLInputElement>("emailField");
 const passwordInput = getEl<HTMLInputElement>("passwordField");
@@ -20,6 +20,7 @@ const patchOrderButton = getEl<HTMLButtonElement>("patchOrderButton");
 const deleteOrderButton = getEl<HTMLButtonElement>("deleteOrderButton");
 
 const stringingTable = getEl<HTMLTableSectionElement>("stringingTable");
+const tableCard = getEl<HTMLDivElement>("tableCard");
 
 let email: String;
 let firstName: String;
@@ -28,6 +29,7 @@ let role: String;
 
 let stringTypes: StringTypes[] = [];
 let userStrings: StringingOrder[] = [];
+let users: users[] = [];
 
 if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", init);
@@ -102,7 +104,21 @@ async function setUserCredentials(): Promise<Boolean> {
     return false;
 }
 
-function buildForAdmin(): void { }
+async function buildForAdmin(): Promise<void> { 
+    var token = localStorage.getItem("token");
+
+    if (token === undefined || token === null) {
+        showError("dashboardError", "Konto wurde nicht gefunden");
+        console.error("No token was found");
+        return;
+    }
+
+    await getStringTypes(token);
+    await adminGetUserStringingOrders(token);
+    await adminGetUsers(token);
+
+    insertStringingTable();
+}
 
 async function buildForUser(): Promise<void> {
     var token = localStorage.getItem("token");
@@ -117,6 +133,81 @@ async function buildForUser(): Promise<void> {
     await getUserStrings(token);
 
     insertStringingTable();
+}
+
+async function adminGetUserStringingOrders(token: String): Promise<void> {
+    try {
+        const response = await fetch(
+            "https://api.mtbespannung.de/getAdminStringingOrders",
+            {
+                method: "GET",
+
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            },
+        );
+
+        if (response.status === 200) {
+            userStrings = (await response.json()) as StringingOrder[];
+            return;
+        }
+
+        if (response.status === 304) {
+            console.log("No Stringing Orders found");
+        }
+
+        if (response.status === 500) {
+            console.error("Serverfehler bei Benutzerbesaitungen anzeigen lassen");
+        }
+
+        if(response.status === 401){
+            showError("dashboardError", "Bitte neu anmelden");
+            console.error("Database error");
+        }
+
+        showNoStringingOrders();
+    } catch (error) {
+        console.error("Could not reach backend: ", error);
+        showError("dashboardError", "Server konnte nicht erreicht werden");
+        showNoStringingOrders();
+    }
+}
+
+async function adminGetUsers(token: String): Promise<void> {
+    try {
+        const response = await fetch(
+            "https://api.mtbespannung.de/getAdminUsers",
+            {
+                method: "GET",
+
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            },
+        );
+
+        if (response.status === 200) {
+            users = (await response.json()) as users[];
+            return;
+        }
+
+        if (response.status === 304) {
+            console.log("No Users Orders found");
+        }
+
+        if (response.status === 500) {
+            console.error("Serverfehler bei Benutzern anzeigen lassen");
+        }
+
+        if(response.status === 401){
+            showError("dashboardError", "Bitte neu anmelden");
+            console.error("Database error");
+        }
+    } catch (error) {
+        console.error("Could not reach backend: ", error);
+        showError("dashboardError", "Server konnte nicht erreicht werden");
+    }
 }
 
 async function getStringTypes(token: String): Promise<void> {
@@ -197,6 +288,7 @@ async function deleteStringingOrder() {
         console.log("Server error");
     }
 }
+
 async function getUserStrings(token: String): Promise<void> {
     try {
         const response = await fetch(
@@ -227,10 +319,20 @@ async function getUserStrings(token: String): Promise<void> {
             showError("dashboardError", "Bitte neu anmelden");
             console.error("Database error");
         }
+
+        showNoStringingOrders();
     } catch (error) {
         console.error("Could not reach backend: ", error);
         showError("dashboardError", "Server konnte nicht erreicht werden");
+        showNoStringingOrders();
     }
+}
+
+function showNoStringingOrders(): void {
+    tableCard.classList.add("d-flex");
+    tableCard.innerHTML = `
+        <h2 class="text-secondary my-5 align-items-center justify-content-center text-center w-100">Keine Bespannungen gefunden</h2>
+    `;
 }
 
 function setPlaceholderItems(): void {

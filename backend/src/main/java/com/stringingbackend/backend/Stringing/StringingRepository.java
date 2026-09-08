@@ -320,16 +320,35 @@ public class StringingRepository {
             });
     }
 
-    public Future<Integer> orderIsModifiable(Integer id) {
+    public Future<Integer> adminDeleteStringingOrder(Integer orderId){
+        String query = """
+            DELETE FROM stringing_orders WHERE order_id=$1
+        """;
+
+        return pool.preparedQuery(query)
+            .execute(Tuple.of(orderId))
+            .map(result -> {
+                if(result.rowCount() == 0){
+                    return 404;
+                }
+
+                return 200;
+            })
+            .recover(error -> {
+                return Future.failedFuture(error);
+            });
+    }
+
+    public Future<Integer> orderIsModifiable(Integer id, Integer userId) {
         if (id == null) {
             return Future.succeededFuture(404);
         }
 
         String query = """
-            SELECT status
+            SELECT status, user_id
             FROM stringing_orders
             WHERE order_id = $1
-            """;
+        """;
 
         return pool.preparedQuery(query)
             .execute(Tuple.of(id))
@@ -341,12 +360,72 @@ public class StringingRepository {
 
                 Row row = result.iterator().next();
                 String status = row.getString("status");
+                Integer uId = row.getInteger("user_id");
 
-                if ("pending".equals(status)) {
+                if ("pending".equals(status) && userId.equals(uId)) {
                     return 200;
                 }
 
                 return 403;
+            });
+    }
+
+    public Future<Integer> adminUpdateOrder(Integer orderId, BigDecimal kgVert, BigDecimal kgHor, String infos, String orderStatus) {
+
+        List<String> updates = new ArrayList<>();
+        List<Object> values = new ArrayList<>();
+
+        int index = 1;
+
+        if (kgVert != null) {
+            updates.add("vertical_kg = $" + index++);
+            values.add(kgVert);
+        }
+
+        if (kgHor != null) {
+            updates.add("horizontal_kg = $" + index++);
+            values.add(kgHor);
+        }
+
+        if (infos != null && !infos.isBlank()) {
+            updates.add("additional_info = $" + index++);
+            values.add(infos);
+        }
+
+        if (orderStatus != null && !orderStatus.isBlank()) {
+            updates.add("orderStatus = $" + index++);
+            values.add(orderStatus);
+        }
+
+        // No fields to update
+        if (updates.isEmpty()) {
+            return Future.succeededFuture(400);
+        }
+
+        values.add(orderId);
+
+        String query = """
+            UPDATE stringing_orders
+            SET %s
+            WHERE order_id = $%d
+            """.formatted(
+                String.join(", ", updates),
+                index
+            );
+
+        return pool.preparedQuery(query)
+            .execute(Tuple.from(values))
+            .map(result -> {
+
+                if (result.rowCount() == 0) {
+                    return 404;
+                }
+
+                return 200;
+            })
+            .recover(err -> {
+                err.printStackTrace();
+                return Future.succeededFuture(500);
             });
     }
 
