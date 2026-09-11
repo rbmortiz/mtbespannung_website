@@ -22,6 +22,11 @@ const deleteOrderButton = getEl<HTMLButtonElement>("deleteOrderButton");
 const stringingTable = getEl<HTMLTableSectionElement>("stringingTable");
 const tableCard = getEl<HTMLDivElement>("tableCard");
 
+const adminFields = getEl<HTMLDivElement>("adminFields");
+let adminFirstNameInput: HTMLSpanElement;
+let adminLastNameInput: HTMLSpanElement;
+let adminEmailInput: HTMLSpanElement;
+
 let email: String;
 let firstName: String;
 let lastName: String;
@@ -49,7 +54,8 @@ async function init(): Promise<void> {
     });
 
     logoutButton.addEventListener("click", () => {
-        void logout();
+        localStorage.removeItem("token");
+        window.location.replace("/src/pages/loginRegister.html");
     });
 
     saveButton.addEventListener("click", () => {
@@ -102,37 +108,6 @@ async function setUserCredentials(): Promise<Boolean> {
     }
 
     return false;
-}
-
-async function buildForAdmin(): Promise<void> { 
-    var token = localStorage.getItem("token");
-
-    if (token === undefined || token === null) {
-        showError("dashboardError", "Konto wurde nicht gefunden");
-        console.error("No token was found");
-        return;
-    }
-
-    await getStringTypes(token);
-    await adminGetUserStringingOrders(token);
-    await adminGetUsers(token);
-
-    insertStringingTable();
-}
-
-async function buildForUser(): Promise<void> {
-    var token = localStorage.getItem("token");
-
-    if (token === undefined || token === null) {
-        showError("dashboardError", "Konto wurde nicht gefunden");
-        console.error("No token was found");
-        return;
-    }
-
-    await getStringTypes(token);
-    await getUserStrings(token);
-
-    insertStringingTable();
 }
 
 async function adminGetUserStringingOrders(token: String): Promise<void> {
@@ -330,21 +305,6 @@ async function getUserStrings(token: String): Promise<void> {
     }
 }
 
-function showNoStringingOrders(): void {
-    tableCard.classList.add("d-flex");
-    tableCard.innerHTML = `
-        <h2 class="text-secondary my-5 align-items-center justify-content-center text-center w-100">Keine Bespannungen gefunden</h2>
-    `;
-}
-
-function setPlaceholderItems(): void {
-    emailInput.placeholder = "" + (email === undefined ? "E-Mail" : email);
-    firstNameInput.placeholder =
-        "" + (firstName === undefined ? "Vorname" : firstName);
-    lastNameInput.placeholder =
-        "" + (lastName === undefined ? "Nachname" : lastName);
-}
-
 async function deleteUserAccount(): Promise<void> {
     const token = localStorage.getItem("token");
 
@@ -384,9 +344,69 @@ async function deleteUserAccount(): Promise<void> {
     }
 }
 
-function logout(): void {
-    localStorage.removeItem("token");
-    window.location.replace("/src/pages/loginRegister.html");
+async function updateOrderInformation(): Promise<void> {
+    const token = localStorage.getItem("token");
+
+    var infos: string = getEl<HTMLInputElement>("modalInfos").value;
+    var orderId: number = Number(
+        getEl<HTMLSpanElement>("modalRacketName").getAttribute("order-id"),
+    );
+
+    const kgVertInput = getEl<HTMLInputElement>("modalVerticalKG").value;
+
+    const kgHorInput = getEl<HTMLInputElement>("modalHorizontalKG").value;
+
+    const kgVert: number | null = kgVertInput === "" ? null : Number(kgVertInput);
+
+    const kgHor: number | null = kgHorInput === "" ? null : Number(kgHorInput);
+
+    try {
+        const response = await fetch("https://api.mtbespannung.de/updateOrder", {
+            method: "PATCH",
+
+            headers: {
+                Authorization: `Bearer ${token}`,
+                "Content-Type": "application/json",
+            },
+
+            body: JSON.stringify({
+                order_id: orderId,
+                kgVert: kgVert,
+                kgHor: kgHor,
+                infos: infos,
+            }),
+        });
+
+        if (response.status === 400) {
+            showError("patchOrderError", "Fehlende Daten");
+            return;
+        }
+
+        if (response.status === 404) {
+            showError("patchOrderError", "Bespannungsorder existiert nicht");
+            return;
+        }
+
+        if (response.status === 401) {
+            showError("patchOrderError", "Bitte neu anmelden");
+            return;
+        }
+
+        if (response.status === 403) {
+            showError("patchOrderError", "Bespannungsorder kann nicht mehr verändert werden",);
+            return;
+        }
+
+        if (response.status === 500) {
+            showError("patchOrderError", "Datenbankfehler");
+            return;
+        }
+
+        window.location.reload();
+    } catch (error) {
+        console.error(error);
+        showError("dashboardError", "Server konnte nicht erreicht werden");
+    }
 }
 
 async function updateUser(): Promise<void> {
@@ -451,6 +471,89 @@ async function updateUser(): Promise<void> {
         console.error("Could not reach backend:", error);
         showError("dashboardError", "Server konnte nicht erreicht werden");
     }
+}
+
+async function buildForAdmin(): Promise<void> { 
+    var token = localStorage.getItem("token");
+
+    if (token === undefined || token === null) {
+        showError("dashboardError", "Konto wurde nicht gefunden");
+        console.error("No token was found");
+        return;
+    }
+
+    buildAdminFields();
+
+    await getStringTypes(token);
+    await adminGetUserStringingOrders(token);
+    await adminGetUsers(token);
+
+    insertStringingTable();
+}
+
+async function buildForUser(): Promise<void> {
+    var token = localStorage.getItem("token");
+
+    if (token === undefined || token === null) {
+        showError("dashboardError", "Konto wurde nicht gefunden");
+        console.error("No token was found");
+        return;
+    }
+
+    await getStringTypes(token);
+    await getUserStrings(token);
+
+    insertStringingTable();
+}
+
+function buildAdminFields(): void {
+    adminFields.innerHTML += `
+        <div class="d-flex align-items-center gap-3 mb-2">
+            <label for="adminFirstNameInput"
+                class="form-label mb-0 text-nowrap d-flex"
+                style="min-width: 100%;">
+                Vorname:
+                <span class="text-primary ms-auto" id="adminFirstNameInput"></span>
+            </label>
+        </div>
+
+        <div class="d-flex align-items-center gap-3 mb-2">
+            <label for="adminLastNameInput"
+                class="form-label mb-0 text-nowrap d-flex"
+                style="min-width: 100%;">
+                Nachname:
+                <span class="text-primary ms-auto" id="adminLastNameInput"></span>
+            </label>
+        </div>
+
+        <div class="d-flex align-items-center gap-3 mb-2">
+            <label for="adminEmailInput"
+                class="form-label mb-0 text-nowrap d-flex"
+                style="min-width: 100%;">
+                E-Mail:
+                <span class="text-primary ms-auto" id="adminEmailInput"></span>
+            </label>
+        </div>
+    `
+
+    adminFirstNameInput = getEl<HTMLSpanElement>("adminFirstNameInput");
+    adminLastNameInput = getEl<HTMLSpanElement>("adminLastNameInput");
+    adminEmailInput = getEl<HTMLSpanElement>("adminEmailInput");
+}
+
+function showNoStringingOrders(): void {
+    tableCard.classList.add("d-flex");
+    tableCard.innerHTML = `
+        <h2 class="text-secondary my-5 align-items-center justify-content-center text-center w-100">Keine Bespannungen gefunden</h2>
+    `;
+}
+
+function setPlaceholderItems(): void {
+    emailInput.placeholder = "" + (email === undefined ? "E-Mail" : email);
+    firstNameInput.placeholder =
+        "" + (firstName === undefined ? "Vorname" : firstName);
+    lastNameInput.placeholder =
+        "" + (lastName === undefined ? "Nachname" : lastName);
 }
 
 function insertStringingTable(): void {
@@ -554,6 +657,37 @@ function showOrderDetails(order: StringingOrder): void {
     );
 
     getEl<HTMLSpanElement>("modalPrice").innerHTML = "" + order.price?.toString();
+
+    if(
+        adminFirstNameInput !== null && adminFirstNameInput !== undefined &&
+        adminLastNameInput !== null && adminLastNameInput !== undefined &&
+        adminEmailInput !== null && adminEmailInput !== undefined 
+    ) {
+        if(
+            order.customer_first_name === null && order.customer_first_name === undefined &&
+            order.customer_last_name === null && order.customer_last_name === undefined &&
+            order.customer_email === null && order.customer_email === undefined
+        ) {
+
+            for(const user of users){
+                if(user.user_id === order.user_id){
+                    adminFirstNameInput.innerHTML = user.first_name;
+                    adminLastNameInput.innerHTML = user.last_name;
+                    adminEmailInput.innerHTML = user.email;
+                }
+            }
+
+            alterFieldsForAdmin();
+        } else {
+            adminFirstNameInput.innerHTML = order.customer_first_name !== null ? order.customer_first_name : "";
+            adminLastNameInput.innerHTML = order.customer_last_name !== null ? order.customer_last_name : "";
+            adminEmailInput.innerHTML = order.customer_email !== null ? order.customer_email : "";
+        }
+    }
+}
+
+function alterFieldsForAdmin(): void {
+    console.log("successfully altered Fields");
 }
 
 function getNameOfString(id: number): string {
@@ -564,69 +698,4 @@ function getNameOfString(id: number): string {
     if (racketString === null || racketString === undefined) return "";
 
     return racketString.name;
-}
-
-async function updateOrderInformation(): Promise<void> {
-    const token = localStorage.getItem("token");
-
-    var infos: string = getEl<HTMLInputElement>("modalInfos").value;
-    var orderId: number = Number(
-        getEl<HTMLSpanElement>("modalRacketName").getAttribute("order-id"),
-    );
-
-    const kgVertInput = getEl<HTMLInputElement>("modalVerticalKG").value;
-
-    const kgHorInput = getEl<HTMLInputElement>("modalHorizontalKG").value;
-
-    const kgVert: number | null = kgVertInput === "" ? null : Number(kgVertInput);
-
-    const kgHor: number | null = kgHorInput === "" ? null : Number(kgHorInput);
-
-    try {
-        const response = await fetch("https://api.mtbespannung.de/updateOrder", {
-            method: "PATCH",
-
-            headers: {
-                Authorization: `Bearer ${token}`,
-                "Content-Type": "application/json",
-            },
-
-            body: JSON.stringify({
-                order_id: orderId,
-                kgVert: kgVert,
-                kgHor: kgHor,
-                infos: infos,
-            }),
-        });
-
-        if (response.status === 400) {
-            showError("patchOrderError", "Fehlende Daten");
-            return;
-        }
-
-        if (response.status === 404) {
-            showError("patchOrderError", "Bespannungsorder existiert nicht");
-            return;
-        }
-
-        if (response.status === 401) {
-            showError("patchOrderError", "Bitte neu anmelden");
-            return;
-        }
-
-        if (response.status === 403) {
-            showError("patchOrderError", "Bespannungsorder kann nicht mehr verändert werden",);
-            return;
-        }
-
-        if (response.status === 500) {
-            showError("patchOrderError", "Datenbankfehler");
-            return;
-        }
-
-        window.location.reload();
-    } catch (error) {
-        console.error(error);
-        showError("dashboardError", "Server konnte nicht erreicht werden");
-    }
 }

@@ -13,6 +13,10 @@ export interface StringTypes {
 
 export interface StringingOrder {
     order_id: number;
+    user_id: number;
+    customer_first_name: string | null;
+    customer_last_name: string | null;
+    customer_email: string | null;
     racket_name: string;
     additional_info: string | null;
     horizontal_kg: number | null;
