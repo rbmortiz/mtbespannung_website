@@ -1,4 +1,11 @@
-import { manageNavBarLinks, setFirstName, initRacketBackground, getEl, displayHTMLElement, showError } from "./helpers/HelperFunctions";
+import {
+    manageNavBarLinks,
+    setFirstName,
+    initRacketBackground,
+    getEl,
+    displayHTMLElement,
+    showError,
+} from "./helpers/HelperFunctions";
 import type { StringTypes } from "./helpers/interfaces";
 
 const infoTextHeader = getEl<HTMLHeadingElement>("infoTextHeader");
@@ -19,8 +26,12 @@ const verticalKGInput = getEl<HTMLInputElement>("verticalKG");
 const infosInput = getEl<HTMLInputElement>("infos");
 const priceTagInput = getEl<HTMLInputElement>("priceTag");
 
-const sendOrderWithoutAccountButton = getEl<HTMLInputElement>("sendOrderWithoutAccount");
-const sendOrderWithAccountButton = getEl<HTMLInputElement>("sendOrderWithAccount");
+const sendOrderWithoutAccountButton = getEl<HTMLInputElement>(
+    "sendOrderWithoutAccount",
+);
+const sendOrderWithAccountButton = getEl<HTMLInputElement>(
+    "sendOrderWithAccount",
+);
 
 // Container Elements
 
@@ -31,7 +42,6 @@ const racketNameContainer = getEl<HTMLDivElement>("racketNameContainer");
 const infosContainer = getEl<HTMLDivElement>("infosContainer");
 const priceTagContainer = getEl<HTMLDivElement>("priceTagContainer");
 
-
 let stringTypes: StringTypes[] = [];
 
 if (document.readyState === "loading") {
@@ -40,13 +50,13 @@ if (document.readyState === "loading") {
     init();
 }
 
-async function init(): Promise<void>{
+async function init(): Promise<void> {
     setInfoFieldButtons();
 
     manageNavBarLinks();
     initRacketBackground();
 
-    if(token === null || token === undefined){
+    if (token === null || token === undefined) {
         buildForGuestUser();
     } else {
         buildForUser();
@@ -113,9 +123,12 @@ function setInfoFieldButtons(): void {
             window.location.href = "/src/pages/infos.html";
         });
     });
-    getEl<HTMLLabelElement>("horizontalKGInfo").addEventListener("click", () => {
-        void racketVHInfoText();
-    });
+    getEl<HTMLLabelElement>("horizontalKGInfo").addEventListener(
+        "click",
+        () => {
+            void racketVHInfoText();
+        },
+    );
     getEl<HTMLLabelElement>("verticalKGInfo").addEventListener("click", () => {
         void racketVHInfoText();
     });
@@ -142,8 +155,16 @@ function racketVHInfoText(): void {
 
 function buildForGuestUser(): void {
     sendOrderWithoutAccountButton.addEventListener("click", () => {
-        void sendInput(racketNameInput.value, siteTypeInput.value, 
-            verticalKGInput.value, horizontalKGInput.value, infosInput.value, firstNameInput.value, lastNameInput.value, emailInput.value);
+        void sendInput(
+            racketNameInput.value,
+            siteTypeInput.value,
+            verticalKGInput.value,
+            horizontalKGInput.value,
+            infosInput.value,
+            firstNameInput.value,
+            lastNameInput.value,
+            emailInput.value,
+        );
     });
 }
 
@@ -158,39 +179,43 @@ function buildForUser(): void {
     infosContainer.classList.add("mb-5");
 
     sendOrderWithAccountButton.addEventListener("click", () => {
-        void sendInput(racketNameInput.value, siteTypeInput.value, 
-            verticalKGInput.value, horizontalKGInput.value, infosInput.value);
+        void sendInput(
+            racketNameInput.value,
+            siteTypeInput.value,
+            verticalKGInput.value,
+            horizontalKGInput.value,
+            infosInput.value,
+        );
     });
 }
 
 async function getStringTypes(): Promise<void> {
     try {
         const response = await fetch("https://api.mtbespannung.de/getStrings", {
-            method: "GET"
+            method: "GET",
         });
 
-        if(response.status === 200){
-            stringTypes = await response.json() as StringTypes[];
+        if (response.status === 200) {
+            stringTypes = (await response.json()) as StringTypes[];
             return;
         }
 
-        if(response.status === 304){
+        if (response.status === 304) {
             console.log("No Strings could be found");
         }
 
-        if(response.status === 500){
+        if (response.status === 500) {
             console.error("Database error, Strings could not be fetched");
         }
-    } catch(error){
+    } catch (error) {
         console.error("Could not reach backend: ", error);
         showError("bespannungenError", "Server konnte nicht erreicht werden");
     }
 }
 
 function addOptions(sport: string): void {
-
-    for(const str of stringTypes){
-        if(str.sport.toLowerCase() === sport.toLowerCase()){
+    for (const str of stringTypes) {
+        if (str.sport.toLowerCase() === sport.toLowerCase()) {
             siteTypeInput.innerHTML += `<option data-price="${str.price}" value="${str.string_id}">${str.name} (${str.price}€)</option>`;
         }
     }
@@ -199,60 +224,81 @@ function addOptions(sport: string): void {
 function calculatePriceOfStringingJob(): void {
     const selectedOption = siteTypeInput.options[siteTypeInput.selectedIndex];
 
-    const price =  Number(selectedOption.dataset.price) + 15;
+    const price = Number(selectedOption.dataset.price) + 15;
 
     priceTagInput.innerHTML = price.toString();
 }
 
-
 // function overloading for the fetch request
 
-async function sendInput(racketName: string, racketString: string, vertKG: string, 
-    horKG: string, infos: string, firstName?: string, lastName?: string, email?:string): Promise<void>{
-
-    if(firstName === undefined || lastName === undefined || email === undefined){
+async function sendInput(
+    racketName: string,
+    racketString: string,
+    vertKG: string,
+    horKG: string,
+    infos: string,
+    firstName?: string,
+    lastName?: string,
+    email?: string,
+): Promise<void> {
+    if (
+        firstName === undefined ||
+        lastName === undefined ||
+        email === undefined
+    ) {
         const string_id: number = Number(racketString);
 
         try {
-            const response = await fetch("https://api.mtbespannung.de/newStringingOrderAccount", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": `Bearer ${token}`
+            const response = await fetch(
+                "https://api.mtbespannung.de/newStringingOrderAccount",
+                {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${token}`,
+                    },
+
+                    body: JSON.stringify({
+                        racket_name: racketName,
+                        horizontal_kg: horKG === "" ? null : Number(horKG),
+                        vertical_kg: vertKG === "" ? null : Number(vertKG),
+                        string_id: string_id,
+                        additional_info: infos,
+                    }),
                 },
+            );
 
-                body: JSON.stringify({
-                    "racket_name": racketName,
-                    "horizontal_kg": horKG === "" ? null : Number(horKG),
-                    "vertical_kg": vertKG === "" ? null : Number(vertKG),
-                    "string_id": string_id, 
-                    "additional_info": infos
-                })
-            })
-
-            if(response.ok){
+            if (response.ok) {
                 window.location.replace("/src/pages/main.html");
             }
 
-            if(response.status === 500){
-                showError("bespannungenError", "Datenbank konnte nicht erreicht werden.");
+            if (response.status === 500) {
+                showError(
+                    "bespannungenError",
+                    "Datenbank konnte nicht erreicht werden.",
+                );
             }
 
-            if(response.status === 403){
+            if (response.status === 403) {
                 showError("bespannungenError", "Fehlende Daten");
             }
 
-            if(response.status === 404){
-                showError("bespannungenError", "Account konnte nicht gefunden werden");
+            if (response.status === 404) {
+                showError(
+                    "bespannungenError",
+                    "Account konnte nicht gefunden werden",
+                );
             }
 
-            if(response.status === 401){
+            if (response.status === 401) {
                 showError("bespannungenError", "Bitte neu anmelden");
             }
-
-        } catch (error) { 
+        } catch (error) {
             console.error(error);
-            showError("bespannungenError", "Server konnte nicht erreicht werden");
+            showError(
+                "bespannungenError",
+                "Server konnte nicht erreicht werden",
+            );
         }
 
         return;
@@ -261,38 +307,43 @@ async function sendInput(racketName: string, racketString: string, vertKG: strin
     const string_id: number = Number(racketString);
 
     try {
-        const response = await fetch("https://api.mtbespannung.de/newStringingOrder", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
+        const response = await fetch(
+            "https://api.mtbespannung.de/newStringingOrder",
+            {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+
+                body: JSON.stringify({
+                    racket_name: racketName,
+                    horizontal_kg: horKG === "" ? null : Number(horKG),
+                    vertical_kg: vertKG === "" ? null : Number(vertKG),
+                    string_id: string_id,
+                    additional_info: infos,
+
+                    customer_first_name: firstName,
+                    customer_last_name: lastName,
+                    customer_email: email,
+                }),
             },
+        );
 
-            body: JSON.stringify({
-                "racket_name": racketName,
-                "horizontal_kg": horKG === "" ? null : Number(horKG),
-                "vertical_kg": vertKG === "" ? null : Number(vertKG),
-                "string_id": string_id, 
-                "additional_info": infos,
-
-                "customer_first_name": firstName,
-                "customer_last_name": lastName,
-                "customer_email": email
-            })
-        })
-
-        if(response.ok){
+        if (response.ok) {
             window.location.replace("/src/pages/main.html");
         }
 
-        if(response.status === 500){
-            showError("bespannungenError", "Datenbank konnte nicht erreicht werden.");
+        if (response.status === 500) {
+            showError(
+                "bespannungenError",
+                "Datenbank konnte nicht erreicht werden.",
+            );
         }
 
-        if(response.status === 403){
+        if (response.status === 403) {
             showError("bespannungenError", "Fehlende Daten");
         }
-        
-    } catch (error) { 
+    } catch (error) {
         console.error(error);
         showError("bespannungenError", "Server konnte nicht erreicht werden");
     }

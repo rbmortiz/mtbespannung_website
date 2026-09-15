@@ -21,52 +21,51 @@ public class RegisterHandler {
     }
 
     private void registerUser(RoutingContext ctx) {
+        System.out.println("[RegisterHandler] registerUser called");
 
-    registerService.registerUser(ctx)
-        .onSuccess(answer -> {
+        registerService.registerUser(ctx)
+            .onSuccess(answer -> {
+                int statusCode = answer.getInteger("statusCode");
 
-            int statusCode = answer.getInteger("statusCode");
+                if (statusCode == 200) {
+                    
+                    String token = jwtAuth.generateToken(
+                        new JsonObject()
+                            .put("userId", answer.getInteger("user_id"))
+                            .put("email", answer.getString("email"))
+                            .put("firstName", answer.getString("firstName"))
+                            .put("lastName", answer.getString("lastName"))
+                            .put("role", answer.getString("role"))
+                    );
 
-            if (statusCode == 200) {
+                    JsonObject response = new JsonObject()
+                        .put("token", token);
 
-                String token = jwtAuth.generateToken(
-                    new JsonObject()
-                        .put("userId", answer.getInteger("user_id"))
-                        .put("email", answer.getString("email"))
-                        .put("firstName", answer.getString("firstName"))
-                        .put("lastName", answer.getString("lastName"))
-                        .put("role", answer.getString("role"))
-                );
+                    System.out.println("[RegisterHandler] (200) registerUser succeeded for "+ answer.getString("email"));
 
-                JsonObject response = new JsonObject()
-                    .put("token", token);
+                    ctx.response()
+                        .setStatusCode(200)
+                        .putHeader("Content-Type", "application/json")
+                        .end(response.encode());
+
+                    return;
+                }
+
+                System.err.println("[RegisterHandler] ("+ statusCode +") registerUser failed");
 
                 ctx.response()
-                    .setStatusCode(200)
-                    .putHeader("Content-Type", "application/json")
-                    .end(response.encode());
+                    .setStatusCode(statusCode)
+                    .end(statusCode == 403 ? "Account bereits vorhanden" : statusCode == 400 ? "Fehlende Daten" : "Interner Server Fehler");
+            })
+            .onFailure(err -> {
+                System.err.println("[RegisterHandler] (500) registerUser failed");
+                err.printStackTrace();
 
-                return;
-            }
-
-            ctx.response()
-                .setStatusCode(statusCode)
-                .end(
-                    statusCode == 403 ? "Account bereits vorhanden" :
-                    statusCode == 400 ? "Fehlende Daten" :
-                    "Interner Server Fehler"
-                );
-        })
-        .onFailure(err -> {
-
-            System.err.println("RegisterHandler failed:");
-            err.printStackTrace();
-
-            if (!ctx.response().ended()) {
-                ctx.response()
-                    .setStatusCode(500)
-                    .end("Interner Server Fehler");
-            }
-        });
-}
+                if (!ctx.response().ended()) {
+                    ctx.response()
+                        .setStatusCode(500)
+                        .end("Interner Server Fehler");
+                }
+            });
+    }
 }

@@ -5,13 +5,12 @@ import io.vertx.core.json.JsonObject;
 import io.vertx.sqlclient.Pool;
 import io.vertx.sqlclient.Row;
 import io.vertx.sqlclient.Tuple;
+import io.vertx.core.Future;
 
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
-
-import io.vertx.core.Future;
 
 public class StringingRepository {
     private final Pool pool;
@@ -20,107 +19,72 @@ public class StringingRepository {
         this.pool = pool;
     }
 
-    public Future<JsonArray> getAdminStringingOrders(){
+    public Future<JsonArray> getAllStringingOrders(){
+        System.out.println("[StringingRepository] getAllStringingOrders called");
+
         String query = """
             SELECT * FROM stringing_orders
         """;
 
         return pool.query(query)
-                    .execute()
-                    .map(rows -> {
-                        JsonArray orders = new JsonArray();
+            .execute()
+            .map(rows -> {
+                JsonArray orders = new JsonArray();
 
-                        for(Row row : rows){
+                for(Row row : rows){
+                    BigDecimal verticalKg = row.getBigDecimal("vertical_kg");
+                    BigDecimal horizontalKg = row.getBigDecimal("horizontal_kg");
 
-                            BigDecimal verticalKg = row.getBigDecimal("vertical_kg");
-                            BigDecimal horizontalKg = row.getBigDecimal("horizontal_kg");
+                    OffsetDateTime createdAt = row.getOffsetDateTime("created_at");
+                    OffsetDateTime updatedAt = row.getOffsetDateTime("updated_at");
 
-                            OffsetDateTime createdAt = row.getOffsetDateTime("created_at");
-                            OffsetDateTime updatedAt = row.getOffsetDateTime("updated_at");
+                    BigDecimal price = row.getBigDecimal("price");
 
-                            BigDecimal price = row.getBigDecimal("price");
+                    orders.add(new JsonObject()
+                            .put("order_id", row.getInteger("order_id"))
+                            .put("user_id", row.getInteger("user_id"))
+                            .put("customer_first_name", row.getString("customer_first_name"))
+                            .put("customer_last_name", row.getString("customer_last_name"))
+                            .put("customer_email", row.getString("customer_email"))
+                            .put("racket_name", row.getString("racket_name"))
+                            .put("additional_info", row.getString("additional_info"))
+                            .put("vertical_kg", verticalKg == null ? null : verticalKg.doubleValue())
+                            .put("horizontal_kg", horizontalKg == null ? null : horizontalKg.doubleValue())
+                            .put("string_id", row.getInteger("string_id"))
+                            .put("status", row.getString("status"))
+                            .put("price", price == null ? null : price.doubleValue())
+                            .put("created_at", createdAt == null ? null : createdAt.toString())
+                            .put("updated_at", updatedAt == null ? null : updatedAt.toString())
+                    );
+                }
 
-                            orders.add(
-                                new JsonObject()
-                                    .put("order_id", row.getInteger("order_id"))
-                                    .put("user_id", row.getInteger("user_id"))
-                                    .put("customer_first_name", row.getString("customer_first_name"))
-                                    .put("customer_last_name", row.getString("customer_last_name"))
-                                    .put("customer_email", row.getString("customer_email"))
-                                    .put("racket_name", row.getString("racket_name"))
-                                    .put("additional_info", row.getString("additional_info"))
-                                    .put("vertical_kg", verticalKg == null ? null : verticalKg.doubleValue())
-                                    .put("horizontal_kg", horizontalKg == null ? null : horizontalKg.doubleValue())
-                                    .put("string_id", row.getInteger("string_id"))
-                                    .put("status", row.getString("status"))
-                                    .put("price", price == null ? null : price.doubleValue())
-                                    .put("created_at", createdAt == null ? null : createdAt.toString())
-                                    .put("updated_at", updatedAt == null ? null : updatedAt.toString())
-                            );
-                        }
+                System.out.println("[StringingRepository] (200) getAllStringingOrders succeeded");
 
-                        return orders;
-                    });
-    }
-
-    public Future<JsonArray> getAdminUsers(){
-        String query = """
-            SELECT * FROM users
-        """;
-
-        return pool.query(query)
-                    .execute()
-                    .map(rows -> {
-                        JsonArray users = new JsonArray();
-
-                        for(Row row : rows){
-
-                            OffsetDateTime createdAt = row.getOffsetDateTime("created_at");
-                            OffsetDateTime updatedAt = row.getOffsetDateTime("updated_at");
-
-                            users.add(
-                                new JsonObject()
-                                    .put("user_id", row.getInteger("user_id"))
-                                    .put("first_name", row.getString("first_name"))
-                                    .put("last_name", row.getString("last_name"))
-                                    .put("email", row.getString("email"))
-                                    .put("role", row.getString("role"))
-                                    .put("created_at", createdAt == null ? null : createdAt.toString())
-                                    .put("updated_at", updatedAt == null ? null : updatedAt.toString())
-                            );
-                        }
-
-                        return users;
-                    });
+                return orders;
+            });
     }
 
     public Future<Integer> newStringingOrder(String email, String firstName, String lastName, String racketName, Integer stringId, String infos, BigDecimal vertKG, BigDecimal horKG) {
+        System.out.println("[StringingRepository] newStringingOrder called");
 
         String query = """
-            INSERT INTO stringing_orders(
-                customer_first_name,
-                customer_last_name,
-                customer_email,
-                racket_name,
-                additional_info,
-                horizontal_kg,
-                vertical_kg,
-                string_id,
-                price
-            )
+            INSERT INTO stringing_orders(customer_first_name, customer_last_name, customer_email, racket_name, additional_info, horizontal_kg, vertical_kg, string_id, price)
             VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
-            """;
+        """;
 
         return getPriceOfString(stringId)
             .compose(priceObj -> {
-
                 if (priceObj.isEmpty()) {
+                    System.err.println("[StringingRepository] (404) newStringingOrder failed");
+
                     return Future.succeededFuture(404);
                 }
 
                 Number priceNumber = priceObj.getNumber("price");
 
                 if (priceNumber == null) {
+                    System.err.println("[StringingRepository] (500) newStringingOrder failed");
+
                     return Future.succeededFuture(500);
                 }
 
@@ -129,37 +93,34 @@ public class StringingRepository {
 
                 return pool.preparedQuery(query)
                     .execute(Tuple.of(firstName, lastName, email, racketName, infos, horKG, vertKG, stringId, price))
-                    .map(result -> 200);
+                    .map(result -> {
+                        System.out.println("[StringingRepository] (200) newStringingOrder succeeded");
+                        return 200;
+                    });
             });
     }
 
     public Future<Integer> newStringingOrderAccount(Integer userId, String email, String firstName, String lastName, String racketName, Integer stringId, String infos, BigDecimal vertKG, BigDecimal horKG){
+        System.out.println("[StringingRepository] newStringingOrderAccount called");
+
         String query = """
-            INSERT INTO stringing_orders(
-                user_id,
-                customer_first_name,
-                customer_last_name,
-                customer_email,
-                racket_name,
-                additional_info,
-                horizontal_kg,
-                vertical_kg,
-                string_id,
-                price
-            )
+            INSERT INTO stringing_orders(user_id, customer_first_name, customer_last_name, customer_email, racket_name, additional_info, horizontal_kg, vertical_kg, string_id, price)
             VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
-            """;
+        """;
 
         return getPriceOfString(stringId)
             .compose(priceObj -> {
-
                 if (priceObj.isEmpty()) {
+                    System.err.println("[StringingRepository] (404) newStringingOrderAccount failed");
+
                     return Future.succeededFuture(404);
                 }
 
                 Number priceNumber = priceObj.getNumber("price");
 
                 if (priceNumber == null) {
+                    System.err.println("[StringingRepository] (500) newStringingOrderAccount failed");
+
                     return Future.succeededFuture(500);
                 }
 
@@ -168,143 +129,180 @@ public class StringingRepository {
 
                 return pool.preparedQuery(query)
                     .execute(Tuple.of(userId, firstName, lastName, email, racketName, infos, horKG, vertKG, stringId, price))
-                    .map(result -> 200);
+                    .map(result -> {
+                        System.out.println("[StringingRepository] (200) newStringingOrderAccount succeeded");
+                        return 200;
+                    });
             });
     }
 
     public Future<JsonObject> getPriceOfString(Integer string_id){
+        System.out.println("[StringingRepository] getPriceOfString called");
+
         String query = """
             SELECT price FROM strings WHERE string_id = $1
         """;
 
         return pool.preparedQuery(query)
-                    .execute(Tuple.of(string_id))
-                    .map(rows -> {
-                        if(rows.rowCount() != 1){
-                            return new JsonObject();
-                        }
+            .execute(Tuple.of(string_id))
+            .map(rows -> {
+                if(rows.rowCount() != 1){
+                    System.err.println("[StringingRepository] (404) getPriceOfString failed");
+                    return new JsonObject();
+                }
 
-                        Row row = rows.iterator().next();
-                        BigDecimal price = row.getBigDecimal("price");
+                Row row = rows.iterator().next();
+                BigDecimal price = row.getBigDecimal("price");
 
-                        return new JsonObject().put("price", price == null ? null : price.doubleValue());
-                    })
-                    .recover(err -> {
-                        err.printStackTrace();
-                        return Future.failedFuture(err);
-                    });
+                return new JsonObject().put("price", price == null ? null : price.doubleValue());
+            })
+            .recover(err -> {
+                System.err.println("[StringingRepository] (500) getPriceOfString failed");
+
+                err.printStackTrace();
+                return Future.failedFuture(err);
+            });
     }
 
     public Future<JsonArray> getStrings() {
+        System.out.println("[StringingRepository] getStrings called");
 
         String query = """
             SELECT * FROM strings
         """;
 
         return pool.query(query)
-                    .execute()
-                    .map(result -> {
-                        JsonArray ans = new JsonArray();
+            .execute()
+            .map(result -> {
+                JsonArray ans = new JsonArray();
 
-                        if(result.rowCount()>0){
-                            for(Row row : result){
-                                JsonObject string = new JsonObject();
+                if(result.rowCount()>0){
+                    for(Row row : result){
+                        OffsetDateTime createdAt = row.getOffsetDateTime("created_at");
+                        OffsetDateTime updatedAt = row.getOffsetDateTime("updated_at");
+                        BigDecimal price = row.getBigDecimal("price");
 
-                                string.put("string_id", row.getInteger("string_id"));
-                                string.put("sport", row.getString("sport"));
-                                string.put("name", row.getString("name"));
-                                string.put("color", row.getString("color"));
-                                string.put("description", row.getString("description"));
-                                string.put("type", row.getString("type"));
-                                string.put("is_active", row.getBoolean("is_active"));
+                        ans.add(new JsonObject()
+                            .put("string_id", row.getInteger("string_id"))
+                            .put("sport", row.getString("sport"))
+                            .put("name", row.getString("name"))
+                            .put("color", row.getString("color"))
+                            .put("description", row.getString("description"))
+                            .put("type", row.getString("type"))
+                            .put("is_active", row.getBoolean("is_active"))
 
-                                OffsetDateTime createdAt = row.getOffsetDateTime("created_at");
-                                OffsetDateTime updatedAt = row.getOffsetDateTime("updated_at");
-                                BigDecimal price = row.getBigDecimal("price");
+                            .put("price", price == null ? null : price.doubleValue())
+                            .put("created_at", createdAt.toString())
+                            .put("updated_at", updatedAt.toString())
+                        );
+                    }
+                } 
+                
+                else {
+                    System.out.println("[StringingRepository] (404) getStrings failed");
+                    return ans;
+                }
 
-                                string.put("price", price == null ? null : price.doubleValue());
-                                string.put("created_at", createdAt.toString());
-                                string.put("updated_at", updatedAt.toString());
+                System.out.println("[StringingRepository] (200) getStrings succeeded");
 
-                                ans.add(string);
-                            }
-                        }
+                return ans;
+            })
+            .recover(err -> {
+                System.err.println("[StringingRepository] (500) getStrings failed");
 
-                        return ans;
-                    })
-                    .recover(err -> {
-                        err.printStackTrace();
-                        return Future.failedFuture("Database error");
-                    });
+                err.printStackTrace();
+                return Future.failedFuture("Database error");
+            });
     }
 
-    public Future<JsonArray> getStringingJobs(Integer id) {
+    public Future<JsonArray> getStringingOrders(Integer id) {
+        System.out.println("[StringingRepository] getStringingOrders called");
 
         String query = """
             SELECT * FROM stringing_orders WHERE user_id = $1
         """;
 
         return pool.preparedQuery(query)
-                    .execute(Tuple.of(id))
-                    .map(result -> {
-                        JsonArray ans = new JsonArray();
+            .execute(Tuple.of(id))
+            .map(result -> {
+                JsonArray ans = new JsonArray();
 
-                        if(result.rowCount()>0){
-                            for(Row row : result){
-                                JsonObject string = new JsonObject();
+                if(result.rowCount()>0){
+                    for(Row row : result){
+                        BigDecimal horizontalKg = row.getBigDecimal("horizontal_kg");
+                        BigDecimal verticalKg = row.getBigDecimal("vertical_kg");
+                        BigDecimal price = row.getBigDecimal("price");
 
-                                BigDecimal horizontalKg = row.getBigDecimal("horizontal_kg");
-                                BigDecimal verticalKg = row.getBigDecimal("vertical_kg");
-                                BigDecimal price = row.getBigDecimal("price");
+                        OffsetDateTime createdAt = row.getOffsetDateTime("created_at");
+                        OffsetDateTime updatedAt = row.getOffsetDateTime("updated_at");
 
-                                string.put("order_id", row.getInteger("order_id"));
-                                string.put("racket_name", row.getString("racket_name"));
-                                string.put("additional_info", row.getString("additional_info"));
-                                string.put("horizontal_kg", horizontalKg == null ? null : horizontalKg.doubleValue());
-                                string.put("vertical_kg", verticalKg == null ? null : verticalKg.doubleValue());
-                                string.put("string_id", row.getInteger("string_id"));
-                                string.put("status", row.getString("status"));
-                                string.put("price", price == null ? null : price.doubleValue());
-                                
-                                OffsetDateTime createdAt = row.getOffsetDateTime("created_at");
-                                OffsetDateTime updatedAt = row.getOffsetDateTime("updated_at");
+                        ans.add(new JsonObject()
+                            .put("order_id", row.getInteger("order_id"))
+                            .put("racket_name", row.getString("racket_name"))
+                            .put("additional_info", row.getString("additional_info"))
+                            .put("horizontal_kg", horizontalKg == null ? null : horizontalKg.doubleValue())
+                            .put("vertical_kg", verticalKg == null ? null : verticalKg.doubleValue())
+                            .put("string_id", row.getInteger("string_id"))
+                            .put("status", row.getString("status"))
+                            .put("price", price == null ? null : price.doubleValue())
+                            .put("created_at", createdAt.toString())
+                            .put("updated_at", updatedAt.toString())
+                        );
+                    }
+                }
 
-                                string.put("created_at", createdAt.toString());
-                                string.put("updated_at", updatedAt.toString());
+                else {
+                    System.out.println("[StringingRepository] (404) getStringingOrders failed");
+                    return ans;
+                }
 
-                                ans.add(string);
-                            }
-                        }
+                System.out.println("[StringingRepository] (200) getStringingOrders succeeded");
 
-                        return ans;
-                    })
-                    .recover(err -> {
-                        err.printStackTrace();
-                        return Future.failedFuture("Database error");
-                    });
+                return ans;
+            })
+            .recover(err -> {
+                System.err.println("[StringingRepository] (500) getStrings failed");
+
+                err.printStackTrace();
+                return Future.failedFuture("Database error");
+            });
     }
 
     public Future<Integer> isValidOrder(Integer id){
-        String query = """
-                SELECT * FROM stringing_orders WHERE order_id=$1
-            """;
+        System.out.println("[StringingRepository] isValidOrder called");
 
-        if(id == null) return Future.succeededFuture(404);
+        String query = """
+            SELECT * FROM stringing_orders WHERE order_id=$1
+        """;
+
+        if(id == null) {
+            System.err.println("[StringingRepository] (404) isValidOrder failed");
+            return Future.succeededFuture(404);
+        }
 
         return pool.preparedQuery(query)
-                    .execute(Tuple.of(id))
-                    .map(result -> {
-                        if(result.rowCount()>0){
-                            return 200;
-                        }
-                        return 404;
-                    })
-                    .recover(err -> {
-                        return Future.failedFuture("Database error");
-                    });
+            .execute(Tuple.of(id))
+            .map(result -> {
+                if(result.rowCount()>0){
+                    System.out.println("[StringingRepository] (200) isValidOrder succeeded");
+
+                    return 200;
+                }
+
+                System.out.println("[StringingRepository] (404) isValidOrder failed");
+
+                return 404;
+            })
+            .recover(err -> {
+                System.err.println("[StringingRepository] (500) isValidOrder failed");
+
+                return Future.failedFuture("Database error");
+            });
     }
 
     public Future<Integer> deleteStringingOrder(Integer userId, Integer orderId){
+        System.out.println("[StringingRepository] deleteStringingOrder called");
+
         String query = """
             DELETE FROM stringing_orders WHERE user_id=$1 AND order_id=$2
         """;
@@ -313,17 +311,25 @@ public class StringingRepository {
             .execute(Tuple.of(userId, orderId))
             .map(result -> {
                 if(result.rowCount() == 0){
+                    System.out.println("[StringingRepository] (404) deleteStringingOrder failed");
+
                     return 404;
                 }
+
+                System.out.println("[StringingRepository] (200) deleteStringingOrder succeeded");
 
                 return 200;
             })
             .recover(error -> {
+                System.out.println("[StringingRepository] (500) deleteStringingOrder failed");
+
                 return Future.failedFuture(error);
             });
     }
 
     public Future<Integer> adminDeleteStringingOrder(Integer orderId){
+        System.out.println("[StringingRepository] adminDeleteStringingOrder called");
+
         String query = """
             DELETE FROM stringing_orders WHERE order_id=$1
         """;
@@ -332,25 +338,33 @@ public class StringingRepository {
             .execute(Tuple.of(orderId))
             .map(result -> {
                 if(result.rowCount() == 0){
+                    System.out.println("[StringingRepository] (404) adminDeleteStringingOrder failed");
+
                     return 404;
                 }
+
+                System.out.println("[StringingRepository] (200) adminDeleteStringingOrder succeeded");
 
                 return 200;
             })
             .recover(error -> {
+                System.err.println("[StringingRepository] (500) adminDeleteStringingOrder failed");
+
                 return Future.failedFuture(error);
             });
     }
 
     public Future<Integer> orderIsModifiable(Integer id, Integer userId) {
+        System.out.println("[StringingRepository] orderIsModifiable called");
+
         if (id == null) {
+            System.out.println("[StringingRepository] (404) orderIsModifiable failed");
+
             return Future.succeededFuture(404);
         }
 
         String query = """
-            SELECT status, user_id
-            FROM stringing_orders
-            WHERE order_id = $1
+            SELECT status, user_id FROM stringing_orders WHERE order_id = $1
         """;
 
         return pool.preparedQuery(query)
@@ -358,6 +372,8 @@ public class StringingRepository {
             .map(result -> {
 
                 if (!result.iterator().hasNext()) {
+                    System.out.println("[StringingRepository] (404) orderIsModifiable failed");
+
                     return 404;
                 }
 
@@ -366,14 +382,19 @@ public class StringingRepository {
                 Integer uId = row.getInteger("user_id");
 
                 if ("pending".equals(status) && userId.equals(uId)) {
+                    System.out.println("[StringingRepository] (200) orderIsModifiable succeeded");
+
                     return 200;
                 }
+
+                System.out.println("[StringingRepository] (403) orderIsModifiable failed");
 
                 return 403;
             });
     }
 
     public Future<Integer> adminUpdateOrder(Integer orderId, BigDecimal kgVert, BigDecimal kgHor, String infos, String orderStatus) {
+        System.out.println("[StringingRepository] adminUpdateOrder called");
 
         List<String> updates = new ArrayList<>();
         List<Object> values = new ArrayList<>();
@@ -400,7 +421,6 @@ public class StringingRepository {
             values.add(orderStatus);
         }
 
-        // No fields to update
         if (updates.isEmpty()) {
             return Future.succeededFuture(400);
         }
@@ -408,31 +428,32 @@ public class StringingRepository {
         values.add(orderId);
 
         String query = """
-            UPDATE stringing_orders
-            SET %s
-            WHERE order_id = $%d
-            """.formatted(
-                String.join(", ", updates),
-                index
-            );
+            UPDATE stringing_orders SET %s WHERE order_id = $%d
+        """ .formatted(String.join(", ", updates), index);
 
         return pool.preparedQuery(query)
             .execute(Tuple.from(values))
             .map(result -> {
-
                 if (result.rowCount() == 0) {
+                    System.out.println("[StringingRepository] (400) adminUpdateOrder failed");
+
                     return 404;
                 }
+
+                System.out.println("[StringingRepository] (200) adminUpdateOrder succeeded");
 
                 return 200;
             })
             .recover(err -> {
+                System.err.println("[StringingRepository] (500) adminUpdateOrder failed");
+
                 err.printStackTrace();
                 return Future.succeededFuture(500);
             });
     }
 
     public Future<Integer> updateOrder(Integer orderId, BigDecimal kgVert, BigDecimal kgHor, String infos) {
+        System.out.println("[StringingRepository] updateOrder called");
 
         List<String> updates = new ArrayList<>();
         List<Object> values = new ArrayList<>();
@@ -454,7 +475,6 @@ public class StringingRepository {
             values.add(infos);
         }
 
-        // No fields to update
         if (updates.isEmpty()) {
             return Future.succeededFuture(400);
         }
@@ -462,29 +482,27 @@ public class StringingRepository {
         values.add(orderId);
 
         String query = """
-            UPDATE stringing_orders
-            SET %s
-            WHERE order_id = $%d
-            """.formatted(
-                String.join(", ", updates),
-                index
-            );
+            UPDATE stringing_orders SET %s WHERE order_id = $%d
+        """ .formatted(String.join(", ", updates), index);
 
         return pool.preparedQuery(query)
             .execute(Tuple.from(values))
             .map(result -> {
-
                 if (result.rowCount() == 0) {
+                    System.out.println("[StringingRepository] (404) updateOrder failed");
+
                     return 404;
                 }
+
+                System.out.println("[StringingRepository] (200) updateOrder succeeded");
 
                 return 200;
             })
             .recover(err -> {
+                System.err.println("[StringingRepository] (500) updateOrder failed");
+
                 err.printStackTrace();
                 return Future.succeededFuture(500);
             });
     }
 }
-
-

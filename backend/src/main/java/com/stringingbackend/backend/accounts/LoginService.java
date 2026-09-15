@@ -15,6 +15,7 @@ public class LoginService {
     }
 
     public Future<JsonObject> loginUser(RoutingContext ctx) {
+        System.out.println("[LoginService] loginUser called");
 
         JsonObject body = ctx.body().asJsonObject();
 
@@ -25,36 +26,30 @@ public class LoginService {
         String email = body.getString("email");
         String password = body.getString("password");
 
-        if (
-            email == null ||
-            email.isBlank() ||
-            password == null ||
-            password.isBlank()
-        ) {
+        if (email == null || email.isBlank() || password == null || password.isBlank()) {
+            System.err.println("[LoginService] loginUser (No Credentials found)");
             return Future.failedFuture("Missing credentials");
         }
 
         return accountRepository.getUser(email)
             .compose(user -> {
-
                 if (user == null) {
+                    System.err.println("[LoginService] loginUser (Invalid Credentials)");
                     return Future.failedFuture("Invalid credentials");
                 }
 
-                String hashedPassword =
-                    user.getString("hashedPassword");
+                String hashedPassword = user.getString("hashedPassword");
 
-                boolean valid = Hashing.verifyPassword(
-                    password,
-                    hashedPassword
-                );
+                boolean valid = Hashing.verifyPassword(password, hashedPassword);
 
                 if (!valid) {
+                    System.err.println("[LoginService] loginUser (No Credentials found)");
                     return Future.failedFuture("Invalid credentials");
                 }
 
                 user.remove("hashedPassword");
 
+                System.out.println("[LoginService] loginUser succeeded for "+ email);
                 return Future.succeededFuture(user);
             });
     }

@@ -17,9 +17,9 @@ public class StringingHandler {
     public void registerRoutes(Router router){
         router.get("/getStrings")
             .handler(this::getStrings);
-        router.post("/getUserStringingJobs")
+        router.post("/getUserStringingOrders")
             .handler(JWTAuthHandler.create(jwtAuth))
-            .handler(this::getStringingJobs);
+            .handler(this::getStringingOrders);
         router.patch("/updateOrder")
             .handler(JWTAuthHandler.create(jwtAuth))
             .handler(this::updateOrder);
@@ -31,17 +31,18 @@ public class StringingHandler {
         router.delete("/deleteStringingOrder")
             .handler(JWTAuthHandler.create(jwtAuth))
             .handler(this::deleteStringingOrder);
-        router.get("/getAdminStringingOrders")
+        router.get("/getAllStringingOrders")
             .handler(JWTAuthHandler.create(jwtAuth))
-            .handler(this::getAdminStringingOrders);
-        router.get("/getAdminUsers")
-            .handler(JWTAuthHandler.create(jwtAuth))
-            .handler(this::getAdminUsers);
+            .handler(this::getAllStringingOrders);
+
+        // TODO: Auftrag neu schicken, alten Auftrag übernehmen
     }
 
-    private void getAdminStringingOrders(RoutingContext ctx){
+    private void getAllStringingOrders(RoutingContext ctx){
+        System.out.println("[StringingHandler] getAllStringingOrders called");
+
         if(ctx.user().principal().getString("role").equals("admin")){
-            stringingService.getAdminStringingOrders(ctx)
+            stringingService.getAllStringingOrders(ctx)
             .onSuccess(obj -> {
                 if(obj==null || obj.isEmpty()){
                     ctx.response()
@@ -53,6 +54,8 @@ public class StringingHandler {
                     .end(obj.encode());
             })
             .onFailure(err -> {
+                System.err.println("[StringingHandler] (500) getAllStringingOrders failed");
+
                 err.printStackTrace();
                 ctx.response()
                     .setStatusCode(500)
@@ -61,32 +64,7 @@ public class StringingHandler {
             return;
         }
 
-        ctx.response()
-            .setStatusCode(403)
-            .end("User is not permitted");
-    }
-
-    private void getAdminUsers(RoutingContext ctx){
-        if(ctx.user().principal().getString("role").equals("admin")){
-            stringingService.getAdminUsers(ctx)
-            .onSuccess(obj -> {
-                if(obj==null || obj.isEmpty()){
-                    ctx.response()
-                        .setStatusCode(404)
-                        .end("No Users have been found");
-                }
-                ctx.response()
-                    .setStatusCode(200)
-                    .end(obj.encode());
-            })
-            .onFailure(err -> {
-                err.printStackTrace();
-                ctx.response()
-                    .setStatusCode(500)
-                    .end(err.getLocalizedMessage());
-            });
-            return;
-        }
+        System.out.println("[StringingHandler] (403) getAllStringingOrders failed");
 
         ctx.response()
             .setStatusCode(403)
@@ -94,13 +72,18 @@ public class StringingHandler {
     }
 
     private void newStringingOrderAccount(RoutingContext ctx){
+        System.out.println("[StringingHandler] newStringingOrderAccount called");
+
         stringingService.newStringingOrderAccount(ctx)
             .onSuccess(response -> {
+                System.out.println("[StringingHandler] (200) newStringingOrderAccount succeeded");
+
                 ctx.response()
                     .setStatusCode(response)
                     .end();
             })
             .onFailure(err -> {
+                System.err.println("[StringingHandler] (500) newStringingOrderAccount failed");
                 err.printStackTrace();
 
                 ctx.response()
@@ -110,13 +93,18 @@ public class StringingHandler {
     }
 
     private void newStringingOrder(RoutingContext ctx){
+        System.out.println("[StringingHandler] newStringingOrder called");
+
         stringingService.newStringingOrder(ctx)
             .onSuccess(response -> {
+                System.out.println("[StringingHandler] (200) newStringingOrder succeeded");
+
                 ctx.response()
                     .setStatusCode(response)
                     .end();
             })
             .onFailure(err -> {
+                System.err.println("[StringingHandler] (500) newStringingOrder failed");
                 err.printStackTrace();
 
                 ctx.response()
@@ -126,13 +114,18 @@ public class StringingHandler {
     }
 
     private void deleteStringingOrder(RoutingContext ctx){
+        System.out.println("[StringingHandler] deleteStringingOrder called");
+
         stringingService.deleteStringingOrder(ctx)
             .onSuccess(response -> {
+                System.out.println("[StringingHandler] (200) deleteStringingOrder succeeded");
+
                 ctx.response()
                     .setStatusCode(response)
                     .end();
             })
             .onFailure(err -> {
+                System.err.println("[StringingHandler] (500) deleteStringingOrder failed");
                 err.printStackTrace();
 
                 ctx.response()
@@ -142,42 +135,59 @@ public class StringingHandler {
     }
 
     private void getStrings(RoutingContext ctx){
+        System.out.println("[StringingHandler] getStrings called");
+
         stringingService.getStrings(ctx)
             .onSuccess(response -> {
                 if(response == null){
+                    System.err.println("[StringingHandler] (500) getStrings failed");
+
                     ctx.response()
                         .setStatusCode(500)
                         .end("Database could not be reached");
                     return;
                 }
                 else if(response.isEmpty()){
+                    System.out.println("[StringingHandler] (304) getStrings failed");
+
                     ctx.response()
                         .setStatusCode(304)
                         .end("No Strings could be found");
                     return;
                 }
 
+                System.out.println("[StringingHandler] (200) getStrings succeeded");
+
                 ctx.response()
                     .setStatusCode(200)
                     .putHeader("Content-Type", "application/json")
                     .end(response.encode());
             })
             .onFailure(err -> {
+                System.err.println("[StringingHandler] (500) getStrings failed");
+                err.printStackTrace();
+
                 ctx.response()
                     .setStatusCode(500)
                     .end("No connection to Database");
             });
     }
 
-    private void getStringingJobs(RoutingContext ctx){
-        stringingService.getStringingJobs(ctx)
+    private void getStringingOrders(RoutingContext ctx){
+        System.out.println("[StringingHandler] getStringingOrders called");
+
+        stringingService.getStringingOrders(ctx)
             .onSuccess(response -> {
                 if(response.isEmpty()){
+                    System.out.println("[StringingHandler] (304) getStringingOrders failed");
+
                     ctx.response()
                         .setStatusCode(304)
                         .end("No Stringing Orders could be found");
                     return;
                 }
+
+                System.out.println("[StringingHandler] (200) getStringingOrders succeeded");
 
                 ctx.response()
                     .setStatusCode(200)
@@ -185,7 +195,7 @@ public class StringingHandler {
                     .end(response.encode());
             })
             .onFailure(err -> {
-                System.err.println("Getting stringing jobs failed:");
+                System.err.println("[StringingHandler] (500) getStringingOrders failed");
                 err.printStackTrace();
 
                 ctx.response()
@@ -195,9 +205,13 @@ public class StringingHandler {
     }
 
     private void updateOrder(RoutingContext ctx) {
+        System.out.println("[StringingHandler] updateOrder called");
+
         stringingService.updateOrder(ctx)
             .onSuccess(statusCode -> {
                 if (statusCode == 400) {
+                    System.out.println("[StringingHandler] (400) updateOrder failed");
+
                     ctx.response()
                         .setStatusCode(400)
                         .end("No valid fields to update");
@@ -205,6 +219,8 @@ public class StringingHandler {
                 }
 
                 if (statusCode == 403) {
+                    System.out.println("[StringingHandler] (403) updateOrder failed");
+
                     ctx.response()
                         .setStatusCode(403)
                         .end("Order can not be modified anymore");
@@ -212,18 +228,22 @@ public class StringingHandler {
                 }
 
                 if (statusCode == 404) {
+                    System.out.println("[StringingHandler] (404) updateOrder failed");
+
                     ctx.response()
                         .setStatusCode(404)
                         .end("Order not found");
                     return;
                 }
 
+                System.out.println("[StringingHandler] (200) updateOrder succeeded");
+
                 ctx.response()
                     .setStatusCode(200)
                     .end("Order updated");
             })
             .onFailure(err -> {
-
+                System.err.println("[StringingHandler] (500) updateOrder failed");
                 err.printStackTrace();
 
                 if (!ctx.response().ended()) {

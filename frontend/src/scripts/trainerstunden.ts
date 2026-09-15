@@ -1,4 +1,8 @@
-import { manageNavBarLinks, setFirstName, initRacketBackground } from "./helpers/HelperFunctions";
+import {
+    manageNavBarLinks,
+    setFirstName,
+    initRacketBackground,
+} from "./helpers/HelperFunctions";
 
 if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", init);
@@ -6,7 +10,7 @@ if (document.readyState === "loading") {
     init();
 }
 
-async function init(): Promise<void>{
+async function init(): Promise<void> {
     manageNavBarLinks();
     initRacketBackground();
     await setFirstName();

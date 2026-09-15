@@ -22,6 +22,7 @@ public class LoginHandler {
     }
 
     private Future<Void> loginUser(RoutingContext ctx) {
+        System.out.println("[LoginHandler] loginUser called");
 
         return loginService.loginUser(ctx)
             .compose(user -> {
@@ -38,6 +39,8 @@ public class LoginHandler {
                 JsonObject response = new JsonObject()
                     .put("token", token);
 
+                System.out.println("[LoginHandler] (200) loginUser succeeded for "+ user.getString("email"));
+
                 ctx.response()
                     .setStatusCode(200)
                     .putHeader("Content-Type", "application/json")
@@ -46,25 +49,14 @@ public class LoginHandler {
                 return Future.<Void>succeededFuture();
             })
             .recover(err -> {
-
                 if (!ctx.response().ended()) {
+                    int statusCode = "Invalid credentials".equals(err.getMessage()) ? 403 : "Missing credentials".equals(err.getMessage()) ? 400 : 500;
 
-                    int statusCode =
-                        "Invalid credentials".equals(err.getMessage())
-                            ? 403
-                            : "Missing credentials".equals(err.getMessage())
-                                ? 400
-                                : 500;
+                    System.err.println("[LoginHandler] ("+ statusCode +") loginUser failed");
 
                     ctx.response()
                         .setStatusCode(statusCode)
-                        .end(
-                            statusCode == 403
-                                ? "Login fehlgeschlagen"
-                                : statusCode == 400
-                                    ? "Fehlende Daten"
-                                    : "Interner Server Fehler"
-                        );
+                        .end(statusCode == 403 ? "Login fehlgeschlagen" : statusCode == 400 ? "Fehlende Daten" : "Interner Server Fehler");
                 }
 
                 return Future.<Void>succeededFuture();

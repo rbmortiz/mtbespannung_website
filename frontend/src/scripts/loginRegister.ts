@@ -1,4 +1,10 @@
-import { getEl, manageNavBarLinks, initRacketBackground, showError, displayHTMLElement } from "./helpers/HelperFunctions";
+import {
+    getEl,
+    manageNavBarLinks,
+    initRacketBackground,
+    showError,
+    displayHTMLElement,
+} from "./helpers/HelperFunctions";
 
 const emailInput = getEl<HTMLInputElement>("emailInput");
 const passwordInput = getEl<HTMLInputElement>("passwordInput");
@@ -13,15 +19,13 @@ const goBackButton = getEl<HTMLButtonElement>("goBackButton");
 const accountText = getEl<HTMLParagraphElement>("accountText");
 let sendToReg: boolean = false;
 
-
 if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", init);
 } else {
     init();
 }
 
-function init(){
-
+function init() {
     //checks
     manageNavBarLinks();
     redirectIfLoggedIn();
@@ -49,21 +53,21 @@ function init(){
 
     // Keyboard "Enter" Event handling
     document.addEventListener("keydown", (event) => {
-        if(event.key === "Enter") {
-            if(sendToReg) sendRegister();
-            else if(!sendToReg) sendLogin();
+        if (event.key === "Enter") {
+            if (sendToReg) sendRegister();
+            else if (!sendToReg) sendLogin();
         }
     });
 }
 
 function redirectIfLoggedIn(): void {
     let token = localStorage.getItem("token");
-    if(token){
+    if (token) {
         window.location.replace("/src/pages/main.html");
     }
 }
 
-function showRegisterFields(showRegister: boolean): void{
+function showRegisterFields(showRegister: boolean): void {
     displayHTMLElement(goBackButton, showRegister);
     displayHTMLElement(registerPullupButton, !showRegister);
     displayHTMLElement(accountText, !showRegister);
@@ -95,23 +99,20 @@ async function sendRegister(): Promise<void> {
     const lastName = lastNameInput.value;
 
     try {
-        const response = await fetch(
-            "https://api.mtbespannung.de/register",
-            {
-                method: "POST",
+        const response = await fetch("https://api.mtbespannung.de/register", {
+            method: "POST",
 
-                headers: {
-                    "Content-Type": "application/json"
-                },
+            headers: {
+                "Content-Type": "application/json",
+            },
 
-                body: JSON.stringify({
-                    email: email,
-                    password: password,
-                    firstname: firstName,
-                    lastname: lastName
-                })
-            }
-        );
+            body: JSON.stringify({
+                email: email,
+                password: password,
+                firstname: firstName,
+                lastname: lastName,
+            }),
+        });
 
         // Successful registration
         if (response.status === 200) {
@@ -129,7 +130,10 @@ async function sendRegister(): Promise<void> {
         }
 
         if (response.status === 403) {
-            showError("loginError", "Ein Account mit dieser E-Mail existiert bereits.");
+            showError(
+                "loginError",
+                "Ein Account mit dieser E-Mail existiert bereits.",
+            );
             return;
         }
 
@@ -140,7 +144,6 @@ async function sendRegister(): Promise<void> {
 
         console.error("Unexpected status:", response.status);
         showError("loginError", "Ein unbekannter Fehler ist aufgetreten.");
-
     } catch (error) {
         console.error("Could not reach backend:", error);
         showError("loginError", "Server konnte nicht erreicht werden");
@@ -152,21 +155,18 @@ async function sendLogin(): Promise<void> {
     const password = passwordInput.value;
 
     try {
-        const response = await fetch(
-            "https://api.mtbespannung.de/loginUser",
-            {
-                method: "POST",
+        const response = await fetch("https://api.mtbespannung.de/loginUser", {
+            method: "POST",
 
-                headers: {
-                    "Content-Type": "application/json"
-                },
+            headers: {
+                "Content-Type": "application/json",
+            },
 
-                body: JSON.stringify({
-                    email: email,
-                    password: password
-                })
-            }
-        );
+            body: JSON.stringify({
+                email: email,
+                password: password,
+            }),
+        });
 
         if (response.ok) {
             const data = await response.json();
@@ -181,7 +181,6 @@ async function sendLogin(): Promise<void> {
 
             showError("loginError", "Login fehlgeschlagen");
         }
-
     } catch (error) {
         console.error("Backend could not be reached:", error);
 
