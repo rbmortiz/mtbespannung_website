@@ -374,7 +374,7 @@ async function updateOrderInformation(): Promise<void> {
 	const kgHor: number | null = kgHorInput === "" ? null : Number(kgHorInput);
 
 	if (role === "admin") {
-		const stringData = adminStringInput.value;
+		const stringData: number = Number(adminStringInput.value);
 
 		const statusData = adminStatusInput.value;
 
@@ -577,11 +577,6 @@ function buildAdminFields(): void {
 		</label>
 
 		<select class="form-select" id="adminStatus">
-			<option value="" selected></option>
-			<option value="pending">Unerledigt</option>
-			<option value="in_progress">In Bearbeitung</option>
-			<option value="completed">Bespannt</option>
-			<option value="delivered">Zugestellt</option>
 		</select>
 	`;
 
@@ -736,6 +731,8 @@ function showOrderDetails(order: StringingOrder): void {
 				break;
 		}
 	} else if (role === "admin") {
+		adminStringInput.innerHTML = "";
+
 		for (const string of stringTypes) {
 			if (order.string_id === string.string_id) {
 				adminStringInput.innerHTML += `
@@ -758,6 +755,13 @@ function showOrderDetails(order: StringingOrder): void {
 				`;
 			}
 		}
+
+		adminStatusInput.innerHTML = `
+			<option value="pending" ${order.status === "pending" ? "selected" : ""}>Unerledigt</option>
+			<option value="in_progress" ${order.status === "in_progress" ? "selected" : ""}>In Bearbeitung</option>
+			<option value="completed" ${order.status === "completed" ? "selected" : ""}>Bespannt</option>
+			<option value="delivered" ${order.status === "delivered" ? "selected" : ""}>Zugestellt</option>
+		`;
 	}
 
 	if (
