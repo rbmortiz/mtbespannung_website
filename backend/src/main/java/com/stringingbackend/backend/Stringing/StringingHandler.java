@@ -34,8 +34,6 @@ public class StringingHandler {
         router.get("/getAllStringingOrders")
             .handler(JWTAuthHandler.create(jwtAuth))
             .handler(this::getAllStringingOrders);
-
-        // TODO: Auftrag neu schicken, alten Auftrag übernehmen
     }
 
     private void getAllStringingOrders(RoutingContext ctx){

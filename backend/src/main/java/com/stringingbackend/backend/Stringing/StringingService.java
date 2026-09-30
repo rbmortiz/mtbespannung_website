@@ -216,8 +216,9 @@ public class StringingService {
 
         if("admin".equals(userRole)){
             String orderStatus = body.getString("status");
+            Integer stringId = body.getInteger("stringId");
 
-            return stringingRepository.adminUpdateOrder(orderId, kgVert, kgHor, infos, orderStatus);
+            return stringingRepository.adminUpdateOrder(orderId, kgVert, kgHor, infos, orderStatus, stringId);
         }
 
         return stringingRepository.orderIsModifiable(orderId, userId)

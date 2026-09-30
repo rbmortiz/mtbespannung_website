@@ -1,189 +1,390 @@
-<!DOCTYPE html>
+<!doctype html>
 <canvas class="star-background" id="star-background"></canvas>
 
-{{> head title="Dashboard"}}
-
-{{> navbar title="Dashboard"}}
+{{> head title="Dashboard"}} {{> navbar title="Dashboard"}}
 
 <main>
-    <div class="main-content">
-        <div class="row g-3 px-3">
+	<div class="main-content">
+		<div class="row g-3 px-3">
+			<!-- Delete Account Modal -->
+			<div
+				class="modal fade"
+				id="deleteAccountModal"
+				tabindex="-1"
+				aria-labelledby="exampleModalLabel"
+				aria-hidden="true"
+			>
+				<div class="modal-dialog modal-dialog-centered">
+					<div class="modal-content">
+						<div class="modal-header">
+							<h1 class="modal-title fs-5" id="exampleModalLabel">
+								Account löschen
+							</h1>
+							<button
+								type="button"
+								class="btn-close"
+								data-bs-dismiss="modal"
+								aria-label="Close"
+							></button>
+						</div>
+						<div class="modal-body">
+							Möchten sie wirklich ihren Account löschen?
+						</div>
+						<div
+							class="modal-footer align-items-center justify-content-center"
+						>
+							<button
+								type="button"
+								class="btn btn-danger w-100"
+								id="deleteAccountButton"
+							>
+								Löschen
+							</button>
+						</div>
+					</div>
+				</div>
+			</div>
 
-            <!-- Delete Account Modal -->
-            <div class="modal fade" id="deleteAccountModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-                <div class="modal-dialog modal-dialog-centered">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h1 class="modal-title fs-5" id="exampleModalLabel">Account löschen</h1>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                        </div>
-                        <div class="modal-body">
-                            Möchten sie wirklich ihren Account löschen?
-                        </div>
-                        <div class="modal-footer align-items-center justify-content-center">
-                            <button type="button" class="btn btn-danger w-100" id="deleteAccountButton">Löschen</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
+			<!-- Bespannung Modal -->
+			<div
+				class="modal fade"
+				id="stringingModal"
+				tabindex="-1"
+				aria-labelledby="exampleModalLabel"
+				aria-hidden="true"
+			>
+				<div class="modal-dialog modal-dialog-centered">
+					<div class="modal-content">
+						<div class="modal-header">
+							<h5>Bespannungsauftrag</h5>
+							<button
+								type="button"
+								class="btn-close"
+								data-bs-dismiss="modal"
+								aria-label="Close"
+							></button>
+						</div>
+						<div class="modal-body">
+							<div class="modal-body">
+								<div
+									id="patchOrderError"
+									class="alert alert-danger d-none mx-auto text-center mt-4"
+									role="alert"
+									style="width: 70% !important"
+								></div>
 
-            <!-- Bespannung Modal -->
-            <div class="modal fade" id="stringingModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-                <div class="modal-dialog modal-dialog-centered">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h5>Bespannungsauftrag</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                        </div>
-                        <div class="modal-body">
-                            <div class="modal-body">
+								<div
+									class="d-flex align-items-center gap-3 mb-2"
+								>
+									<label
+										for="modalRacketName"
+										class="form-label mb-0 text-nowrap d-flex"
+										style="min-width: 100%"
+									>
+										Schlägername:
+										<span
+											class="text-primary ms-auto"
+											id="modalRacketName"
+										></span>
+									</label>
+								</div>
 
-                                <div id="patchOrderError" class="alert alert-danger d-none mx-auto text-center mt-4" role="alert" style="width: 70% !important"></div>
+								<div id="adminFields"></div>
 
-                                <div class="d-flex align-items-center gap-3 mb-2">
-                                    <label for="modalRacketName"
-                                        class="form-label mb-0 text-nowrap d-flex"
-                                        style="min-width: 100%;">
-                                        Schlägername:
-                                        <span class="text-primary ms-auto" id="modalRacketName"></span>
-                                    </label>
-                                </div>
+								<div
+									class="d-flex align-items-center gap-3 mb-2"
+								>
+									<label
+										for="modalVerticalKG"
+										class="form-label mb-0 text-nowrap"
+										style="min-width: 130px"
+									>
+										KG-Längs:
+									</label>
+									<input
+										type="number"
+										min="5"
+										max="20"
+										step="0.1"
+										class="form-control"
+										id="modalVerticalKG"
+									/>
+								</div>
 
-                                <div id="adminFields">
-                                
-                                </div>
+								<div
+									class="d-flex align-items-center gap-3 mb-2"
+								>
+									<label
+										for="modalHorizontalKG"
+										class="form-label mb-0 text-nowrap"
+										style="min-width: 130px"
+									>
+										KG-Quer:
+									</label>
+									<input
+										type="number"
+										min="5"
+										max="20"
+										step="0.1"
+										class="form-control"
+										id="modalHorizontalKG"
+									/>
+								</div>
 
-                                <div class="d-flex align-items-center gap-3 mb-2">
-                                    <label for="modalVerticalKG" class="form-label mb-0 text-nowrap" style="min-width: 130px;">
-                                        KG-Längs:
-                                    </label>
-                                    <input type="number" min="5" max="20" step="0.1" class="form-control" id="modalVerticalKG">
-                                </div>
+								<div
+									class="d-flex align-items-center gap-3 mb-2"
+									id="stringContainer"
+								>
+									<label
+										for="modalString"
+										class="form-label mb-0 text-nowrap d-flex"
+										style="min-width: 100%"
+									>
+										Saite:
+										<span
+											class="ms-auto"
+											id="modalString"
+										></span>
+									</label>
+								</div>
 
-                                <div class="d-flex align-items-center gap-3 mb-2">
-                                    <label for="modalHorizontalKG" class="form-label mb-0 text-nowrap" style="min-width: 130px;">
-                                        KG-Quer:
-                                    </label>
-                                    <input type="number" min="5" max="20" step="0.1" class="form-control" id="modalHorizontalKG">
-                                </div>
+								<div
+									class="d-flex align-items-center gap-3 mb-2"
+								>
+									<label
+										for="modalInfos"
+										class="form-label mb-0 text-nowrap"
+										style="min-width: 130px"
+									>
+										Infos:
+									</label>
+									<input
+										type="text"
+										class="form-control"
+										id="modalInfos"
+									/>
+								</div>
 
-                                <div class="d-flex align-items-center gap-3 mb-2">
-                                    <label for="modalString"
-                                        class="form-label mb-0 text-nowrap d-flex"
-                                        style="min-width: 100%;">
-                                        Saite:
-                                        <span class="ms-auto" id="modalString"></span>
-                                    </label>
-                                </div>
+								<div
+									class="d-flex align-items-center gap-3 mb-2"
+									id="statusContainer"
+								>
+									<label
+										for="modalStatus"
+										class="form-label mb-0 text-nowrap d-flex"
+										style="min-width: 100%"
+									>
+										Status:
+										<span
+											class="ms-auto"
+											id="modalStatus"
+										></span>
+									</label>
+								</div>
 
-                                <div class="d-flex align-items-center gap-3 mb-2">
-                                    <label for="modalInfos" class="form-label mb-0 text-nowrap" style="min-width: 130px;">
-                                        Infos:
-                                    </label>
-                                    <input type="text" class="form-control" id="modalInfos">
-                                </div>
+								<div
+									class="d-flex align-items-center gap-3 mb-2"
+								>
+									<label
+										for="modalPrice"
+										class="form-label mb-0 text-nowrap d-flex"
+										style="min-width: 100%"
+									>
+										Preis:
+										<span
+											class="ms-auto"
+											id="modalPrice"
+										></span
+										>€
+									</label>
+								</div>
 
-                                <div class="d-flex align-items-center gap-3 mb-2">
-                                    <label for="modalStatus"
-                                        class="form-label mb-0 text-nowrap d-flex"
-                                        style="min-width: 100%;">
-                                        Status:
-                                        <span class="ms-auto" id="modalStatus"></span>
-                                    </label>
-                                </div>
+								<div
+									class="d-flex align-items-center gap-3 mb-2"
+								>
+									<label
+										for="modalCreatedAt"
+										class="form-label mb-0 text-nowrap d-flex"
+										style="min-width: 100%"
+									>
+										Erstellt am:
+										<span
+											class="ms-auto"
+											id="modalCreatedAt"
+										></span>
+									</label>
+								</div>
 
-                                <div class="d-flex align-items-center gap-3 mb-2">
-                                    <label for="modalPrice"
-                                        class="form-label mb-0 text-nowrap d-flex"
-                                        style="min-width: 100%;">
-                                        Preis:
-                                        <span class="ms-auto" id="modalPrice"></span>€
-                                    </label>
-                                </div>
+								<div
+									class="d-flex align-items-center gap-5 mb-2"
+								>
+									<label
+										for="modalUpdatedAt"
+										class="form-label mb-0 text-nowrap d-flex"
+										style="min-width: 100%"
+									>
+										Aktualisiert am:
+										<span
+											class="ms-auto"
+											id="modalUpdatedAt"
+										></span>
+									</label>
+								</div>
+							</div>
+						</div>
+						<div
+							class="modal-footer align-items-center justify-content-center"
+						>
+							<button
+								type="button"
+								class="btn btn-success w-100"
+								style="max-width: 90%"
+								id="patchOrderButton"
+							>
+								Speichern
+							</button>
+							<button
+								type="button"
+								class="btn btn-danger w-100"
+								style="max-width: 90%"
+								id="deleteOrderButton"
+							>
+								Löschen
+							</button>
+						</div>
+					</div>
+				</div>
+			</div>
 
-                                <div class="d-flex align-items-center gap-3 mb-2">
-                                    <label for="modalCreatedAt"
-                                        class="form-label mb-0 text-nowrap d-flex"
-                                        style="min-width: 100%;">
-                                        Erstellt am:
-                                        <span class="ms-auto" id="modalCreatedAt"></span>
-                                    </label>
-                                </div>
+			<div
+				id="dashboardError"
+				class="alert alert-danger d-none mx-auto text-center mt-4"
+				role="alert"
+				style="width: 70% !important"
+			></div>
 
-                                <div class="d-flex align-items-center gap-5 mb-2">
-                                    <label for="modalUpdatedAt"
-                                        class="form-label mb-0 text-nowrap d-flex"
-                                        style="min-width: 100%;">
-                                        Aktualisiert am:
-                                        <span class="ms-auto" id="modalUpdatedAt"></span>
-                                    </label>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="modal-footer align-items-center justify-content-center">
-                            <button type="button" class="btn btn-success w-100" style="max-width: 90%" id="patchOrderButton">Speichern</button>
-                            <button type="button" class="btn btn-danger w-100" style="max-width: 90%" id="deleteOrderButton">Löschen</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
+			<div class="col-12 col-md-6">
+				<div class="card custom-card-dashboard text-white h-100">
+					<div class="card-header p-0 m-0">
+						<h5 class="py-2 pt-2 m-0 text-center">
+							Benutzer verwalten
+						</h5>
+					</div>
+					<div class="card-body text-center">
+						<div class="d-flex align-items-center mb-2">
+							<label
+								for="email"
+								class="form-label mb-0"
+								style="min-width: 100px"
+								>E-Mail:
+							</label>
+							<input
+								type="email"
+								class="form-control"
+								id="emailField"
+								placeholder=""
+							/>
+						</div>
+						<div class="d-flex align-items-center mb-2">
+							<label
+								for="text"
+								class="form-label mb-0"
+								style="min-width: 100px"
+								>Vorname:
+							</label>
+							<input
+								type="text"
+								class="form-control"
+								id="firstName"
+								placeholder=""
+							/>
+						</div>
+						<div class="d-flex align-items-center mb-2">
+							<label
+								for="text"
+								class="form-label mb-0"
+								style="min-width: 100px"
+								>Nachname:
+							</label>
+							<input
+								type="text"
+								class="form-control"
+								id="lastName"
+								placeholder=""
+							/>
+						</div>
+						<div class="d-flex align-items-center mb-2">
+							<label
+								for="text"
+								class="form-label mb-0"
+								style="min-width: 100px"
+								>Passwort:
+							</label>
+							<input
+								type="text"
+								class="form-control"
+								id="passwordField"
+								placeholder="***********"
+							/>
+						</div>
 
-            <div id="dashboardError" class="alert alert-danger d-none mx-auto text-center mt-4" role="alert" style="width: 70% !important"></div>
+						<button
+							type="button"
+							class="btn btn-success mt-2 w-100"
+							id="saveButton"
+							style="max-width: 90% !important"
+						>
+							Speichern
+						</button>
+						<button
+							type="button"
+							class="btn btn-warning mt-2 w-100 text-white"
+							id="logoutButton"
+							style="max-width: 90% !important"
+						>
+							Ausloggen
+						</button>
+						<button
+							type="button"
+							class="btn btn-danger mt-2 w-100"
+							data-bs-toggle="modal"
+							data-bs-target="#deleteAccountModal"
+							style="max-width: 90% !important"
+						>
+							Account löschen
+						</button>
+					</div>
+				</div>
+			</div>
 
-            <div class="col-12 col-md-6">
-                <div class="card custom-card-dashboard text-white h-100">
-                    <div class="card-header p-0 m-0">
-                        <h5 class="py-2 pt-2 m-0 text-center">Benutzer verwalten</h5>
-                    </div>
-                    <div class="card-body text-center">
-                        <div class="d-flex align-items-center mb-2">
-                            <label for="email" class="form-label mb-0" style="min-width:100px">E-Mail: </label>
-                            <input type="email" class="form-control" id="emailField" placeholder="">
-                        </div>
-                        <div class="d-flex align-items-center mb-2">
-                            <label for="text" class="form-label mb-0" style="min-width:100px">Vorname: </label>
-                            <input type="text" class="form-control" id="firstName" placeholder="">
-                        </div>
-                        <div class="d-flex align-items-center mb-2">
-                            <label for="text" class="form-label mb-0" style="min-width:100px">Nachname: </label>
-                            <input type="text" class="form-control" id="lastName" placeholder="">
-                        </div>
-                        <div class="d-flex align-items-center mb-2">
-                            <label for="text" class="form-label mb-0" style="min-width:100px">Passwort: </label>
-                            <input type="text" class="form-control" id="passwordField" placeholder="***********">
-                        </div>
-
-                        <button type="button" class="btn btn-success mt-2 w-100" id="saveButton" style="max-width: 90% !important">Speichern</button>
-                        <button type="button" class="btn btn-warning mt-2 w-100 text-white" id="logoutButton" style="max-width: 90% !important">Ausloggen</button>
-                        <button type="button" class="btn btn-danger mt-2 w-100" data-bs-toggle="modal" data-bs-target="#deleteAccountModal" style="max-width: 90% !important">Account löschen</button>
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-12 col-md-6" id="table">
-                <div class="card custom-card-dashboard text-white h-100" id="tableCard">
-                    <div class="card-header p-0 m-0">
-                        <h5 class="py-2 pt-2 m-0 text-center">Bespannungen verwalten</h5>
-                    </div>
-                    <div class="card-body m-0 p-0">
-                        <div class="table-responsive table-scroll">
-                            <table class="table">
-                                <thead>
-                                    <tr>
-                                        <th scope="col">Erstellt</th>
-                                        <th scope="col">Schlägername</th>
-                                        <th scope="col"></th>
-                                    </tr>
-                                </thead>
-                                <tbody id="stringingTable">
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+			<div class="col-12 col-md-6" id="table">
+				<div
+					class="card custom-card-dashboard text-white h-100"
+					id="tableCard"
+				>
+					<div class="card-header p-0 m-0">
+						<h5 class="py-2 pt-2 m-0 text-center">
+							Bespannungen verwalten
+						</h5>
+					</div>
+					<div class="card-body m-0 p-0">
+						<div class="table-responsive table-scroll">
+							<table class="table">
+								<thead>
+									<tr>
+										<th scope="col">Erstellt</th>
+										<th scope="col">Schlägername</th>
+										<th scope="col"></th>
+									</tr>
+								</thead>
+								<tbody id="stringingTable"></tbody>
+							</table>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
 </main>
 
 <script type="module" src="../scripts/dashboard.ts"></script>

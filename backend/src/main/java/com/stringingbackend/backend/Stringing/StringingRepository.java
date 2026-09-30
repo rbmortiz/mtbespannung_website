@@ -393,7 +393,7 @@ public class StringingRepository {
             });
     }
 
-    public Future<Integer> adminUpdateOrder(Integer orderId, BigDecimal kgVert, BigDecimal kgHor, String infos, String orderStatus) {
+    public Future<Integer> adminUpdateOrder(Integer orderId, BigDecimal kgVert, BigDecimal kgHor, String infos, String orderStatus, Integer stringId) {
         System.out.println("[StringingRepository] adminUpdateOrder called");
 
         List<String> updates = new ArrayList<>();
@@ -419,6 +419,11 @@ public class StringingRepository {
         if (orderStatus != null && !orderStatus.isBlank()) {
             updates.add("orderStatus = $" + index++);
             values.add(orderStatus);
+        }
+
+        if (stringId != null) {
+            updates.add("string_id = $" + index++);
+            values.add(stringId);
         }
 
         if (updates.isEmpty()) {

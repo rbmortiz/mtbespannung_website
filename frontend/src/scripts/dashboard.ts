@@ -26,6 +26,8 @@ const adminFields = getEl<HTMLDivElement>("adminFields");
 let adminFirstNameInput: HTMLSpanElement;
 let adminLastNameInput: HTMLSpanElement;
 let adminEmailInput: HTMLSpanElement;
+let adminStatusInput: HTMLSelectElement;
+let adminStringInput: HTMLSelectElement;
 
 let email: String;
 let firstName: String;
@@ -354,8 +356,10 @@ async function deleteUserAccount(): Promise<void> {
 
 async function updateOrderInformation(): Promise<void> {
 	const token = localStorage.getItem("token");
+	var bodyData: string;
 
 	var infos: string = getEl<HTMLInputElement>("modalInfos").value;
+
 	var orderId: number = Number(
 		getEl<HTMLSpanElement>("modalRacketName").getAttribute("order-id")
 	);
@@ -369,6 +373,28 @@ async function updateOrderInformation(): Promise<void> {
 
 	const kgHor: number | null = kgHorInput === "" ? null : Number(kgHorInput);
 
+	if (role === "admin") {
+		const stringData = adminStringInput.value;
+
+		const statusData = adminStatusInput.value;
+
+		bodyData = JSON.stringify({
+			order_id: orderId,
+			kgVert: kgVert,
+			kgHor: kgHor,
+			infos: infos,
+			status: statusData,
+			stringId: stringData
+		});
+	} else {
+		bodyData = JSON.stringify({
+			order_id: orderId,
+			kgVert: kgVert,
+			kgHor: kgHor,
+			infos: infos
+		});
+	}
+
 	try {
 		const response = await fetch(
 			"https://api.mtbespannung.de/updateOrder",
@@ -380,12 +406,7 @@ async function updateOrderInformation(): Promise<void> {
 					"Content-Type": "application/json"
 				},
 
-				body: JSON.stringify({
-					order_id: orderId,
-					kgVert: kgVert,
-					kgHor: kgHor,
-					infos: infos
-				})
+				body: bodyData
 			}
 		);
 
@@ -551,9 +572,41 @@ function buildAdminFields(): void {
         </div>
     `;
 
+	getEl<HTMLDivElement>("statusContainer").innerHTML = `
+		<label for="modalStatus" class="form-label mb-0 text-nowrap d-flex" style="min-width: 100%">
+
+		<select class="form-select" id="adminStatus">
+			<option value="" selected></option>
+			<option value="pending">Unerledigt</option>
+			<option value="in_progress">In Bearbeitung</option>
+			<option value="completed">Bespannt</option>
+			<option value="delivered">Zugestellt</option>
+		</select>
+	`;
+
+	getEl<HTMLDivElement>("stringContainer").innerHTML = `
+		<label for="modalStatus" class="form-label mb-0 text-nowrap d-flex" style="min-width: 100%">
+
+		<select class="form-select" id="adminString">
+			
+		</select>
+	`;
+
 	adminFirstNameInput = getEl<HTMLSpanElement>("adminFirstNameInput");
 	adminLastNameInput = getEl<HTMLSpanElement>("adminLastNameInput");
 	adminEmailInput = getEl<HTMLSpanElement>("adminEmailInput");
+	adminStatusInput = getEl<HTMLSelectElement>("adminStatus");
+	adminStringInput = getEl<HTMLSelectElement>("adminString");
+
+	if (adminStringInput !== null || adminStringInput !== undefined) {
+		for (const string of stringTypes) {
+			adminStringInput.innerHTML += `
+				<option data-price="${string.price}" value="${string.string_id}">${string.name} (${string.price}€)</option>
+			`;
+		}
+	} else {
+		showError("dashboardError", "Kein AdminStringInput gefunden");
+	}
 }
 
 function showNoStringingOrders(): void {
