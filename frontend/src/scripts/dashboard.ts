@@ -702,9 +702,6 @@ function showOrderDetails(order: StringingOrder): void {
 			? ""
 			: order.additional_info;
 
-	getEl<HTMLSpanElement>("modalString").innerHTML =
-		order.string_id.toString();
-
 	getEl<HTMLSpanElement>("modalStatus").classList.remove(
 		"text-secondary",
 		"text-warning",
@@ -734,6 +731,7 @@ function showOrderDetails(order: StringingOrder): void {
 		default:
 			break;
 	}
+
 	if (role === "user") {
 		getEl<HTMLSpanElement>("modalString").innerHTML = getNameOfString(
 			order.string_id
