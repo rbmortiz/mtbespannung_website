@@ -518,12 +518,11 @@ async function buildForAdmin(): Promise<void> {
 		return;
 	}
 
-	buildAdminFields();
-
 	await getStringTypes(token);
 	await adminGetUserStringingOrders(token);
 	await adminGetUsers(token);
 
+	buildAdminFields();
 	insertStringingTable();
 }
 
@@ -573,7 +572,7 @@ function buildAdminFields(): void {
     `;
 
 	getEl<HTMLDivElement>("statusContainer").innerHTML = `
-		<label for="modalStatus" class="form-label mb-0 text-nowrap d-flex" style="min-width: 100%">
+		<label for="modalStatus" class="form-label mb-0" style="min-width: 100%">
 			Status:
 		</label>
 
@@ -587,7 +586,7 @@ function buildAdminFields(): void {
 	`;
 
 	getEl<HTMLDivElement>("stringContainer").innerHTML = `
-		<label for="modalStatus" class="form-label mb-0 text-nowrap d-flex" style="min-width: 100%">
+		<label for="modalStatus" class="form-label mb-0" style="min-width: 100%">
 			Saite: 
 		</label>
 
