@@ -572,7 +572,7 @@ function buildAdminFields(): void {
     `;
 
 	getEl<HTMLDivElement>("statusContainer").innerHTML = `
-		<label for="modalStatus" class="form-label mb-0" style="min-width: 100%">
+		<label for="modalStatus" class="form-label mb-0" style="min-width: 150px">
 			Status:
 		</label>
 
@@ -586,7 +586,7 @@ function buildAdminFields(): void {
 	`;
 
 	getEl<HTMLDivElement>("stringContainer").innerHTML = `
-		<label for="modalStatus" class="form-label mb-0" style="min-width: 100%">
+		<label for="modalStatus" class="form-label mb-0" style="min-width: 150px">
 			Saite: 
 		</label>
 
@@ -734,10 +734,11 @@ function showOrderDetails(order: StringingOrder): void {
 		default:
 			break;
 	}
-
-	getEl<HTMLSpanElement>("modalString").innerHTML = getNameOfString(
-		order.string_id
-	);
+	if (role === "user") {
+		getEl<HTMLSpanElement>("modalString").innerHTML = getNameOfString(
+			order.string_id
+		);
+	}
 
 	getEl<HTMLSpanElement>("modalPrice").innerHTML =
 		"" + order.price?.toString();
@@ -766,7 +767,7 @@ function showOrderDetails(order: StringingOrder): void {
 				}
 			}
 
-			alterFieldsForAdmin();
+			console.log("successfully altered fields for admin");
 		} else {
 			adminFirstNameInput.innerHTML =
 				order.customer_first_name !== null
@@ -780,10 +781,6 @@ function showOrderDetails(order: StringingOrder): void {
 				order.customer_email !== null ? order.customer_email : "";
 		}
 	}
-}
-
-function alterFieldsForAdmin(): void {
-	console.log("successfully altered Fields");
 }
 
 function getNameOfString(id: number): string {
