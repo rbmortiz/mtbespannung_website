@@ -572,7 +572,7 @@ function buildAdminFields(): void {
     `;
 
 	getEl<HTMLDivElement>("statusContainer").innerHTML = `
-		<label for="modalStatus" class="form-label mb-0" style="min-width: 150px">
+		<label for="modalStatus" class="form-label mb-0" style="min-width: 130px">
 			Status:
 		</label>
 
@@ -586,7 +586,7 @@ function buildAdminFields(): void {
 	`;
 
 	getEl<HTMLDivElement>("stringContainer").innerHTML = `
-		<label for="modalStatus" class="form-label mb-0" style="min-width: 150px">
+		<label for="modalStatus" class="form-label mb-0" style="min-width: 130px">
 			Saite: 
 		</label>
 
@@ -601,17 +601,6 @@ function buildAdminFields(): void {
 	adminEmailInput = getEl<HTMLSpanElement>("adminEmailInput");
 	adminStatusInput = getEl<HTMLSelectElement>("adminStatus");
 	adminStringInput = getEl<HTMLSelectElement>("adminString");
-
-	for (const string of stringTypes) {
-		adminStringInput.innerHTML += `
-            <option
-                data-price="${string.price}"
-                value="${string.string_id}"
-            >
-                ${string.name} (${string.price}€)
-            </option>
-        `;
-	}
 }
 
 function showNoStringingOrders(): void {
@@ -702,6 +691,9 @@ function showOrderDetails(order: StringingOrder): void {
 			? ""
 			: order.additional_info;
 
+	getEl<HTMLSpanElement>("modalPrice").innerHTML =
+		"" + order.price?.toString();
+
 	if (role === "user") {
 		getEl<HTMLSpanElement>("modalString").innerHTML = getNameOfString(
 			order.string_id
@@ -743,10 +735,30 @@ function showOrderDetails(order: StringingOrder): void {
 			default:
 				break;
 		}
+	} else if (role === "admin") {
+		for (const string of stringTypes) {
+			if (order.string_id === string.string_id) {
+				adminStringInput.innerHTML += `
+					<option
+						data-price="${string.price}"
+						value="${string.string_id}"
+						selected
+					>
+						${string.name} (${string.price}€)
+					</option>
+				`;
+			} else {
+				adminStringInput.innerHTML += `
+					<option
+						data-price="${string.price}"
+						value="${string.string_id}"
+					>
+						${string.name} (${string.price}€)
+					</option>
+				`;
+			}
+		}
 	}
-
-	getEl<HTMLSpanElement>("modalPrice").innerHTML =
-		"" + order.price?.toString();
 
 	if (
 		adminFirstNameInput !== null &&
