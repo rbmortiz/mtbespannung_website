@@ -574,6 +574,8 @@ function buildAdminFields(): void {
 
 	getEl<HTMLDivElement>("statusContainer").innerHTML = `
 		<label for="modalStatus" class="form-label mb-0 text-nowrap d-flex" style="min-width: 100%">
+			Status:
+		</label>
 
 		<select class="form-select" id="adminStatus">
 			<option value="" selected></option>
@@ -586,6 +588,8 @@ function buildAdminFields(): void {
 
 	getEl<HTMLDivElement>("stringContainer").innerHTML = `
 		<label for="modalStatus" class="form-label mb-0 text-nowrap d-flex" style="min-width: 100%">
+			Saite: 
+		</label>
 
 		<select class="form-select" id="adminString">
 			
@@ -594,18 +598,20 @@ function buildAdminFields(): void {
 
 	adminFirstNameInput = getEl<HTMLSpanElement>("adminFirstNameInput");
 	adminLastNameInput = getEl<HTMLSpanElement>("adminLastNameInput");
+
 	adminEmailInput = getEl<HTMLSpanElement>("adminEmailInput");
 	adminStatusInput = getEl<HTMLSelectElement>("adminStatus");
 	adminStringInput = getEl<HTMLSelectElement>("adminString");
 
-	if (adminStringInput !== null || adminStringInput !== undefined) {
-		for (const string of stringTypes) {
-			adminStringInput.innerHTML += `
-				<option data-price="${string.price}" value="${string.string_id}">${string.name} (${string.price}€)</option>
-			`;
-		}
-	} else {
-		showError("dashboardError", "Kein AdminStringInput gefunden");
+	for (const string of stringTypes) {
+		adminStringInput.innerHTML += `
+            <option
+                data-price="${string.price}"
+                value="${string.string_id}"
+            >
+                ${string.name} (${string.price}€)
+            </option>
+        `;
 	}
 }
 
