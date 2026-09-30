@@ -417,7 +417,7 @@ public class StringingRepository {
         }
 
         if (orderStatus != null && !orderStatus.isBlank()) {
-            updates.add("orderStatus = $" + index++);
+            updates.add("status = $" + index++);
             values.add(orderStatus);
         }
 
