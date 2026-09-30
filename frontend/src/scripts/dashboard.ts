@@ -702,40 +702,47 @@ function showOrderDetails(order: StringingOrder): void {
 			? ""
 			: order.additional_info;
 
-	getEl<HTMLSpanElement>("modalStatus").classList.remove(
-		"text-secondary",
-		"text-warning",
-		"text-info",
-		"text-success"
-	);
-
-	switch (order.status) {
-		case "pending":
-			getEl<HTMLSpanElement>("modalStatus").innerHTML = "Unerledigt";
-			getEl<HTMLSpanElement>("modalStatus").classList.add(
-				"text-secondary"
-			);
-			break;
-		case "in_progress":
-			getEl<HTMLSpanElement>("modalStatus").innerHTML = "In Bearbeitung";
-			getEl<HTMLSpanElement>("modalStatus").classList.add("text-warning");
-			break;
-		case "completed":
-			getEl<HTMLSpanElement>("modalStatus").innerHTML = "Bespannt";
-			getEl<HTMLSpanElement>("modalStatus").classList.add("text-info");
-			break;
-		case "delivered":
-			getEl<HTMLSpanElement>("modalStatus").innerHTML = "Zugestellt";
-			getEl<HTMLSpanElement>("modalStatus").classList.add("text-success");
-			break;
-		default:
-			break;
-	}
-
 	if (role === "user") {
 		getEl<HTMLSpanElement>("modalString").innerHTML = getNameOfString(
 			order.string_id
 		);
+
+		getEl<HTMLSpanElement>("modalStatus").classList.remove(
+			"text-secondary",
+			"text-warning",
+			"text-info",
+			"text-success"
+		);
+
+		switch (order.status) {
+			case "pending":
+				getEl<HTMLSpanElement>("modalStatus").innerHTML = "Unerledigt";
+				getEl<HTMLSpanElement>("modalStatus").classList.add(
+					"text-secondary"
+				);
+				break;
+			case "in_progress":
+				getEl<HTMLSpanElement>("modalStatus").innerHTML =
+					"In Bearbeitung";
+				getEl<HTMLSpanElement>("modalStatus").classList.add(
+					"text-warning"
+				);
+				break;
+			case "completed":
+				getEl<HTMLSpanElement>("modalStatus").innerHTML = "Bespannt";
+				getEl<HTMLSpanElement>("modalStatus").classList.add(
+					"text-info"
+				);
+				break;
+			case "delivered":
+				getEl<HTMLSpanElement>("modalStatus").innerHTML = "Zugestellt";
+				getEl<HTMLSpanElement>("modalStatus").classList.add(
+					"text-success"
+				);
+				break;
+			default:
+				break;
+		}
 	}
 
 	getEl<HTMLSpanElement>("modalPrice").innerHTML =
