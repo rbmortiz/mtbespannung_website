@@ -543,6 +543,8 @@ public class StringingRepository {
                     return Future.succeededFuture(false);
                 }
 
+                stringPrice = stringPrice.add(BigDecimal.valueOf(15));
+
                 String updateQuery = """
                     UPDATE stringing_orders SET price = $1 WHERE order_id = $2
                 """;
