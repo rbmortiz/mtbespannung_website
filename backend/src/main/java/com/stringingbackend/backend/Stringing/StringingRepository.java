@@ -447,7 +447,7 @@ public class StringingRepository {
 
                 System.out.println("[StringingRepository] (200) adminUpdateOrder succeeded");
 
-                if(stringId == null)updatePrice(orderId, stringId).await();
+                if(stringId != null)updatePrice(orderId, stringId).await();
 
                 return 200;
             })
