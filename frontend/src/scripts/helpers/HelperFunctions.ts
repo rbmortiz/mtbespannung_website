@@ -19,19 +19,28 @@ export function manageNavBarLinks(): void {
 	let bespannungenLink = getEl<HTMLLIElement>("bespannungenLink");
 	let trainerstundenLink = getEl<HTMLLIElement>("trainerstundenLink");
 	let mainLink = getEl<HTMLLIElement>("mainLink");
+	let logoutLink = getEl<HTMLLIElement>("logoutLink");
 
 	let path = window.location.pathname;
 	let token = localStorage.getItem("token");
 
 	if (token) {
 		loginLink.classList.add("d-none");
+
+		logoutLink.addEventListener("click", () => {
+			localStorage.removeItem("token");
+			window.location.replace("/src/pages/main.html");
+		});
+
 		console.log("User is logged in");
 	} else {
 		dashboardLink.classList.add("d-none");
+		logoutLink.classList.add("d-none");
 		console.log("User is not logged in");
 	}
 
 	if (path.includes("loginRegister.html")) {
+		logoutLink.classList.add("d-none");
 		dashboardLink.classList.add("d-none");
 		trainerstundenLink.classList.add("d-none");
 		bespannungenLink.classList.add("d-none");
@@ -41,6 +50,7 @@ export function manageNavBarLinks(): void {
 	} else if (path.includes("trainerstunden.html")) {
 		trainerstundenLink.classList.add("d-none");
 	} else if (path.includes("dashboard.html")) {
+		logoutLink.classList.add("d-none");
 		dashboardLink.classList.add("d-none");
 		loginLink.classList.add("d-none");
 	} else if (path.includes("main.html")) {

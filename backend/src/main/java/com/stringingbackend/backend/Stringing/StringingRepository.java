@@ -447,6 +447,8 @@ public class StringingRepository {
 
                 System.out.println("[StringingRepository] (200) adminUpdateOrder succeeded");
 
+                if(stringId == null)updatePrice(orderId, stringId).await();
+
                 return 200;
             })
             .recover(err -> {
@@ -508,6 +510,48 @@ public class StringingRepository {
 
                 err.printStackTrace();
                 return Future.succeededFuture(500);
+            });
+    }
+
+    private Future<Boolean> updatePrice(Integer orderId, Integer stringId){
+        System.out.println("[StringingRepository] updatePrice called");
+
+        if (orderId == null || stringId == null) {
+            System.err.println("[StringingRepository] (403) updatePrice failed");
+            return Future.succeededFuture(false);
+        }
+
+        String getPriceQuery = """
+            SELECT price FROM strings WHERE string_id = $1
+        """;
+
+        return pool.preparedQuery(getPriceQuery)
+            .execute(Tuple.of(stringId))
+            .compose(result -> {
+
+                if (result.rowCount() != 1) {
+                    System.err.println("[StringingRepository] (404) updatePrice failed");
+                    return Future.succeededFuture(false);
+                }
+
+                Row row = result.iterator().next();
+
+                BigDecimal stringPrice = row.getBigDecimal("price");
+
+                if (stringPrice == null) {
+                    System.err.println("[StringingRepository] (404) updatePrice failed");
+                    return Future.succeededFuture(false);
+                }
+
+                String updateQuery = """
+                    UPDATE stringing_orders SET price = $1 WHERE order_id = $2
+                """;
+
+                return pool.preparedQuery(updateQuery)
+                    .execute(Tuple.of(stringPrice, orderId))
+                    .map(updateResult -> {
+                        return updateResult.rowCount() == 1;
+                    });
             });
     }
 }

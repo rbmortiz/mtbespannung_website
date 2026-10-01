@@ -162,7 +162,6 @@ public class AccountRepository {
                 values.add(hashedPassword);
             }
 
-            // Nothing was supplied to update
             if (updates.isEmpty()) {
                 System.out.println("[AccountRepository] (400) updateUser failed for "+ oldEmail);
 
