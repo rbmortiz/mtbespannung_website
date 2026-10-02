@@ -666,6 +666,8 @@ function filterStringingTable(): void {
 			insertSingleEntry(strOrder);
 		}
 	}
+
+	addMoreInfoListeners();
 }
 
 function insertSingleEntry(order: StringingOrder): void {
