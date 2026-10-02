@@ -28,6 +28,7 @@ let adminLastNameInput: HTMLSpanElement;
 let adminEmailInput: HTMLSpanElement;
 let adminStatusInput: HTMLSelectElement;
 let adminStringInput: HTMLSelectElement;
+let adminSearchBarInput: HTMLInputElement;
 
 let email: String;
 let firstName: String;
@@ -590,12 +591,29 @@ function buildAdminFields(): void {
 		</select>
 	`;
 
+	getEl<HTMLDivElement>("searchBarContainer").innerHTML = `
+		<input
+			type="search"
+			class="form-control"
+			id="searchInput"
+			placeholder="Suchen..."
+			aria-label="Suchen"
+			style="border: none; border-radius: 0px"
+		/>
+	`;
+
 	adminFirstNameInput = getEl<HTMLSpanElement>("adminFirstNameInput");
 	adminLastNameInput = getEl<HTMLSpanElement>("adminLastNameInput");
 
 	adminEmailInput = getEl<HTMLSpanElement>("adminEmailInput");
 	adminStatusInput = getEl<HTMLSelectElement>("adminStatus");
 	adminStringInput = getEl<HTMLSelectElement>("adminString");
+
+	adminSearchBarInput = getEl<HTMLInputElement>("searchInput");
+
+	adminSearchBarInput.addEventListener("input", () => {
+		void filterStringingTable();
+	});
 }
 
 function showNoStringingOrders(): void {
@@ -621,6 +639,33 @@ function insertStringingTable(): void {
 	}
 
 	addMoreInfoListeners();
+}
+
+function filterStringingTable(): void {
+	stringingTable.innerHTML = "";
+
+	const searchValue = adminSearchBarInput.value.toLowerCase().trim();
+
+	for (const strOrder of userStrings) {
+		if (
+			strOrder.customer_email
+				?.toLowerCase()
+				.trim()
+				.includes(searchValue) ||
+			strOrder.customer_first_name
+				?.toLowerCase()
+				.trim()
+				.includes(searchValue) ||
+			strOrder.customer_last_name
+				?.toLowerCase()
+				.trim()
+				.includes(searchValue) ||
+			strOrder.racket_name.toLowerCase().trim().includes(searchValue) ||
+			strOrder.additional_info?.toLowerCase().trim().includes(searchValue)
+		) {
+			insertSingleEntry(strOrder);
+		}
+	}
 }
 
 function insertSingleEntry(order: StringingOrder): void {
