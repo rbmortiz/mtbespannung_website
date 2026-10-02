@@ -73,7 +73,6 @@ function setInfoFieldButtons(): void {
 	});
 
 	siteTypeInput.addEventListener("change", () => {
-		displayHTMLElement(priceTagContainer, true);
 		calculatePriceOfStringingJob();
 	});
 
@@ -214,7 +213,7 @@ async function getStringTypes(): Promise<void> {
 }
 
 function addOptions(sport: string): void {
-	siteTypeInput.innerHTML += `<option data-price="" value="">Bitte auswählen</option>`;
+	siteTypeInput.innerHTML += `<option data-price="-1" value="">Bitte auswählen</option>`;
 
 	for (const str of stringTypes) {
 		if (str.sport.toLowerCase() === sport.toLowerCase()) {
@@ -226,9 +225,13 @@ function addOptions(sport: string): void {
 function calculatePriceOfStringingJob(): void {
 	const selectedOption = siteTypeInput.options[siteTypeInput.selectedIndex];
 
-	const price = Number(selectedOption.dataset.price) + 15;
-
-	priceTagInput.innerHTML = price.toString() + "€";
+	if (Number(selectedOption.dataset.price) === -1)
+		displayHTMLElement(priceTagContainer, false);
+	else {
+		displayHTMLElement(priceTagContainer, true);
+		const price = Number(selectedOption.dataset.price) + 15;
+		priceTagInput.innerHTML = price.toString() + "€";
+	}
 }
 
 // function overloading for the fetch request
