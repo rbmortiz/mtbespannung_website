@@ -671,13 +671,43 @@ function filterStringingTable(): void {
 				.trim()
 				.includes(searchValue) ||
 			strOrder.racket_name.toLowerCase().trim().includes(searchValue) ||
-			strOrder.additional_info?.toLowerCase().trim().includes(searchValue)
+			strOrder.additional_info
+				?.toLowerCase()
+				.trim()
+				.includes(searchValue) ||
+			getTransformedStatus(strOrder.status)
+				.toLowerCase()
+				.trim()
+				.includes(searchValue)
 		) {
 			insertSingleEntry(strOrder);
 		}
 	}
 
 	addMoreInfoListeners();
+}
+
+function getTransformedStatus(status: string) {
+	let temp: string = "";
+
+	switch (status) {
+		case "pending":
+			temp = "Unerledigt";
+			break;
+		case "in_progress":
+			temp = "In Bearbeitung";
+			break;
+		case "completed":
+			temp = "Bespannt";
+			break;
+		case "delivered":
+			temp = "Zugestellt";
+			break;
+		default:
+			break;
+	}
+
+	return temp;
 }
 
 function insertSingleEntry(order: StringingOrder): void {
@@ -689,7 +719,7 @@ function insertSingleEntry(order: StringingOrder): void {
 				<td>${created_at.toLocaleDateString("de-DE")}</td>
 				<td>${order.customer_first_name}, ${order.customer_last_name}</td>
 				<td>${order.racket_name}</td>
-				<td>${order.status}</td>
+				<td>${getTransformedStatus(order.status)}</td>
 				<td><button class="btn btn-primary moreInfoButton" data-order-id="${order.order_id}" data-bs-toggle="modal" data-bs-target="#stringingModal">Mehr Details</button></td>
 			</tr>
 		`;
