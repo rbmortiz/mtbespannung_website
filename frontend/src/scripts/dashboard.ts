@@ -602,6 +602,16 @@ function buildAdminFields(): void {
 		/>
 	`;
 
+	getEl<HTMLTableSectionElement>("tableHeader").innerHTML = `
+		<tr>
+			<th scope="col">Erstellt</th>
+			<th scope="col">Name</th>
+			<th scope="col">Schlägername</th>
+			<th scope="col">Status</th>
+			<th scope="col"></th>
+		</tr>
+	`;
+
 	adminFirstNameInput = getEl<HTMLSpanElement>("adminFirstNameInput");
 	adminLastNameInput = getEl<HTMLSpanElement>("adminLastNameInput");
 
@@ -673,13 +683,25 @@ function filterStringingTable(): void {
 function insertSingleEntry(order: StringingOrder): void {
 	var created_at = new Date(order.created_at);
 
-	stringingTable.innerHTML += `
-        <tr>
-            <td>${created_at.toLocaleDateString("de-DE")}</td>
-            <td>${order.racket_name}</td>
-            <td><button class="btn btn-primary moreInfoButton" data-order-id="${order.order_id}" data-bs-toggle="modal" data-bs-target="#stringingModal">Mehr Details</button></td>
-        </tr>
-    `;
+	if (role === "admin") {
+		stringingTable.innerHTML += `
+			<tr>
+				<td>${created_at.toLocaleDateString("de-DE")}</td>
+				<td>${order.customer_first_name}, ${order.customer_last_name}</td>
+				<td>${order.racket_name}</td>
+				<td>${order.status}</td>
+				<td><button class="btn btn-primary moreInfoButton" data-order-id="${order.order_id}" data-bs-toggle="modal" data-bs-target="#stringingModal">Mehr Details</button></td>
+			</tr>
+		`;
+	} else {
+		stringingTable.innerHTML += `
+			<tr>
+				<td>${created_at.toLocaleDateString("de-DE")}</td>
+				<td>${order.racket_name}</td>
+				<td><button class="btn btn-primary moreInfoButton" data-order-id="${order.order_id}" data-bs-toggle="modal" data-bs-target="#stringingModal">Mehr Details</button></td>
+			</tr>
+		`;
+	}
 }
 
 function addMoreInfoListeners(): void {
