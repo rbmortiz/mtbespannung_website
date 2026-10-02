@@ -69,6 +69,7 @@ async function init(): Promise<void> {
 function setInfoFieldButtons(): void {
 	racketTypeInput.addEventListener("change", () => {
 		siteTypeInput.innerHTML = "";
+		displayHTMLElement(priceTagContainer, false);
 		addOptions(racketTypeInput.value);
 	});
 
