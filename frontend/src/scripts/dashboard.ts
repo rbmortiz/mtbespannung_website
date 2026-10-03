@@ -523,7 +523,7 @@ async function buildForAdmin(): Promise<void> {
 	await adminGetUserStringingOrders(token);
 	await adminGetUsers(token);
 
-	buildAdminFields();
+	alterAdminFields();
 	insertStringingTable();
 }
 
@@ -542,7 +542,7 @@ async function buildForUser(): Promise<void> {
 	insertStringingTable();
 }
 
-function buildAdminFields(): void {
+function alterAdminFields(): void {
 	adminFields.innerHTML += `
         <div class="d-flex align-items-center gap-3 mb-2">
             <label for="adminFirstNameInput"

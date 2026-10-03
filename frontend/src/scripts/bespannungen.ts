@@ -26,6 +26,9 @@ const verticalKGInput = getEl<HTMLInputElement>("verticalKG");
 const infosInput = getEl<HTMLInputElement>("infos");
 const priceTagInput = getEl<HTMLInputElement>("priceTag");
 
+const modalSendWithoutAccountButton = getEl<HTMLInputElement>(
+	"modalSendWithoutAccountButton"
+);
 const sendOrderWithoutAccountButton = getEl<HTMLInputElement>(
 	"sendOrderWithoutAccount"
 );
@@ -170,7 +173,7 @@ function buildForGuestUser(): void {
 
 function buildForUser(): void {
 	displayHTMLElement(sendOrderWithAccountButton, true);
-	displayHTMLElement(sendOrderWithoutAccountButton, false);
+	displayHTMLElement(modalSendWithoutAccountButton, false);
 	displayHTMLElement(firstNameContainer, false);
 	displayHTMLElement(lastNameContainer, false);
 	displayHTMLElement(emailContainer, false);

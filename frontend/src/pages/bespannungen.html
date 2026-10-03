@@ -30,6 +30,53 @@
 		</div>
 	</div>
 
+	<!-- Send Without Account Modal -->
+	<div
+		class="modal fade"
+		id="sendWithoutAccountModal"
+		tabindex="-1"
+		aria-labelledby="exampleModalLabel"
+		aria-hidden="true"
+	>
+		<div class="modal-dialog modal-dialog-centered">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h1 class="modal-title fs-5" id="exampleModalLabel">
+						Info
+					</h1>
+					<button
+						type="button"
+						class="btn-close"
+						data-bs-dismiss="modal"
+						aria-label="Close"
+					></button>
+				</div>
+				<div class="modal-body text-center">
+					<h3>
+						Möchten sie wirklich ohne Account die Bespannung
+						abschicken?
+					</h3>
+					<br />
+					<p class="text-primary">
+						Mit Account können sie all ihre Bespannungen verwalten
+						und den Status der Bespannung einlesen
+					</p>
+				</div>
+				<div
+					class="modal-footer align-items-center justify-content-center"
+				>
+					<button
+						type="button"
+						class="btn btn-success w-100"
+						id="sendOrderWithoutAccount"
+					>
+						Abschicken
+					</button>
+				</div>
+			</div>
+		</div>
+	</div>
+
 	<div
 		class="w-100 d-flex flex-column justify-content-center align-items-center"
 	>
@@ -246,7 +293,9 @@
 
 				<button
 					class="btn btn-success mb-4 mt-4 w-100"
-					id="sendOrderWithoutAccount"
+					data-bs-toggle="modal"
+					id="modalSendWithoutAccountButton"
+					data-bs-target="#sendWithoutAccountModal"
 					style="max-width: 90%"
 				>
 					Abschicken
