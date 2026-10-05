@@ -2,11 +2,7 @@
 
 ## _[Link for the website](https://mtbespannung.de)_
 
----
-
 ## Diagram
-
----
 
 ![Diagram](diagram.png)
 

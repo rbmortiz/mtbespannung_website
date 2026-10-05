@@ -540,6 +540,98 @@ async function buildForUser(): Promise<void> {
 	await getUserStrings(token);
 
 	insertStringingTable();
+	setInfoFields();
+}
+
+function setInfoFields(): void {
+	const header = getEl<HTMLDivElement>("infoModalHeader");
+	const body = getEl<HTMLDivElement>("infoModalBody");
+
+	getEl<HTMLLabelElement>("infoRacketName").addEventListener("click", () => {
+		header.innerHTML = `
+			Schlägername
+		`;
+		body.innerHTML = `
+		`;
+	});
+
+	getEl<HTMLLabelElement>("infoKG").addEventListener("click", () => {
+		header.innerHTML = `
+			Besaitungshärte
+		`;
+		body.innerHTML = `
+			Die Schlägerhärte setzt sich zusammen aus der Härte der Quergezogenen einzelnen Saiten und aus der Härte der Längsgezogenen einzelnen Saiten. <br><br>
+
+			Wenn ein Schläger <span class="text-warning">fest</span> bespannt ist, dann gewinnt man Präzision, verliert aber Geschwindigkeit aus dem Schlag. <br><br>
+
+			Wenn ein Schläger <span class="text-success">weich</span> bespannt ist, verliert man Präzision, bekommt aber mehr Geschwindigkeit aus dem Schlag. <br><br>
+
+			Falls sie sich mit den Härten nicht auskennen, können sie gerne in das <span class="text-info">Info</span> Feld ihre Präferenz schreiben ("Etwas fester", "Etwas weicher", "Eher ausgeglichen").
+		`;
+	});
+
+	getEl<HTMLLabelElement>("infoString").addEventListener("click", () => {
+		header.innerHTML = `
+			Saite
+		`;
+		body.innerHTML = `
+			Dies ist die Saite die sie bei der Bespannung ausgewählt haben. <br><br>
+			Möchten sie diese im nachhinein ändern, so kontaktieren sie mich bitte unter <span class="text-success">moritz@mtbespannung.de</span>
+		`;
+	});
+
+	getEl<HTMLLabelElement>("infoInfos").addEventListener("click", () => {
+		header.innerHTML = `
+			Infos
+		`;
+		body.innerHTML = `
+			Hier haben sie zusätzliche Informationen zur Bespannung angegeben. <br><br>
+			Solange Der Status noch <span class="text-secondary">Unerledigt</span> ist, können sie diesen Verändern.
+		`;
+	});
+
+	getEl<HTMLLabelElement>("infoStatus").addEventListener("click", () => {
+		header.innerHTML = `
+			Status
+		`;
+		body.innerHTML = `
+			Der Status besteht aus vier Zuständen, welche die momentane Bearbeitungsstufe ihrer Bespannung festlegen. <br><br>
+			<span class="text-secondary">Unerledigt</span>: Die Bespannung wurde erst abgegeben, und noch nicht angefangen. <br><br>
+			<span class="text-warning">In Bearbeitung</span>: Der Schläger wird in diesem Moment bespannt, und es können keine Details mehr verändert werden. <br><br>
+			<span class="text-info">Bespannt</span>: Der Schläger ist vollständig bespannt, wurde aber noch nicht im Sportpoint zum abholen hinterlegt. <br><br>
+			<span class="text-success">Zugestellt</span>: Der Schläger ist vollständig bespannt und wurde im Sportpoint zum abholen hinterlegt. 
+		`;
+	});
+
+	getEl<HTMLLabelElement>("infoPrice").addEventListener("click", () => {
+		header.innerHTML = `
+			Preis
+		`;
+		body.innerHTML = `
+			Dies ist der Preis der Bespannung, welcher sich aus <span class="text-info">15€</span> Besaitungskosten, und den <span class="text-info">Saitenkosten</span> zusammensetzt.
+		`;
+	});
+
+	getEl<HTMLLabelElement>("infoCreationDate").addEventListener(
+		"click",
+		() => {
+			header.innerHTML = `
+			Erstellungsdatum
+		`;
+			body.innerHTML = `
+			An diesem Tag ist die Bespannung in das System eingegangen.
+		`;
+		}
+	);
+
+	getEl<HTMLLabelElement>("infoUpdatedDate").addEventListener("click", () => {
+		header.innerHTML = `
+			Aktualisierungsdatum
+		`;
+		body.innerHTML = `
+			Sobald sich etwas an ihrer Bespannung verändert, egal ob von ihnen oder dem Bespanner, wird das Datum aktualisiert.
+		`;
+	});
 }
 
 function alterAdminFields(): void {
