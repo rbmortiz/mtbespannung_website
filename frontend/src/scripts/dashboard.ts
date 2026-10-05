@@ -552,6 +552,7 @@ function setInfoFields(): void {
 			Schlägername
 		`;
 		body.innerHTML = `
+			Hier erscheint der Name den sie bei der Erstellung des Auftrags angegeben haben. Dies ist der Name des Schlägers, oder eine grobe Beschreibung des Schlägers.
 		`;
 	});
 
