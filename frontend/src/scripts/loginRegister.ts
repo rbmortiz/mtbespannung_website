@@ -1,9 +1,9 @@
 import {
-    getEl,
-    manageNavBarLinks,
-    initRacketBackground,
-    showError,
-    displayHTMLElement,
+	getEl,
+	manageNavBarLinks,
+	initRacketBackground,
+	showError,
+	displayHTMLElement
 } from "./helpers/HelperFunctions";
 
 const emailInput = getEl<HTMLInputElement>("emailInput");
@@ -20,170 +20,175 @@ const accountText = getEl<HTMLParagraphElement>("accountText");
 let sendToReg: boolean = false;
 
 if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", init);
+	document.addEventListener("DOMContentLoaded", init);
 } else {
-    init();
+	init();
 }
 
 function init() {
-    //checks
-    manageNavBarLinks();
-    redirectIfLoggedIn();
+	//checks
+	manageNavBarLinks();
+	redirectIfLoggedIn();
 
-    //background init
-    initRacketBackground();
+	//background init
+	initRacketBackground();
 
-    // Button Events
-    registerPullupButton.addEventListener("click", () => {
-        void registerPullupPress();
-    });
+	// Button Events
+	registerPullupButton.addEventListener("click", () => {
+		void registerPullupPress();
+	});
 
-    loginButton.addEventListener("click", () => {
-        void sendLogin();
-    });
+	loginButton.addEventListener("click", () => {
+		void sendLogin();
+	});
 
-    registerSendButton.addEventListener("click", () => {
-        void sendRegister();
-    });
+	registerSendButton.addEventListener("click", () => {
+		void sendRegister();
+	});
 
-    goBackButton.addEventListener("click", () => {
-        void showRegisterFields(false);
-        sendToReg = false;
-    });
+	goBackButton.addEventListener("click", () => {
+		void showRegisterFields(false);
+		sendToReg = false;
+	});
 
-    // Keyboard "Enter" Event handling
-    document.addEventListener("keydown", (event) => {
-        if (event.key === "Enter") {
-            if (sendToReg) sendRegister();
-            else if (!sendToReg) sendLogin();
-        }
-    });
+	// Keyboard "Enter" Event handling
+	document.addEventListener("keydown", (event) => {
+		if (event.key === "Enter") {
+			if (sendToReg) sendRegister();
+			else if (!sendToReg) sendLogin();
+		}
+	});
 }
 
 function redirectIfLoggedIn(): void {
-    let token = localStorage.getItem("token");
-    if (token) {
-        window.location.replace("/src/pages/main.html");
-    }
+	let token = localStorage.getItem("token");
+	if (token) {
+		window.location.replace("/src/pages/main.html");
+	}
 }
 
 function showRegisterFields(showRegister: boolean): void {
-    displayHTMLElement(goBackButton, showRegister);
-    displayHTMLElement(registerPullupButton, !showRegister);
-    displayHTMLElement(accountText, !showRegister);
-    displayHTMLElement(loginButton, !showRegister);
-    displayHTMLElement(firstNameInput, showRegister);
-    displayHTMLElement(lastNameInput, showRegister);
-    displayHTMLElement(registerSendButton, showRegister);
+	displayHTMLElement(goBackButton, showRegister);
+	displayHTMLElement(registerPullupButton, !showRegister);
+	displayHTMLElement(accountText, !showRegister);
+	displayHTMLElement(loginButton, !showRegister);
+	displayHTMLElement(firstNameInput, showRegister);
+	displayHTMLElement(lastNameInput, showRegister);
+	displayHTMLElement(registerSendButton, showRegister);
 }
 
 // Button presses
 
 function registerPullupPress(): void {
-    showRegisterFields(true);
-    sendToReg = true;
+	showRegisterFields(true);
+	sendToReg = true;
 
-    firstNameInput.value = "";
-    lastNameInput.value = "";
+	firstNameInput.value = "";
+	lastNameInput.value = "";
 
-    firstNameInput.required = true;
-    lastNameInput.required = true;
+	firstNameInput.required = true;
+	lastNameInput.required = true;
 }
 
 // fetch functions
 
 async function sendRegister(): Promise<void> {
-    const email = emailInput.value;
-    const password = passwordInput.value;
-    const firstName = firstNameInput.value;
-    const lastName = lastNameInput.value;
+	const email = emailInput.value;
+	const password = passwordInput.value;
+	const firstName = firstNameInput.value;
+	const lastName = lastNameInput.value;
 
-    try {
-        const response = await fetch("https://api.mtbespannung.de/register", {
-            method: "POST",
+	try {
+		const response = await fetch("https://api.mtbespannung.de/register", {
+			method: "POST",
 
-            headers: {
-                "Content-Type": "application/json",
-            },
+			headers: {
+				"Content-Type": "application/json"
+			},
 
-            body: JSON.stringify({
-                email: email,
-                password: password,
-                firstname: firstName,
-                lastname: lastName,
-            }),
-        });
+			body: JSON.stringify({
+				email: email,
+				password: password,
+				firstname: firstName,
+				lastname: lastName
+			})
+		});
 
-        // Successful registration
-        if (response.status === 200) {
-            const data = await response.json();
+		// Successful registration
+		if (response.status === 200) {
+			const data = await response.json();
 
-            localStorage.setItem("token", data.token);
+			localStorage.setItem("token", data.token);
 
-            window.location.replace("/src/pages/loginRegister.html");
-            return;
-        }
+			window.location.replace("/src/pages/loginRegister.html");
+			return;
+		}
 
-        if (response.status === 400) {
-            showError("loginError", "Bitte fülle alle Felder aus.");
-            return;
-        }
+		if (response.status === 400) {
+			showError("loginError", "Bitte fülle alle Felder aus.");
+			return;
+		}
 
-        if (response.status === 403) {
-            showError(
-                "loginError",
-                "Ein Account mit dieser E-Mail existiert bereits.",
-            );
-            return;
-        }
+		if (response.status === 403) {
+			showError(
+				"loginError",
+				"Ein Account mit dieser E-Mail existiert bereits."
+			);
+			return;
+		}
 
-        if (response.status === 500) {
-            showError("loginError", "Interner Serverfehler.");
-            return;
-        }
+		if (response.status === 422) {
+			showError("loginError", "E-Mail Adresse ist ungültig.");
+			return;
+		}
 
-        console.error("Unexpected status:", response.status);
-        showError("loginError", "Ein unbekannter Fehler ist aufgetreten.");
-    } catch (error) {
-        console.error("Could not reach backend:", error);
-        showError("loginError", "Server konnte nicht erreicht werden");
-    }
+		if (response.status === 500) {
+			showError("loginError", "Interner Serverfehler.");
+			return;
+		}
+
+		console.error("Unexpected status:", response.status);
+		showError("loginError", "Ein unbekannter Fehler ist aufgetreten.");
+	} catch (error) {
+		console.error("Could not reach backend:", error);
+		showError("loginError", "Server konnte nicht erreicht werden");
+	}
 }
 
 async function sendLogin(): Promise<void> {
-    const email = emailInput.value;
-    const password = passwordInput.value;
+	const email = emailInput.value;
+	const password = passwordInput.value;
 
-    try {
-        const response = await fetch("https://api.mtbespannung.de/loginUser", {
-            method: "POST",
+	try {
+		const response = await fetch("https://api.mtbespannung.de/loginUser", {
+			method: "POST",
 
-            headers: {
-                "Content-Type": "application/json",
-            },
+			headers: {
+				"Content-Type": "application/json"
+			},
 
-            body: JSON.stringify({
-                email: email,
-                password: password,
-            }),
-        });
+			body: JSON.stringify({
+				email: email,
+				password: password
+			})
+		});
 
-        if (response.ok) {
-            const data = await response.json();
+		if (response.ok) {
+			const data = await response.json();
 
-            console.log("Login successful!");
+			console.log("Login successful!");
 
-            localStorage.setItem("token", data.token);
+			localStorage.setItem("token", data.token);
 
-            window.location.replace("/src/pages/main.html");
-        } else {
-            console.log("Login failed!");
+			window.location.replace("/src/pages/main.html");
+		} else {
+			console.log("Login failed!");
 
-            showError("loginError", "Login fehlgeschlagen");
-        }
-    } catch (error) {
-        console.error("Backend could not be reached:", error);
+			showError("loginError", "Login fehlgeschlagen");
+		}
+	} catch (error) {
+		console.error("Backend could not be reached:", error);
 
-        showError("loginError", "Server konnte nicht erreicht werden");
-    }
+		showError("loginError", "Server konnte nicht erreicht werden");
+	}
 }

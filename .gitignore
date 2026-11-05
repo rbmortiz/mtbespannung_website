@@ -1,2 +1,4 @@
 .env
 .vscode
+docker-compose-local.yaml
+runlocalserver.sh

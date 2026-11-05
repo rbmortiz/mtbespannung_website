@@ -53,6 +53,7 @@ public class MainVerticle extends VerticleBase {
     router.route().handler(
         CorsHandler.create()
             .addOrigin("https://mtbespannung.de")
+            .addOrigin("https://www.mtbespannung.de")
             .allowedMethod(HttpMethod.GET)
             .allowedMethod(HttpMethod.POST)
             .allowedMethod(HttpMethod.PUT)

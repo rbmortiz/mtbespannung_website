@@ -1,5 +1,6 @@
 package com.stringingbackend.backend.accounts;
 
+import com.sanctionco.jmail.JMail;
 import com.stringingbackend.backend.accounts.tools.Hashing;
 
 import io.vertx.core.Future;
@@ -32,6 +33,11 @@ public class RegisterService {
         if (email == null || email.isBlank() || firstName == null || firstName.isBlank() || lastName == null || lastName.isBlank() || password == null || password.isBlank()) {
             System.err.println("[RegisterService] (400) registerUser failed");
             return Future.succeededFuture(new JsonObject().put("statusCode", 400));
+        }
+
+        if(JMail.isInvalid(email)){
+            System.out.println("[RegisterService] (422) registerUser failed");
+            return Future.succeededFuture(new JsonObject().put("statusCode", 422));
         }
 
         return accountRepository.isAccountFree(email)
