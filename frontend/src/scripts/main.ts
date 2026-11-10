@@ -1,17 +1,19 @@
 import {
-    manageNavBarLinks,
-    setFirstName,
-    initRacketBackground,
+	manageNavBarLinks,
+	setFirstName,
+	initRacketBackground,
+	redirectIfNoToken
 } from "./helpers/HelperFunctions";
 
 if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", init);
+	document.addEventListener("DOMContentLoaded", init);
 } else {
-    init();
+	init();
 }
 
 async function init(): Promise<void> {
-    manageNavBarLinks();
-    initRacketBackground();
-    await setFirstName();
+	manageNavBarLinks();
+	initRacketBackground();
+	redirectIfNoToken();
+	await setFirstName();
 }
